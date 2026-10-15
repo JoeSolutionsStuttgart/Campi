@@ -61,6 +61,10 @@ a{color:inherit}
 .btn-link{background:none;border:0;padding:4px 2px;min-height:36px;color:var(--ink2);font-weight:700;font-size:14px;text-decoration:underline;text-underline-offset:3px}
 .btn-danger{background:none;border:1px solid var(--border);color:var(--crit-ink);min-height:36px;padding:0 12px;border-radius:10px;font-weight:700;font-size:13px}
 .btn-danger.armed{background:var(--crit);border-color:var(--crit);color:#fff}
+.btn-crit{background:var(--crit);color:#fff}
+.dialog{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(480px, calc(100% - 32px));max-height:calc(100% - 32px);overflow-y:auto;background:var(--surface);border-radius:18px;padding:22px;z-index:41;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.dialog h2{font-size:19px;line-height:1.3}
+.dsum{margin:12px 0 4px;font-weight:700;font-size:15px}
 .btn-sm{min-height:34px;padding:0 11px;font-size:13px;border-radius:9px}
 
 .card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:20px}
@@ -402,6 +406,7 @@ async function loadData(){
     S.data.v2 = interviews !== null;
     sessionStarts(S.data);
     S.loadedAt = new Date();
+    loadDelState();
   } catch(e){ S.error = 'Die Daten konnten nicht geladen werden: ' + e.message; }
   S.loading = false; render();
 }
@@ -630,7 +635,7 @@ function viewSurvey(v){
   let html = '<div class="stack">';
   qs.forEach((q, i) => {
     const a = answersFor(v, q);
-    html += card((i + 1) + '. ' + q.frage, typName[q.typ] + (q.aktiv ? '' : ' · zurzeit nicht aktiv') + (q.schluessel ? ' · Schlüssel: ' + q.schluessel : ''), questionStats(q, a, completed));
+    html += card((i + 1) + '. ' + q.frage, typName[q.typ] + (q.aktiv ? '' : ' · zurzeit nicht aktiv') + (q.schluessel ? ' · Schlüssel: ' + q.schluessel : '') + (h2aQuestions(v).some(x => x.id === q.id) ? ' · zählt für H2a' : ''), questionStats(q, a, completed));
   });
   const known = new Set(qs.map(q => q.id));
   const orphans = v.ans.filter(a => !a.frage_id || !known.has(a.frage_id));
@@ -653,7 +658,7 @@ function viewQuestions(){
     const n = ansCount(q.id);
     html += '<div class="q-row' + (q.aktiv ? '' : ' off') + '"><span class="q-num">' + (i + 1) + '</span><div class="q-text"><b>' + esc(q.frage) + '</b><div class="q-meta"><span class="pill">' + typName[q.typ] + '</span>' +
       (q.pflicht ? '<span class="pill">Pflicht</span>' : '<span class="pill">freiwillig</span>') + (q.aktiv ? '' : '<span class="pill">nicht aktiv</span>') +
-      (q.schluessel === 'installieren' ? '<span class="pill key">zählt für H2a</span>' : '') + (q.uebersetzungen && Object.keys(q.uebersetzungen).length ? '<span class="pill">übersetzt: ' + Object.keys(q.uebersetzungen).map(x => x.toUpperCase()).join(' ') + '</span>' : '') + '<span class="pill">' + n + ' Antworten</span></div></div>' +
+      (h2aQuestions({fragen: S.data.fragen}).some(x => x.id === q.id) ? '<span class="pill key">zählt für H2a</span>' : '') + (q.uebersetzungen && Object.keys(q.uebersetzungen).length ? '<span class="pill">übersetzt: ' + Object.keys(q.uebersetzungen).map(x => x.toUpperCase()).join(' ') + '</span>' : '') + '<span class="pill">' + n + ' Antworten</span></div></div>' +
       '<div class="q-act"><button class="icon-btn" type="button" data-a="q-up" data-id="' + q.id + '" aria-label="Nach oben"' + (i === 0 || S.busy ? ' disabled' : '') + '>' + icon('up') + '</button>' +
       '<button class="icon-btn" type="button" data-a="q-down" data-id="' + q.id + '" aria-label="Nach unten"' + (i === qs.length - 1 || S.busy ? ' disabled' : '') + '>' + icon('down') + '</button>' +
       '<button class="btn btn-2 btn-sm" type="button" data-a="q-toggle" data-id="' + q.id + '"' + (S.busy ? ' disabled' : '') + '>' + (q.aktiv ? 'Deaktivieren' : 'Aktivieren') + '</button>' +
@@ -676,6 +681,7 @@ function editorHTML(){
     (e.typ === 'skala' ? '<div class="row2"><div class="field"><label for="q-min">Beschriftung für 1</label><input class="input" id="q-min" name="skala_min" maxlength="60" value="' + esc(e.skala_min) + '" placeholder="gar nicht"></div>' +
       '<div class="field"><label for="q-max">Beschriftung für 5</label><input class="input" id="q-max" name="skala_max" maxlength="60" value="' + esc(e.skala_max) + '" placeholder="voll und ganz"></div></div>' : '') +
     (S.data && S.data.v2 ? trEditorHTML(e) : '<p class="note" style="margin-top:12px">Übersetzungen der Fragen sind möglich, sobald die neue Version von supabase-setup.sql ausgeführt wurde.</p>') +
+    h2aEditorHTML(e) +
     '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:16px"><label class="check"><input type="checkbox" name="pflicht"' + (e.pflicht ? ' checked' : '') + '>Pflichtfrage</label><label class="check"><input type="checkbox" name="aktiv"' + (e.aktiv ? ' checked' : '') + '>Aktiv (wird im Test gezeigt)</label></div>' +
     (S.editError ? '<p class="err-text" role="alert" style="margin-top:12px">' + esc(S.editError) + '</p>' : '') +
     '<div class="editor-actions"><button class="btn" type="submit"' + (S.busy ? ' disabled' : '') + '>' + (S.busy ? 'Wird gespeichert …' : 'Speichern') + '</button><button class="btn-link" type="button" data-a="q-cancel">Abbrechen</button></div></form>';
@@ -685,12 +691,13 @@ function viewData(v){
   let html = card('Export', 'CSV-Dateien für Excel oder Numbers, mit Semikolon getrennt, gefiltert wie oben',
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-2" type="button" data-a="csv-sess">' + icon('down2') + 'Teilnahmen mit Ergebnissen und Antworten</button>' +
     '<button class="btn btn-2" type="button" data-a="csv-ev">' + icon('down2') + 'Alle Ereignisse</button><button class="btn btn-2" type="button" data-a="csv-ans">' + icon('down2') + 'Alle Antworten</button></div>');
-  html += '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Teilnahmen</h2><p class="sub">' + v.sess.length + ' Teilnahmen' + (v.sess.length > 300 ? ', die neuesten 300' : '') + '. Eigene Probeläufe kannst du hier löschen.</p></div></div>' +
+  html += viewDelete();
+  html += '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Teilnahmen</h2><p class="sub">' + v.sess.length + ' Teilnahmen' + (v.sess.length > 300 ? ', die neuesten 300' : '') + '. Einzelne Teilnahmen (z. B. eigene Probeläufe) löschst du hier, mit dem Lösch-Kennwort.</p></div></div>' +
     (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Zeit</th><th>Art</th><th>Gerät</th><th>System · Browser</th><th>Sprache</th><th>Gruppe</th><th>Semester</th><th>Fertig</th><th class="num">Dauer</th><th class="num">A1</th><th class="num">Vertrauen</th><th class="num">Ereignisse</th><th></th></tr></thead><tbody>' +
       rows.map(s => { const r = v.resBy[s.id]; const evn = (v.evBy[s.id] || []).length;
         return '<tr><td>' + esc(dt(new Date(s._start).toISOString())) + '</td><td>' + (isPilot(s) ? 'Pilot' : 'Test') + '</td><td>' + esc(s.geraet || '') + '</td><td>' + esc((s.betriebssystem || '') + ' · ' + (s.browser || '')) + '</td><td>' + esc((s.sprache_app || '').toUpperCase()) + '</td><td>' + esc(s.gruppe || '') + '</td><td>' + esc(s.semester || '') + '</td>' +
           '<td>' + (r ? 'ja' : 'nein') + '</td><td class="num">' + (r ? dur(Number(r.dauer_sekunden)) : '–') + '</td><td class="num">' + (r ? (r.a1_ergebnis === 'gefunden' ? nf(Number(r.a1_sekunden)) + ' s' : 'aufgegeben') : '–') + '</td><td class="num">' + (r && r.a2_vertrauen !== null ? r.a2_vertrauen : '–') + '</td><td class="num">' + evn + '</td>' +
-          '<td><div style="display:flex;gap:6px"><button class="btn btn-2 btn-sm" type="button" data-a="person" data-id="' + (isPilot(s) && s.pilot_id ? 'P:' + s.pilot_id : 'S:' + s.id) + '">Zeitleiste</button><button class="btn-danger' + (S.armed === 's:' + s.id ? ' armed' : '') + '" type="button" data-a="s-del" data-id="' + s.id + '">' + (S.armed === 's:' + s.id ? 'Wirklich?' : 'Löschen') + '</button></div></td></tr>'; }).join('') +
+          '<td><div style="display:flex;gap:6px"><button class="btn btn-2 btn-sm" type="button" data-a="person" data-id="' + (isPilot(s) && s.pilot_id ? 'P:' + s.pilot_id : 'S:' + s.id) + '">Zeitleiste</button><button class="btn-danger" type="button" data-a="s-del" data-id="' + s.id + '">Löschen</button></div></td></tr>'; }).join('') +
       '</tbody></table></div>' : empty()) + '</section>';
   return html;
 }
@@ -735,7 +742,7 @@ function exportSessions(v){
 
 
 /* ================= Erweiterung: Hypothesen H1a/H1b/H2a/H2b, Interviews, Pilot, Personen, Orte ================= */
-const ESS = {"campus":{"SM":{"name":"Campus Esslingen Stadtmitte","short":"Stadtmitte","center":[48.73818,9.310455],"zoom":17,"addr":"Kanalstraße 33, 73728 Esslingen am Neckar","street":"Kanalstraße 33","plz":"73728","city":"Esslingen am Neckar","plan":false,"groups":null,"parts":null},"FL":{"name":"Campus Esslingen Flandernstraße","short":"Flandernstraße","center":[48.74498,9.321454],"zoom":17,"addr":"Flandernstraße 101, 73732 Esslingen am Neckar","street":"Flandernstraße 101","plz":"73732","city":"Esslingen am Neckar","plan":true,"groups":{"1":{"addr":"Flandernstraße 101","parts":"A–E"},"2":{"addr":"Flandernstraße 103","parts":"F–H"},"3":{"addr":"Flandernstraße 107","parts":"J"}},"parts":{"A":"1","B":"1","C":"1","D":"1","E":"1","F":"2","G":"2","H":"2","J":"3"}},"GP":{"name":"Campus Göppingen","short":"Göppingen","center":[48.697089,9.656403],"zoom":17,"addr":"Robert-Bosch-Straße 1, 73037 Göppingen","street":"Robert-Bosch-Straße 1","plz":"73037","city":"Göppingen","plan":false,"groups":null,"parts":null}},"orte":[{"id":"SM:b:1","campus":"SM","label":"Gebäude 1","addr":"Kanalstraße 33","ll":[48.738,9.311],"est":true},{"id":"SM:b:2","campus":"SM","label":"Gebäude 2","addr":"Mühlstraße 1","ll":[48.738449,9.310183],"est":true},{"id":"SM:b:3","campus":"SM","label":"Gebäude 3","addr":"Mühlstraße 5","ll":[48.738629,9.310591],"est":true},{"id":"SM:b:4","campus":"SM","label":"Gebäude 4","addr":"Mühlstraße 5","ll":[48.738674,9.310728],"est":true},{"id":"SM:b:5","campus":"SM","label":"Gebäude 5","addr":"Mühlstraße 7","ll":[48.738791,9.310864],"est":true},{"id":"SM:b:6","campus":"SM","label":"Gebäude 6","addr":"Obertorstraße 16","ll":[48.738808,9.309365],"est":true},{"id":"SM:b:7","campus":"SM","label":"Gebäude 7","addr":"Mühlstraße 3","ll":[48.738539,9.310387],"est":true},{"id":"SM:b:8","campus":"SM","label":"Gebäude 8","addr":"Mühlstraße 9","ll":[48.738898,9.311136],"est":true},{"id":"SM:b:9","campus":"SM","label":"Gebäude 9","addr":"Kanalstraße 31","ll":[48.73791,9.310523],"est":true},{"id":"SM:b:10","campus":"SM","label":"Gebäude 10","addr":"Kanalstraße 29","ll":[48.737865,9.310047],"est":true},{"id":"SM:b:12","campus":"SM","label":"Gebäude 12","addr":"Neckarstraße 67","ll":[48.737371,9.311545],"est":true},{"id":"SM:b:13","campus":"SM","label":"Gebäude 13","addr":"Neckarstraße 63","ll":[48.737281,9.311],"est":true},{"id":"SM:b:14","campus":"SM","label":"Gebäude 14","addr":"Neckarstraße 65/1","ll":[48.737461,9.311272],"est":true},{"id":"SM:b:15","campus":"SM","label":"Gebäude 15","addr":"Mühlstraße 16","ll":[48.739078,9.311409],"est":true},{"id":"SM:b:16","campus":"SM","label":"Gebäude 16","addr":"Kanalstraße 27","ll":[48.73782,9.30957],"est":true},{"id":"SM:b:17","campus":"SM","label":"Gebäude 17","addr":"Kanalstraße 12/1","ll":[48.737461,9.308821],"est":true},{"id":"SM:b:18","campus":"SM","label":"Gebäude 18","addr":"Neckarstraße 71","ll":[48.737461,9.31209],"est":true},{"id":"SM:b:19","campus":"SM","label":"Gebäude 19","addr":"Kiesstraße 6","ll":[48.738269,9.312635],"est":true},{"id":"SM:s:BF","campus":"SM","label":"Start: Bahnhof","addr":"","ll":[48.73861,9.3],"est":true},{"id":"SM:s:G1","campus":"SM","label":"Start: Gebäude 1","addr":"","ll":[48.738,9.311],"est":true},{"id":"FL:b:A","campus":"FL","label":"Bauteil A (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.744984,9.320821],"est":true},{"id":"FL:b:B","campus":"FL","label":"Bauteil B (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.74515,9.321189],"est":true},{"id":"FL:b:C","campus":"FL","label":"Bauteil C (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.74484,9.320617],"est":true},{"id":"FL:b:D","campus":"FL","label":"Bauteil D (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.745155,9.320617],"est":true},{"id":"FL:b:E","campus":"FL","label":"Bauteil E (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.745474,9.320365],"est":true},{"id":"FL:b:F","campus":"FL","label":"Bauteil F (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.744863,9.321604],"est":true},{"id":"FL:b:G","campus":"FL","label":"Bauteil G (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.745173,9.321843],"est":true},{"id":"FL:b:H","campus":"FL","label":"Bauteil H (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.745447,9.321393],"est":true},{"id":"FL:b:J","campus":"FL","label":"Bauteil J (Gebäude 3)","addr":"Flandernstraße 107","ll":[48.74467,9.32217],"est":true},{"id":"FL:s:B105","campus":"FL","label":"Start: Bus 105","addr":"","ll":[48.744414,9.321237],"est":true},{"id":"FL:s:B111N","campus":"FL","label":"Start: Bus 111 Nord","addr":"","ll":[48.745734,9.322033],"est":true},{"id":"FL:s:B111S","campus":"FL","label":"Start: Bus 111 Süd","addr":"","ll":[48.744414,9.322878],"est":true},{"id":"FL:s:PH","campus":"FL","label":"Start: Parkhaus","addr":"","ll":[48.74484,9.320262],"est":true},{"id":"GP:b:1","campus":"GP","label":"Gebäude 1","addr":"Robert-Bosch-Straße 1","ll":[48.696999,9.656131],"est":false},{"id":"GP:b:2","campus":"GP","label":"Gebäude 2","addr":"Robert-Bosch-Straße 4","ll":[48.697358,9.657084],"est":true},{"id":"GP:b:3","campus":"GP","label":"Gebäude 3","addr":"Robert-Bosch-Straße 3","ll":[48.696595,9.656948],"est":true},{"id":"GP:b:4","campus":"GP","label":"Gebäude 4","addr":"Robert-Bosch-Straße 2","ll":[48.697403,9.655382],"est":true},{"id":"GP:b:5","campus":"GP","label":"Gebäude 5","addr":"Heinrich-Landerer-Straße 53","ll":[48.698346,9.658989],"est":true},{"id":"GP:s:G1","campus":"GP","label":"Start: Gebäude 1","addr":"","ll":[48.696999,9.656131],"est":true},{"id":"GP:s:G4","campus":"GP","label":"Start: Bibliothek","addr":"","ll":[48.697403,9.655382],"est":true}],"t1":{"SM":"09.203","FL":"02.115","GP":"02.105"},"rooms":{"SM-01105":"01.105","SM-08101":"08.101","SM-09203":"09.203","SM-13012":"13.012","SM-SSV":"01.010","SM-PA":"01.014","SM-IC":"17.010","SM-SB":"17.105","SM-CC":"17.110","SM-MENSA":"Mensa Stadtmitte","SM-RZ":"07.010","SM-ASTA":"08.005","SM-BIB":"05.007","FL-01203":"01.203","FL-01112":"01.112","FL-01004":"01.004","FL-02102":"02.102","FL-02115":"02.115","FL-02010":"02.010","FL-IT":"01.002","FL-BIB":"Bibliothek","FL-MENSA":"Mensa Flandernstraße","GP-05012":"05.012","GP-02012":"02.012","GP-02105":"02.105","GP-AULA":"Aula","GP-BIB":"Bibliothek","GP-SSV":"Student Services","GP-RZ":"Rechenzentrum","GP-CAF":"Cafeteria Göppingen","GP-CAFE":"Café Campus (AStA)","GP-ASTA":"AStA (Studierendenvertretung)"}};
+const ESS = {"campus":{"SM":{"name":"Campus Esslingen Stadtmitte","short":"Stadtmitte","center":[48.739,9.311045],"zoom":17,"addr":"Kanalstraße 33, 73728 Esslingen am Neckar","street":"Kanalstraße 33","plz":"73728","city":"Esslingen am Neckar","plan":false,"groups":null,"parts":null},"FL":{"name":"Campus Esslingen Flandernstraße","short":"Flandernstraße","center":[48.744855,9.32315],"zoom":17,"addr":"Flandernstraße 101, 73732 Esslingen am Neckar","street":"Flandernstraße 101","plz":"73732","city":"Esslingen am Neckar","plan":true,"groups":{"1":{"addr":"Flandernstraße 101","parts":"A–E"},"2":{"addr":"Flandernstraße 103","parts":"F–H"},"3":{"addr":"Flandernstraße 107","parts":"J"}},"parts":{"A":"1","B":"1","C":"1","D":"1","E":"1","F":"2","G":"2","H":"2","J":"3"}},"GP":{"name":"Campus Göppingen","short":"Göppingen","center":[48.697089,9.656403],"zoom":17,"addr":"Robert-Bosch-Straße 1, 73037 Göppingen","street":"Robert-Bosch-Straße 1","plz":"73037","city":"Göppingen","plan":false,"groups":null,"parts":null}},"orte":[{"id":"SM:b:1","campus":"SM","label":"Gebäude 1","addr":"Kanalstraße 33","ll":[48.73882,9.31159],"est":true},{"id":"SM:b:2","campus":"SM","label":"Gebäude 2","addr":"Mühlstraße 1","ll":[48.739269,9.310773],"est":true},{"id":"SM:b:3","campus":"SM","label":"Gebäude 3","addr":"Mühlstraße 5","ll":[48.739449,9.311181],"est":true},{"id":"SM:b:4","campus":"SM","label":"Gebäude 4","addr":"Mühlstraße 5","ll":[48.739494,9.311318],"est":true},{"id":"SM:b:5","campus":"SM","label":"Gebäude 5","addr":"Mühlstraße 7","ll":[48.739611,9.311454],"est":true},{"id":"SM:b:6","campus":"SM","label":"Gebäude 6","addr":"Obertorstraße 16","ll":[48.739628,9.309955],"est":true},{"id":"SM:b:7","campus":"SM","label":"Gebäude 7","addr":"Mühlstraße 3","ll":[48.739359,9.310977],"est":true},{"id":"SM:b:8","campus":"SM","label":"Gebäude 8","addr":"Mühlstraße 9","ll":[48.739718,9.311726],"est":true},{"id":"SM:b:9","campus":"SM","label":"Gebäude 9","addr":"Kanalstraße 31","ll":[48.73873,9.311113],"est":true},{"id":"SM:b:10","campus":"SM","label":"Gebäude 10","addr":"Kanalstraße 29","ll":[48.738685,9.310637],"est":true},{"id":"SM:b:12","campus":"SM","label":"Gebäude 12","addr":"Neckarstraße 67","ll":[48.738191,9.312135],"est":true},{"id":"SM:b:13","campus":"SM","label":"Gebäude 13","addr":"Neckarstraße 63","ll":[48.738101,9.31159],"est":true},{"id":"SM:b:14","campus":"SM","label":"Gebäude 14","addr":"Neckarstraße 65/1","ll":[48.738281,9.311862],"est":true},{"id":"SM:b:15","campus":"SM","label":"Gebäude 15","addr":"Mühlstraße 16","ll":[48.739898,9.311999],"est":true},{"id":"SM:b:16","campus":"SM","label":"Gebäude 16","addr":"Kanalstraße 27","ll":[48.73864,9.31016],"est":false},{"id":"SM:b:17","campus":"SM","label":"Gebäude 17","addr":"Kanalstraße 12/1","ll":[48.738281,9.309411],"est":true},{"id":"SM:b:18","campus":"SM","label":"Gebäude 18","addr":"Neckarstraße 71","ll":[48.738281,9.31268],"est":true},{"id":"SM:b:19","campus":"SM","label":"Gebäude 19","addr":"Kiesstraße 6","ll":[48.739089,9.313225],"est":true},{"id":"SM:s:BF","campus":"SM","label":"Start: Bahnhof","addr":"","ll":[48.73861,9.3],"est":true},{"id":"SM:s:G1","campus":"SM","label":"Start: Gebäude 1","addr":"","ll":[48.73882,9.31159],"est":true},{"id":"FL:b:A","campus":"FL","label":"Bauteil A (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.744859,9.322517],"est":true},{"id":"FL:b:B","campus":"FL","label":"Bauteil B (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.745025,9.322885],"est":true},{"id":"FL:b:C","campus":"FL","label":"Bauteil C (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.744715,9.322313],"est":true},{"id":"FL:b:D","campus":"FL","label":"Bauteil D (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.74503,9.322313],"est":true},{"id":"FL:b:E","campus":"FL","label":"Bauteil E (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.745349,9.322061],"est":true},{"id":"FL:b:F","campus":"FL","label":"Bauteil F (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.744738,9.3233],"est":true},{"id":"FL:b:G","campus":"FL","label":"Bauteil G (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.745048,9.323539],"est":true},{"id":"FL:b:H","campus":"FL","label":"Bauteil H (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.745322,9.323089],"est":true},{"id":"FL:b:J","campus":"FL","label":"Bauteil J (Gebäude 3)","addr":"Flandernstraße 107","ll":[48.744545,9.323866],"est":false},{"id":"FL:s:B105","campus":"FL","label":"Start: Bus 105","addr":"","ll":[48.744289,9.322933],"est":true},{"id":"FL:s:B111N","campus":"FL","label":"Start: Bus 111 Nord","addr":"","ll":[48.745609,9.323729],"est":true},{"id":"FL:s:B111S","campus":"FL","label":"Start: Bus 111 Süd","addr":"","ll":[48.744289,9.324574],"est":true},{"id":"FL:s:PH","campus":"FL","label":"Start: Parkhaus","addr":"","ll":[48.744715,9.321958],"est":true},{"id":"GP:b:1","campus":"GP","label":"Gebäude 1","addr":"Robert-Bosch-Straße 1","ll":[48.696999,9.656131],"est":false},{"id":"GP:b:2","campus":"GP","label":"Gebäude 2","addr":"Robert-Bosch-Straße 4","ll":[48.697358,9.657084],"est":true},{"id":"GP:b:3","campus":"GP","label":"Gebäude 3","addr":"Robert-Bosch-Straße 3","ll":[48.696595,9.656948],"est":true},{"id":"GP:b:4","campus":"GP","label":"Gebäude 4","addr":"Robert-Bosch-Straße 2","ll":[48.697403,9.655382],"est":true},{"id":"GP:b:5","campus":"GP","label":"Gebäude 5","addr":"Heinrich-Landerer-Straße 53","ll":[48.698346,9.658989],"est":true},{"id":"GP:s:G1","campus":"GP","label":"Start: Gebäude 1","addr":"","ll":[48.696999,9.656131],"est":true},{"id":"GP:s:G4","campus":"GP","label":"Start: Bibliothek","addr":"","ll":[48.697403,9.655382],"est":true}],"t1":{"SM":"S 09.203","FL":"F 02.115","GP":"G 02.105"},"rooms":{"SM-01105":"S 01.105","SM-08101":"S 08.101","SM-09203":"S 09.203","SM-13012":"S 13.012","SM-SSV":"S 01.010","SM-PA":"S 01.014","SM-IC":"S 17.010","SM-SB":"S 17.105","SM-CC":"S 17.110","SM-MENSA":"Mensa Stadtmitte","SM-RZ":"S 07.010","SM-ASTA":"S 08.005","SM-BIB":"S 05.007","FL-01203":"F 01.203","FL-01112":"F 01.112","FL-01004":"F 01.004","FL-02102":"F 02.102","FL-02115":"F 02.115","FL-02010":"F 02.010","FL-IT":"F 01.002","FL-BIB":"Bibliothek","FL-MENSA":"Mensa Flandernstraße","GP-05012":"G 05.012","GP-02012":"G 02.012","GP-02105":"G 02.105","GP-AULA":"Aula","GP-BIB":"Bibliothek","GP-SSV":"Student Services","GP-RZ":"Rechenzentrum","GP-CAF":"Cafeteria Göppingen","GP-CAFE":"Café Campus (AStA)","GP-ASTA":"AStA (Studierendenvertretung)"}};
 const HYP = {h1a:{n:15, t:60}, h1b:{n:15, t:50}, h2a:{t:30}, h2b:{t:30}};
 const CAMPUS_NAME = {SM:'Stadtmitte', FL:'Flandernstraße', GP:'Göppingen', andere:'Woanders'};
 const LANG_NAME = {de:'Deutsch', en:'Englisch', es:'Spanisch', it:'Italienisch', fr:'Französisch', tr:'Türkisch'};
@@ -810,15 +817,72 @@ function h2b(users){
   const runningYes = running.filter(u => u.week[1] >= 3).length;
   return {n: done.length, yes: yes.length, value: pct(yes.length, done.length), running: running.length, runningYes, target: HYP.h2b.t};
 }
+/* ---------- Fragen den Hypothesen zuordnen ----------
+   fragen.wertung = {"hypothese": "h2a", "ja": [Antworten, die als Zustimmung zählen]} oder bei Skalen {"hypothese": "h2a", "ab": 4}.
+   So kann die Frage anders formuliert oder durch eine neue ersetzt werden und zählt trotzdem für H2a. */
+const H2A_DEFAULT = {hypothese: 'h2a', ja: ['Ja, sicher', 'Eher ja']};
+function isH2a(q){ return !!(q && q.wertung && q.wertung.hypothese === 'h2a'); }
+function h2aQuestions(v){
+  const qs = v.fragen.filter(q => isH2a(q) && q.typ !== 'text');
+  if(qs.length) return qs;
+  /* Datenbank ohne Wertung (Version 2): die Frage mit dem Schlüssel "installieren" */
+  const qi = v.fragen.some(q => 'wertung' in q && q.wertung) ? null : questionByKey(v, 'installieren');
+  return qi ? [Object.assign({}, qi, {wertung: H2A_DEFAULT})] : [];
+}
+function h2aYes(q, wert){
+  const w = q.wertung || {};
+  if(q.typ === 'skala') return Number(wert) >= Number(w.ab || 4);
+  const ja = new Set((w.ja || []).map(String));
+  return [].concat(wert).some(x => ja.has(String(x)));
+}
+function h2aEditorHTML(e){
+  if(!(S.data && (S.data.fragen.some(q => 'wertung' in q) || S.del.v3))) return '';
+  const choice = e.typ === 'einfach' || e.typ === 'mehrfach';
+  let inner = '';
+  if(e.h2a && choice) inner = '<div id="q-h2a-opts">' + h2aOptsHTML(e) + '</div>';
+  if(e.h2a && e.typ === 'skala') inner = '<div class="field"><label for="q-h2a-ab">Zählt als Zustimmung ab</label><select class="input" id="q-h2a-ab" name="h2a_ab" style="max-width:220px">' +
+    [3, 4, 5].map(k => '<option value="' + k + '"' + (Number(e.h2aAb || 4) === k ? ' selected' : '') + '>' + k + (k < 5 ? ' oder höher' : '') + '</option>').join('') + '</select></div>';
+  if(e.h2a && e.typ === 'text') inner = '<p class="note">Freitext kann nicht automatisch gewertet werden. Wähle Einfach- oder Mehrfachauswahl oder eine Skala.</p>';
+  return '<fieldset class="field h2a-box"><legend class="flabel">Auswertung</legend><label class="check"><input type="checkbox" name="h2a" data-a-change="h2a"' + (e.h2a ? ' checked' : '') + '>Zählt für H2a: Studierende würden Campi installieren</label>' +
+    '<p class="note">So zählt die Frage für H2a, auch wenn du sie anders formulierst oder durch eine neue Frage ersetzt. Mehrere Fragen können zählen; eine Person zählt dann als Zustimmung, wenn sie bei einer davon zustimmt.</p>' + inner + '</fieldset>';
+}
+function h2aOptsHTML(e){
+  const opts = Array.from(new Set(String(e.optionen || '').split('\n').map(x => x.trim()).filter(Boolean)));
+  if(!opts.length) return '<p class="note">Trage oben die Antwortmöglichkeiten ein. Danach wählst du hier, welche als Zustimmung zählen.</p>';
+  const ja = new Set(e.h2aJa || []);
+  return '<p class="flabel" style="margin-top:10px">Diese Antworten zählen als Zustimmung</p><div style="display:flex;gap:8px 18px;flex-wrap:wrap">' +
+    opts.map(o => '<label class="check"><input type="checkbox" name="h2a_ja" value="' + esc(o) + '"' + (ja.has(o) ? ' checked' : '') + '>' + esc(o) + '</label>').join('') + '</div>';
+}
+document.addEventListener('input', e => {
+  if(e.target.id !== 'q-opt' || !S.edit || !S.edit.h2a) return;
+  const box = $('q-h2a-opts'); if(!box) return;
+  S.edit.h2aJa = Array.from(box.querySelectorAll('input[name="h2a_ja"]:checked')).map(x => x.value);
+  S.edit.optionen = e.target.value; box.innerHTML = h2aOptsHTML(S.edit);
+});
+document.addEventListener('change', e => {
+  if(e.target.name !== 'h2a' || !S.edit || !e.target.form) return;
+  readEditor(e.target.form);
+  if(S.edit.h2a && !(S.edit.h2aJa || []).length){
+    const opts = String(S.edit.optionen || '').split('\n').map(x => x.trim());
+    S.edit.h2aJa = opts.filter(o => /^(ja|eher ja|yes)\b/i.test(o));
+  }
+  render(); const c = document.querySelector('input[name="h2a"]'); if(c) c.focus();
+});
+
 function businessHyps(v){
   const d = S.data, iv = d.interviews || [];
   const a = interviewHyp(iv.filter(x => x.art === 'hochschule'), x => x.zahlungsbereit === 'ja' || x.zahlungsbereit === 'eher ja', HYP.h1a);
   const b = interviewHyp(iv.filter(x => x.art === 'servicestelle'), x => Number(x.radar_nuetzlich) >= 4, HYP.h1b);
-  const qi = questionByKey(v, 'installieren');
+  /* H2a: alle Fragen, die im Fragenkatalog H2a zugeordnet sind. Eine Person zählt als Zustimmung,
+     wenn mindestens eine ihrer Antworten auf diese Fragen als Zustimmung gilt. */
+  const q2a = h2aQuestions(v);
   const testIds = new Set(v.sess.filter(isTest).map(s => s.id));
-  const ans = qi ? answersFor(v, qi).filter(x => testIds.has(x.sitzung_id)) : [];
-  const yes2a = ans.filter(x => x.wert === 'Ja, sicher' || x.wert === 'Eher ja').length;
-  const c = {n: ans.length, yes: yes2a, value: pct(yes2a, ans.length), target: HYP.h2a.t, missing: !qi};
+  const per = new Map();
+  q2a.forEach(q => answersFor(v, q).forEach(x => { if(testIds.has(x.sitzung_id)) per.set(x.sitzung_id, per.get(x.sitzung_id) || h2aYes(q, x.wert)); }));
+  const yes2a = [...per.values()].filter(Boolean).length;
+  const c = {n: per.size, yes: yes2a, value: pct(yes2a, per.size), target: HYP.h2a.t, missing: !q2a.length};
+  const jaText = q2a.length === 1 && q2a[0].typ !== 'skala' ? ' (' + (q2a[0].wertung.ja || []).map(o => '„' + o + '“').join(' oder ') + ')'
+    : q2a.length === 1 ? ' (' + q2a[0].wertung.ab + ' oder höher auf der Skala)' : q2a.length > 1 ? ' (Zustimmung bei einer der ' + q2a.length + ' zugeordneten Fragen)' : '';
   const e = h2b(pilotUsers(d));
   return [
     {key:'h1a', tag:'H1a · Hochschulen', title:'Hochschulen würden für die Campus-App zahlen',
@@ -828,9 +892,9 @@ function businessHyps(v){
       crit:'Bestätigt, wenn mindestens 50 % der 15 befragten Mitarbeitenden aus Servicestellen das Radar als nützlich einstufen (4 oder 5 auf der Skala).',
       value: b.value, target: b.target, yes: b.yes, n: b.n, state: b.state, foot: b.n + ' von ' + b.planned + ' Kurzinterviews · ' + b.yes + ' finden es nützlich · nötig: ' + b.need, link:'interviews'},
     {key:'h2a', tag:'H2a · Studierende', title:'Studierende würden die App herunterladen',
-      crit:'Bestätigt, wenn mindestens 30 % der Studierenden im App-Test angeben, dass sie Campi installieren würden („Ja, sicher“ oder „Eher ja“).',
+      crit:'Bestätigt, wenn mindestens 30 % der Studierenden im App-Test angeben, dass sie Campi installieren würden' + jaText + '.',
       value: c.value, target: c.target, yes: c.yes, n: c.n, state: c.missing ? 'missing' : (c.n < 10 ? 'few' : (c.value >= c.target ? 'ok' : 'fail')),
-      foot: c.missing ? 'Die Frage mit dem Schlüssel „installieren“ fehlt im Fragenkatalog.' : c.n + ' Antworten · ' + c.yes + ' würden installieren', link:'fragebogen'},
+      foot: c.missing ? 'Keine Frage ist H2a zugeordnet. Unter „Fragen bearbeiten“ bei einer Frage „Zählt für H2a“ anhaken.' : c.n + ' Antworten · ' + c.yes + ' würden installieren' + (q2a.length > 1 ? ' · aus ' + q2a.length + ' Fragen' : ''), link:'fragebogen'},
     {key:'h2b', tag:'H2b · Pilotphase', title:'Pilotnutzer öffnen die App in Woche 2 mindestens 3-mal',
       crit:'Bestätigt, wenn mindestens 30 % der Pilotnutzer die App in der zweiten Woche des 3-wöchigen Pilots noch mindestens 3-mal öffnen.',
       value: e.value, target: e.target, yes: e.yes, n: e.n, state: e.n < 5 ? (e.running ? 'running' : 'few') : (e.value >= e.target ? 'ok' : 'fail'),
@@ -908,7 +972,7 @@ function ivSection(art){
       '<tr><td>' + esc(x.datum ? new Date(x.datum + 'T12:00:00').toLocaleDateString('de-DE') : '') + '</td><td>' + esc(x.organisation || '') + '</td><td>' + esc(x.rolle || '') + '</td>' +
       '<td>' + (h1a ? esc(x.zahlungsbereit || '–') : esc(x.radar_nuetzlich || '–')) + '</td>' + (h1a ? '<td class="num">' + (x.betrag_euro ? nf(Number(x.betrag_euro), 0) : '–') + '</td>' : '<td>' + esc(x.radar_nutzen || '–') + '</td>') +
       '<td class="num">' + esc(x.problem_zustimmung || '–') + '</td><td class="wrapcell">' + esc(String(x.notizen || '').slice(0, 140)) + '</td>' +
-      '<td><div style="display:flex;gap:6px"><button class="btn btn-2 btn-sm" type="button" data-a="iv-edit" data-id="' + x.id + '"' + (S.ivEdit ? ' disabled' : '') + '>' + icon('edit') + 'Bearbeiten</button><button class="btn-danger' + (S.armed === 'iv:' + x.id ? ' armed' : '') + '" type="button" data-a="iv-del" data-id="' + x.id + '">' + (S.armed === 'iv:' + x.id ? 'Wirklich?' : 'Löschen') + '</button></div></td></tr>')).join('') +
+      '<td><div style="display:flex;gap:6px"><button class="btn btn-2 btn-sm" type="button" data-a="iv-edit" data-id="' + x.id + '"' + (S.ivEdit ? ' disabled' : '') + '>' + icon('edit') + 'Bearbeiten</button><button class="btn-danger" type="button" data-a="iv-del" data-id="' + x.id + '">Löschen</button></div></td></tr>')).join('') +
     '</tbody></table></div>' : empty('Noch keine Interviews erfasst.');
   return html + '</section>';
 }
@@ -934,11 +998,6 @@ async function saveInterview(form){
     S.ivEdit = null; S.notice = 'Interview gespeichert.';
   } catch(x){ S.ivError = 'Speichern hat nicht geklappt: ' + x.message; }
   S.busy = false; render();
-}
-async function deleteInterview(id){
-  try { await api('interviews?id=eq.' + encodeURIComponent(id), {method:'DELETE', prefer:'return=minimal'}); S.data.interviews = S.data.interviews.filter(x => x.id !== id); S.notice = 'Interview gelöscht.'; }
-  catch(x){ S.error = 'Löschen hat nicht geklappt: ' + x.message; }
-  S.armed = ''; render();
 }
 
 /* ---------- pilot ---------- */
@@ -1046,7 +1105,7 @@ function viewPersons(v){
   const sel = '<label class="flabel" for="p-sel">Person</label><select class="input" id="p-sel" data-a-change="person">' + ps.map(x => '<option value="' + esc(x.key) + '"' + (x.key === p.key ? ' selected' : '') + '>' + esc(x.label + ' · ' + x.sessions.length + (x.sessions.length === 1 ? ' Sitzung' : ' Sitzungen') + ' · ' + x.clicks + ' Klicks') + '</option>').join('') + '</select>';
   const m = p.meta;
   const pageRows = PAGE_ORDER.concat(Object.keys(p.pages).filter(k => !PAGE_ORDER.includes(k))).filter(k => p.pages[k]).map(k => ({label: PAGE_LABEL[k] || k, value: p.pages[k] / 1000}));
-  let html = '<section class="card"><div class="card-head"><div style="flex:1;min-width:240px">' + sel + '</div><button class="btn btn-2 btn-sm" type="button" data-a="csv-person">' + icon('down2') + 'Ereignisse dieser Person als CSV</button></div>' +
+  let html = '<section class="card"><div class="card-head"><div style="flex:1;min-width:240px">' + sel + '</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-2 btn-sm" type="button" data-a="csv-person">' + icon('down2') + 'Ereignisse dieser Person als CSV</button><button class="btn-danger" type="button" data-a="p-del" data-id="' + esc(p.key) + '">' + (p.pilot ? 'Alle Daten dieser Person löschen' : 'Diese Teilnahme löschen') + '</button></div></div>' +
     '<div class="mini"><div><b>' + (p.pilot ? 'Pilot' : 'App-Test') + '</b><span>' + esc(p.key.slice(2, 10)) + '</span></div><div><b>' + p.sessions.length + '</b><span>' + (p.pilot ? 'Öffnungen (Sitzungen)' : 'Sitzung') + '</span></div><div><b>' + secTxt(p.active) + '</b><span>aktive Zeit in der App</span></div><div><b>' + p.clicks + '</b><span>Klicks</span></div><div><b>' + esc((m.geraet || '–') + ' · ' + (m.betriebssystem || '')) + '</b><span>' + esc((m.browser || '') + ' · ' + (LANG_NAME[m.sprache_app] || m.sprache || '')) + '</span></div><div><b>' + esc(CAMPUS_NAME[m.standort] || '–') + '</b><span>Campus' + (m.standort_freigabe ? ' · Standort freigegeben' : '') + '</span></div></div>' +
     '<div class="grid g2"><div><h3>Zeit pro Seite</h3>' + bars(pageRows, {fmt: x => secTxt(x * 1000), empty:'Keine Seitenzeiten.'}) + '</div><div><h3>Ablauf der Seiten je Sitzung</h3>' + legendPages() +
     p.sessions.map((s, i) => '<div class="strip-row"><span>' + esc(dShort(s._start) + ' ' + hms(s._start).slice(0, 5)) + '</span>' + stripHTML(s, v.evBy[s.id] || []) + '</div>').join('') + '</div></div></section>';
@@ -1255,6 +1314,178 @@ function readTranslations(form){
   return out;
 }
 
+
+/* ---------- Löschen mit Kennwort ----------
+   Teilnahmen, Ereignisse, Antworten und Interviews lassen sich nur über die Datenbankfunktion daten_loeschen löschen.
+   Sie prüft das Lösch-Kennwort (gespeichert ist nur ein Hash) und sperrt nach 5 Fehlversuchen für 15 Minuten. */
+S.pw = null;
+S.del = {v3: null, gesetzt: null, protokoll: null, bereich: 'test', bis: '', ziel: '', fehler: '', busy: false, change: false};
+const DEL_ERR = {kennwort: 'Das Kennwort stimmt nicht.', gesperrt: 'Zu viele falsche Versuche. Löschen ist für 15 Minuten gesperrt.',
+  kein_kennwort: 'Es ist noch kein Lösch-Kennwort festgelegt.', kein_admin: 'Dieses Konto ist kein Admin.', zu_kurz: 'Das Kennwort braucht mindestens 8 Zeichen.',
+  bereich: 'Unbekannter Bereich.', ziel: 'Es fehlt, was gelöscht werden soll.'};
+const DEL_BEREICH = {test: 'Alle App-Test-Teilnahmen', pilot: 'Alle Pilot-Sitzungen', sitzungen: 'Alle Teilnahmen (App-Test und Pilot)', interviews: 'Alle Interviews',
+  alles: 'Alles: Teilnahmen und Interviews', person: 'Eine Pilotperson (Pilot-Nummer)', sitzung: 'Eine Teilnahme', interview: 'Ein Interview',
+  'kennwort gesetzt': 'Lösch-Kennwort festgelegt', 'kennwort geändert': 'Lösch-Kennwort geändert'};
+const rpc = (f, body) => api('rpc/' + f, {method: 'POST', body: body || {}});
+function delErr(x){
+  const m = (x && x.message) || String(x);
+  return /daten_loeschen|loeschkennwort|PGRST202|schema cache|could not find the function/i.test(m)
+    ? 'Die Datenbank kennt das Löschen mit Kennwort noch nicht. Führe die neue supabase-setup.sql (Version 3) im Supabase SQL Editor aus.' : m;
+}
+function anzahlText(n){
+  if(!n) return '';
+  const parts = [];
+  const add = (k, one, many) => { const x = Number(n[k]) || 0; if(x) parts.push(nf(x, 0) + ' ' + (x === 1 ? one : many)); };
+  add('sitzungen', 'Sitzung', 'Sitzungen'); add('ereignisse', 'Ereignis', 'Ereignisse'); add('antworten', 'Antwort', 'Antworten');
+  add('ergebnisse', 'Aufgaben-Ergebnis', 'Aufgaben-Ergebnisse'); add('interviews', 'Interview', 'Interviews');
+  return parts.join(' · ');
+}
+function dDate(iso){ return iso ? new Date(iso + 'T12:00:00').toLocaleDateString('de-DE') : ''; }
+async function loadDelState(){
+  try { S.del.gesetzt = (await rpc('loeschkennwort_gesetzt')) === true; S.del.v3 = true; }
+  catch(x){ S.del.v3 = false; S.del.gesetzt = null; }
+  if(S.del.v3){ try { S.del.protokoll = await api('loeschprotokoll?select=*&order=zeit.desc&limit=20'); } catch(x){ S.del.protokoll = null; } }
+  if(S.tab === 'daten' || S.pw) render();
+}
+function openDelete(bereich, ziel, bis){
+  S.armed = '';
+  const p = S.pw = {bereich, ziel: ziel || null, bis: bis || null, anzahl: null, fehler: '', busy: false, kw: ''};
+  render();
+  rpc('daten_loeschen', {kennwort: null, bereich, bis: p.bis, ziel: p.ziel, nur_zaehlen: true}).then(r => {
+    if(S.pw !== p) return;
+    if(r && r.ok){ p.anzahl = r.anzahl; if(typeof r.kennwort_gesetzt === 'boolean'){ S.del.gesetzt = r.kennwort_gesetzt; S.del.v3 = true; } }
+    else p.fehler = DEL_ERR[r && r.fehler] || 'Zählen hat nicht geklappt.';
+    render();
+  }).catch(x => { if(S.pw === p){ p.fehler = delErr(x); render(); } });
+}
+function pwDialogHTML(){
+  const p = S.pw;
+  const head = p.bereich === 'sitzung' ? 'Teilnahme löschen' : p.bereich === 'person' ? 'Alle Daten dieser Pilotperson löschen' : p.bereich === 'interview' ? 'Interview löschen'
+    : (DEL_BEREICH[p.bereich] || p.bereich) + (p.bis ? ' bis ' + dDate(p.bis) : '') + ' löschen';
+  const leer = p.anzahl && !anzahlText(p.anzahl);
+  let body;
+  if(S.del.gesetzt === false){
+    body = '<p class="sub" style="margin-top:8px">Zum Löschen brauchst du ein Lösch-Kennwort. Lege es einmalig unter <b>Daten</b> fest. Ohne dieses Kennwort kann niemand Daten löschen, auch kein anderer Admin.</p>' +
+      '<div class="editor-actions"><button class="btn" type="button" data-a="pw-goto">Kennwort festlegen</button><button class="btn-link" type="button" data-a="pw-close">Abbrechen</button></div>';
+  } else {
+    body = '<p class="dsum" id="pw-sum">' + (p.anzahl ? (leer ? 'Dazu gibt es keine Daten.' : 'Gelöscht werden: ' + esc(anzahlText(p.anzahl)) + '.') : 'Wird gezählt …') + '</p>' +
+      '<p class="sub">Das lässt sich nicht rückgängig machen.' + (['sitzung', 'interview'].includes(p.bereich) ? '' : ' Lade vorher die CSV-Dateien herunter, wenn du die Daten behalten willst.') + '</p>' +
+      '<div class="field"><label for="pw-in">Lösch-Kennwort</label><input class="input" id="pw-in" name="kennwort" type="password" autocomplete="current-password" spellcheck="false"' + (p.busy ? ' disabled' : '') + '></div>' +
+      (p.fehler ? '<p class="err-text" role="alert" style="margin-top:12px">' + esc(p.fehler) + '</p>' : '') +
+      '<div class="editor-actions"><button class="btn btn-crit" type="submit"' + (p.busy || leer ? ' disabled' : '') + '>' + (p.busy ? 'Wird gelöscht …' : 'Endgültig löschen') + '</button><button class="btn-link" type="button" data-a="pw-close">Abbrechen</button></div>';
+  }
+  return '<div class="drawer-bg" data-a="pw-close"></div><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="pw-title"><form data-form="pw-del" data-keep novalidate>' +
+    '<h2 id="pw-title">' + esc(head) + '</h2>' + body + '</form></div>';
+}
+/* after every render: keep what was typed in the password field and the focus */
+function afterRender(){
+  if(!S.pw) return;
+  const i = $('pw-in');
+  if(i){ i.value = S.pw.kw || ''; if(!S.pw.busy) i.focus(); }
+  else { const b = document.querySelector('.dialog .btn'); if(b) b.focus(); }
+}
+async function submitDelete(){
+  const p = S.pw; if(!p || p.busy) return;
+  if(!p.kw){ p.fehler = 'Bitte das Lösch-Kennwort eingeben.'; render(); return; }
+  p.busy = true; p.fehler = ''; render();
+  try {
+    const r = await rpc('daten_loeschen', {kennwort: p.kw, bereich: p.bereich, bis: p.bis, ziel: p.ziel, nur_zaehlen: false});
+    if(!r || !r.ok){
+      p.busy = false; p.kw = ''; p.fehler = DEL_ERR[r && r.fehler] || 'Löschen hat nicht geklappt.';
+      if(r && r.fehler === 'kein_kennwort') S.del.gesetzt = false;
+      render(); return;
+    }
+    S.pw = null; S.error = '';
+    S.notice = 'Gelöscht: ' + (anzahlText(r.anzahl) || 'nichts') + '.';
+    const d = S.data;
+    if(p.bereich === 'sitzung' && d){
+      d.sitzungen = d.sitzungen.filter(s => s.id !== p.ziel); d.ergebnisse = d.ergebnisse.filter(x => x.sitzung_id !== p.ziel);
+      d.antworten = d.antworten.filter(a => a.sitzung_id !== p.ziel); d.ereignisse = d.ereignisse.filter(e => e.sitzung_id !== p.ziel);
+      if(S.detail === p.ziel) S.detail = null;
+      render(); loadDelState();
+    } else if(p.bereich === 'interview' && d && d.interviews){
+      d.interviews = d.interviews.filter(x => x.id !== p.ziel); render(); loadDelState();
+    } else loadData();
+  } catch(x){ p.busy = false; p.fehler = delErr(x); render(); }
+}
+function viewDelete(){
+  const D = S.del;
+  if(D.v3 === false) return '<div class="alert err" style="margin-top:16px"><b>Löschen mit Kennwort noch nicht eingerichtet</b>Führe die neue <span class="code">supabase-setup.sql</span> (Version 3) im Supabase SQL Editor aus und lade diese Seite neu. Bis dahin lassen sich keine Daten löschen.</div>';
+  if(D.gesetzt === null) return '';
+  const err = D.fehler ? '<p class="err-text" role="alert" style="margin-top:12px">' + esc(D.fehler) + '</p>' : '';
+  if(!D.gesetzt){
+    return '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Lösch-Kennwort festlegen</h2><p class="sub">Daten lassen sich nur mit diesem Kennwort löschen, auch von anderen Admins. Gespeichert wird nur ein Hash, niemand kann das Kennwort auslesen.</p></div></div>' +
+      '<form data-form="pw-set" data-keep novalidate><div class="grid g2"><div class="field"><label for="pw-neu">Neues Lösch-Kennwort (mindestens 8 Zeichen)</label><input class="input" id="pw-neu" name="neu" type="password" autocomplete="new-password"></div>' +
+      '<div class="field"><label for="pw-wdh">Wiederholen</label><input class="input" id="pw-wdh" name="wdh" type="password" autocomplete="new-password"></div></div>' + err +
+      '<p class="note" style="margin-top:10px">Nimm ein anderes Kennwort als für die Anmeldung. Vergessen? Im SQL Editor <span class="code">delete from public.geheimnisse where name = \'loeschkennwort\';</span> ausführen und hier neu festlegen.</p>' +
+      '<div class="editor-actions"><button class="btn" type="submit"' + (D.busy ? ' disabled' : '') + '>' + (D.busy ? 'Wird gespeichert …' : 'Kennwort festlegen') + '</button></div></form></section>';
+  }
+  const opt = k => '<option value="' + k + '"' + (D.bereich === k ? ' selected' : '') + '>' + esc(DEL_BEREICH[k]) + '</option>';
+  let html = '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Daten löschen</h2><p class="sub">Nur mit dem Lösch-Kennwort. Gelöschte Daten lassen sich nicht wiederherstellen; lade vorher die CSV-Dateien herunter, wenn du sie behalten willst.</p></div>' +
+    '<button class="btn-link" type="button" data-a="pw-change">' + (D.change ? 'Kennwort doch nicht ändern' : 'Kennwort ändern') + '</button></div>';
+  if(D.change){
+    html += '<form data-form="pw-change" data-keep novalidate class="editor"><h3>Lösch-Kennwort ändern</h3><div class="grid g2"><div class="field"><label for="pw-alt">Bisheriges Kennwort</label><input class="input" id="pw-alt" name="alt" type="password" autocomplete="current-password"></div><div></div>' +
+      '<div class="field"><label for="pw-neu">Neues Kennwort (mindestens 8 Zeichen)</label><input class="input" id="pw-neu" name="neu" type="password" autocomplete="new-password"></div>' +
+      '<div class="field"><label for="pw-wdh">Wiederholen</label><input class="input" id="pw-wdh" name="wdh" type="password" autocomplete="new-password"></div></div>' + err +
+      '<div class="editor-actions"><button class="btn" type="submit"' + (D.busy ? ' disabled' : '') + '>' + (D.busy ? 'Wird gespeichert …' : 'Kennwort ändern') + '</button></div></form>';
+  }
+  html += '<form data-form="del-plan" data-keep novalidate><div class="grid g2"><div class="field"><label for="del-bereich">Was soll gelöscht werden?</label><select class="input" id="del-bereich" name="bereich">' +
+      ['test', 'pilot', 'sitzungen', 'interviews', 'alles', 'person'].map(opt).join('') + '</select></div>' +
+    (D.bereich === 'person'
+      ? '<div class="field"><label for="del-ziel">Pilot-Nummer (mindestens die ersten 8 Zeichen)</label><input class="input" id="del-ziel" name="ziel" value="' + esc(D.ziel) + '" autocomplete="off" spellcheck="false" placeholder="z. B. 3f2a9c1b"></div>'
+      : '<div class="field"><label for="del-bis">Nur Daten bis einschließlich (leer = alle)</label><input class="input" id="del-bis" name="bis" type="date" value="' + esc(D.bis) + '"></div>') +
+    '</div>' + (!D.change ? err : '') + '<div class="editor-actions"><button class="btn btn-crit" type="submit">Weiter</button><span class="note">Im nächsten Schritt siehst du, wie viel gelöscht wird, und gibst das Kennwort ein.</span></div></form>';
+  const pr = Array.isArray(D.protokoll) ? D.protokoll : [];
+  html += '<h3 style="margin-top:22px">Löschprotokoll</h3>' + (pr.length ? '<div class="table-wrap"><table><thead><tr><th>Zeit</th><th>Admin</th><th>Was</th><th>Gelöscht</th></tr></thead><tbody>' +
+    pr.map(x => '<tr><td>' + esc(dt(x.zeit)) + '</td><td>' + esc(x.email || '') + '</td><td>' + esc((DEL_BEREICH[x.bereich] || x.bereich) + (x.bis ? ' bis ' + dDate(x.bis) : '') + (x.ziel ? ' · ' + String(x.ziel).slice(0, 8) : '')) + '</td><td>' + esc(anzahlText(x.anzahl) || '–') + '</td></tr>').join('') +
+    '</tbody></table></div>' : '<p class="note">Noch nichts gelöscht.</p>');
+  return html + '</section>';
+}
+async function submitSetPw(f, change){
+  const D = S.del, neu = f.neu.value, wdh = f.wdh.value, alt = change ? f.alt.value : null;
+  D.fehler = '';
+  if(change && !alt) D.fehler = 'Bitte das bisherige Kennwort eingeben.';
+  else if(neu.length < 8) D.fehler = 'Das neue Kennwort braucht mindestens 8 Zeichen.';
+  else if(neu !== wdh) D.fehler = 'Die beiden Eingaben stimmen nicht überein.';
+  if(D.fehler){ render(); return; }
+  D.busy = true; render();
+  try {
+    const r = await rpc('loeschkennwort_setzen', {neu, alt});
+    if(r && r.ok){ D.gesetzt = true; D.change = false; S.notice = change ? 'Lösch-Kennwort geändert.' : 'Lösch-Kennwort festgelegt. Ab jetzt lassen sich Daten nur noch damit löschen.'; loadDelState(); }
+    else D.fehler = DEL_ERR[r && r.fehler] || 'Speichern hat nicht geklappt.';
+  } catch(x){ D.fehler = delErr(x); }
+  D.busy = false; render();
+}
+function submitPlan(f){
+  const D = S.del; D.fehler = '';
+  D.bereich = f.bereich.value; if(f.bis) D.bis = f.bis.value; if(f.ziel) D.ziel = f.ziel.value.trim();
+  if(D.bereich === 'person'){
+    const q = D.ziel.toLowerCase().replace(/[^0-9a-f-]/g, '');
+    const ids = [...new Set(((S.data && S.data.sitzungen) || []).map(s => s.pilot_id).filter(Boolean))].filter(x => x.startsWith(q));
+    if(q.length < 8){ D.fehler = 'Bitte mindestens die ersten 8 Zeichen der Pilot-Nummer eingeben.'; render(); return; }
+    if(ids.length !== 1){ D.fehler = ids.length ? 'Die Nummer passt zu mehreren Personen. Bitte mehr Zeichen eingeben.' : 'Keine Pilotperson mit dieser Nummer gefunden.'; render(); return; }
+    openDelete('person', ids[0]); return;
+  }
+  openDelete(D.bereich, null, D.bis || null);
+}
+document.addEventListener('submit', e => {
+  const f = e.target.closest('[data-form]'); if(!f) return;
+  const k = f.dataset.form;
+  if(k === 'pw-del'){ e.preventDefault(); submitDelete(); }
+  if(k === 'pw-set'){ e.preventDefault(); submitSetPw(f, false); }
+  if(k === 'pw-change'){ e.preventDefault(); submitSetPw(f, true); }
+  if(k === 'del-plan'){ e.preventDefault(); submitPlan(f); }
+});
+document.addEventListener('input', e => { if(e.target.id === 'pw-in' && S.pw) S.pw.kw = e.target.value; });
+document.addEventListener('change', e => {
+  const f = e.target.form; if(!f || f.dataset.form !== 'del-plan') return;
+  const D = S.del, n = e.target.name;
+  if(n === 'bereich'){ D.bereich = e.target.value; D.fehler = ''; render(); const s = $('del-bereich'); if(s) s.focus(); }
+  if(n === 'bis') D.bis = e.target.value;
+  if(n === 'ziel') D.ziel = e.target.value;
+});
+document.addEventListener('keydown', e => { if(e.key === 'Escape' && S.pw && !S.pw.busy){ S.pw = null; render(); } });
+
 /* ---------- action routing ---------- */
 function extClick(a, b){
   const id = b.dataset.id;
@@ -1262,7 +1493,11 @@ function extClick(a, b){
     case 'iv-new': S.ivEdit = {art: b.dataset.art}; S.ivError = ''; S.notice = ''; render(); { const i = $('iv-org'); if(i) i.focus(); } return true;
     case 'iv-edit': { const x = S.data.interviews.find(r => r.id === id); if(x){ S.ivEdit = Object.assign({}, x); S.ivError = ''; render(); } return true; }
     case 'iv-cancel': S.ivEdit = null; S.ivError = ''; render(); return true;
-    case 'iv-del': if(S.armed === 'iv:' + id) deleteInterview(id); else arm('iv:' + id); return true;
+    case 'iv-del': openDelete('interview', id); return true;
+    case 'p-del': openDelete(id.slice(0, 2) === 'P:' ? 'person' : 'sitzung', id.slice(2)); return true;
+    case 'pw-close': if(!(S.pw && S.pw.busy)){ S.pw = null; render(); } return true;
+    case 'pw-goto': S.pw = null; S.tab = 'daten'; saveUI(); render(); window.scrollTo(0, 0); { const i = $('pw-neu'); if(i) i.focus(); } return true;
+    case 'pw-change': S.del.change = !S.del.change; S.del.fehler = ''; render(); { const i = $('pw-alt'); if(i) i.focus(); } return true;
     case 'person': S.person = id; S.tab = 'personen'; saveUI(); render(); window.scrollTo(0, 0); return true;
     case 'csv-person': exportPerson(view()); return true;
     case 'csv-matrix': exportMatrix(view()); return true;
@@ -1349,8 +1584,9 @@ function render(){
   else if(S.tab === 'personen') body += viewPersons(v);
   else if(S.tab === 'orte') body += viewOrte();
   else body += viewOverview(v);
-  app.innerHTML = '<div class="wrap' + (S.loading && S.data ? ' loading' : '') + '">' + top(right) + body + '</div>' + (S.detail && v ? detailHTML(v) : '');
+  app.innerHTML = '<div class="wrap' + (S.loading && S.data ? ' loading' : '') + '">' + top(right) + body + '</div>' + (S.detail && v ? detailHTML(v) : '') + (S.pw ? pwDialogHTML() : '');
   window.scrollTo(0, scrollY);
+  afterRender();
 }
 
 /* ================= Aktionen ================= */
@@ -1367,8 +1603,11 @@ async function start(){
   await checkAdmin(); render();
   if(S.admin) await loadData();
 }
-function editFrom(q){ return q ? {id: q.id, frage: q.frage, typ: q.typ, hinweis: q.hinweis || '', optionen: (q.optionen || []).join('\n'), skala_min: q.skala_min || '', skala_max: q.skala_max || '', pflicht: q.pflicht, aktiv: q.aktiv, uebersetzungen: q.uebersetzungen || {}}
-  : {id: null, frage: '', typ: 'einfach', hinweis: '', optionen: '', skala_min: '', skala_max: '', pflicht: true, aktiv: true, uebersetzungen: {}}; }
+function editFrom(q){
+  const w = q && q.wertung && q.wertung.hypothese === 'h2a' ? q.wertung : (q && !('wertung' in q) && q.schluessel === 'installieren' ? H2A_DEFAULT : null);
+  return q ? {id: q.id, frage: q.frage, typ: q.typ, hinweis: q.hinweis || '', optionen: (q.optionen || []).join('\n'), skala_min: q.skala_min || '', skala_max: q.skala_max || '', pflicht: q.pflicht, aktiv: q.aktiv, uebersetzungen: q.uebersetzungen || {},
+      h2a: !!w, h2aJa: w && Array.isArray(w.ja) ? w.ja.slice() : [], h2aAb: w && w.ab ? Number(w.ab) : 4}
+  : {id: null, frage: '', typ: 'einfach', hinweis: '', optionen: '', skala_min: '', skala_max: '', pflicht: true, aktiv: true, uebersetzungen: {}, h2a: false, h2aJa: [], h2aAb: 4}; }
 function readEditor(form){
   const e = S.edit;
   e.frage = form.frage.value; e.typ = form.typ.value; e.hinweis = form.hinweis.value;
@@ -1376,16 +1615,20 @@ function readEditor(form){
   if(form.skala_min) e.skala_min = form.skala_min.value;
   if(form.skala_max) e.skala_max = form.skala_max.value;
   e.pflicht = form.pflicht.checked; e.aktiv = form.aktiv.checked;
+  if(form.h2a){ e.h2a = form.h2a.checked; if(form.querySelector('#q-h2a-opts')) e.h2aJa = Array.from(form.querySelectorAll('input[name="h2a_ja"]:checked')).map(x => x.value); if(form.h2a_ab) e.h2aAb = Number(form.h2a_ab.value); }
   if(form.querySelector('.tr-lang')){ e.uebersetzungen = readTranslations(form); const det = form.querySelector('details'); e.trOpen = !!(det && det.open); }
 }
 async function saveQuestion(form){
   readEditor(form);
   const e = S.edit, choice = e.typ === 'einfach' || e.typ === 'mehrfach';
   const opts = Array.from(new Set(e.optionen.split('\n').map(x => x.trim()).filter(Boolean)));
-  const err = !e.frage.trim() ? 'Bitte gib eine Frage ein.' : (choice && opts.length < 2) ? 'Bitte gib mindestens zwei Antwortmöglichkeiten ein, jede in einer eigenen Zeile.' : (opts.length > 20) ? 'Höchstens 20 Antwortmöglichkeiten.' : opts.some(o => o.length > 150) ? 'Eine Antwortmöglichkeit ist zu lang (höchstens 150 Zeichen).' : '';
+  const err = !e.frage.trim() ? 'Bitte gib eine Frage ein.' : (choice && opts.length < 2) ? 'Bitte gib mindestens zwei Antwortmöglichkeiten ein, jede in einer eigenen Zeile.' : (opts.length > 20) ? 'Höchstens 20 Antwortmöglichkeiten.' : opts.some(o => o.length > 150) ? 'Eine Antwortmöglichkeit ist zu lang (höchstens 150 Zeichen).'
+    : (e.h2a && e.typ === 'text') ? 'Freitext kann nicht für H2a zählen. Nimm das Häkchen bei „Zählt für H2a“ heraus oder wähle einen anderen Antworttyp.'
+    : (e.h2a && choice && !(e.h2aJa || []).some(o => opts.includes(o))) ? 'Wähle unter „Auswertung“ mindestens eine Antwort, die als Zustimmung zählt.' : '';
   if(err){ S.editError = err; return render(); }
   const body = {frage: e.frage.trim().slice(0, 300), typ: e.typ, hinweis: e.hinweis.trim() || null, optionen: choice ? opts : [], skala_min: e.typ === 'skala' ? (e.skala_min.trim() || null) : null, skala_max: e.typ === 'skala' ? (e.skala_max.trim() || null) : null, pflicht: e.pflicht, aktiv: e.aktiv};
   if(S.data.v2) body.uebersetzungen = e.uebersetzungen || {};
+  if(S.data.fragen.some(q => 'wertung' in q) || S.del.v3) body.wertung = !e.h2a ? null : e.typ === 'skala' ? {hypothese: 'h2a', ab: Number(e.h2aAb) || 4} : {hypothese: 'h2a', ja: (e.h2aJa || []).filter(o => opts.includes(o))};
   S.busy = true; S.editError = ''; render();
   try {
     if(e.id) await api('fragen?id=eq.' + encodeURIComponent(e.id), {method:'PATCH', body, prefer:'return=minimal'});
@@ -1417,15 +1660,6 @@ async function deleteQuestion(id){
   try { await api('fragen?id=eq.' + encodeURIComponent(id), {method:'DELETE', prefer:'return=minimal'}); await reloadQuestions(); S.notice = 'Frage gelöscht. Vorhandene Antworten bleiben unter „Fragebogen“ erhalten.'; }
   catch(x){ S.error = 'Löschen hat nicht geklappt: ' + x.message; }
   S.armed = ''; S.busy = false; render();
-}
-async function deleteSession(id){
-  try {
-    await api('sitzungen?id=eq.' + encodeURIComponent(id), {method:'DELETE', prefer:'return=minimal'});
-    const d = S.data; d.sitzungen = d.sitzungen.filter(s => s.id !== id); d.ergebnisse = d.ergebnisse.filter(r => r.sitzung_id !== id); d.antworten = d.antworten.filter(a => a.sitzung_id !== id); d.ereignisse = d.ereignisse.filter(e => e.sitzung_id !== id);
-    if(S.detail === id) S.detail = null;
-    S.notice = 'Teilnahme gelöscht.';
-  } catch(x){ S.error = 'Löschen hat nicht geklappt: ' + x.message; }
-  S.armed = ''; render();
 }
 let armTimer = null;
 function arm(key){ S.armed = key; clearTimeout(armTimer); armTimer = setTimeout(() => { if(S.armed === key){ S.armed = ''; render(); } }, 5000); render(); }
@@ -1461,7 +1695,7 @@ document.addEventListener('click', e => {
     case 'q-down': moveQuestion(id, 1); break;
     case 'q-toggle': toggleQuestion(id); break;
     case 'q-del': if(S.armed === 'q:' + id) deleteQuestion(id); else arm('q:' + id); break;
-    case 's-del': if(S.armed === 's:' + id) deleteSession(id); else arm('s:' + id); break;
+    case 's-del': openDelete('sitzung', id); break;
     case 'detail': S.detail = id; render(); { const c = document.querySelector('.drawer [data-a="detail-close"]'); if(c) c.focus(); } break;
     case 'detail-close': S.detail = null; render(); break;
     case 'csv-sess': exportSessions(view()); break;
@@ -1480,7 +1714,8 @@ function showTip(el, x, y){
 }
 document.addEventListener('pointermove', e => { const el = e.target.closest && e.target.closest('[data-tip]'); if(el) showTip(el, e.clientX, e.clientY); else tip.hidden = true; });
 document.addEventListener('pointerleave', () => { tip.hidden = true; });
-setInterval(() => { if(S.auto && S.admin && !S.loading && !S.edit && !S.ivEdit && !amDrag && document.visibilityState === 'visible') loadData(); }, 30000);
+const typing = () => { const a = document.activeElement; return !!(a && a.closest && a.closest('[data-keep]')); };
+setInterval(() => { if(S.auto && S.admin && !S.loading && !S.edit && !S.ivEdit && !S.pw && !typing() && !amDrag && document.visibilityState === 'visible') loadData(); }, 30000);
 
 /* ================= Start ================= */
 render();

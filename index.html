@@ -949,7 +949,7 @@ tr: {
   city_src:'Kaynak: {city} belediyesi ve AStA ipuçları (seçki)',
   chat_head:'Yapay zekâ asistanı · yalnızca kaynakla yanıt verir', chat_label:'Campi’ye mesaj', chat_ph:'Campi’ye sor …', send:'Gönder', typing:'Campi yazıyor',
   no_source:'Doğrulanmış kaynak yok', source:'Kaynak: ',
-  chat_intro:'Merhaba Lena, ben Campi, {uni} asistanıyım. Bana derslikler, yemekhane, son tarihler veya {city}. Yalnızca doğrulanmış kaynaklardan yanıt veririm ve yanıtın nereden geldiğini her zaman gösteririm.',
+  chat_intro:'Merhaba Lena, ben Campi, {uni} asistanıyım. Bana derslikler, yemekhane, son tarihler veya {city} hayatı hakkında soru sorabilirsin. Yalnızca doğrulanmış kaynaklardan yanıt veririm ve yanıtın nereden geldiğini her zaman gösteririm.',
   sugg:'{ex} dersliği nerede?|Bugün vegan ne var?|Kampüse nasıl giderim?|Kayıt yenileme için son tarih ne zaman?|Bu akşam nereye gidebilirim?|Sınavımı erteleyebilir miyim?',
   install_t:'Campi’yi ana ekrana ekle', install_s:'Böylece Campi’yi bir uygulama gibi tek dokunuşla açarsın.', install_btn:'Yükle', install_later:'Sonra',
   install_ios:'Safari’de alttaki “Paylaş” düğmesine, sonra “Ana Ekrana Ekle”ye dokun.', install_other:'Tarayıcı menüsünü (⋮) aç ve “Uygulamayı yükle” ya da “Ana ekrana ekle”yi seç.',
@@ -1014,40 +1014,40 @@ function floorLabel(f, lang){
 
 /* additional and refined texts for the Esslingen version */
 const STR_EXTRA = {
-  de: {brand_sub:'Inoffizieller Prototyp', live_here:'Du bist am Ziel: {b}', step_walk_live:'Etwa {m} zu Fuß bis {b}, rund {min} Min.', cafe_src:'Quelle: Studierendenwerk Stuttgart, Stand Oktober 2026', more:'Mehr', today:'Heute', mensa_closed_t:'Keine Mensa mit warmen Gerichten', seats:'{n} Sitzplätze', closed_on:'Geschlossen: {d}', menu_link:'Aktueller Speiseplan',
+  de: {mensa_src_live:'Quelle: Studierendenwerk Stuttgart (über OpenMensa) · Stand {stand}', no_menu_day:'Für diesen Tag gibt es noch keinen Speiseplan.', closed_day:'An diesem Tag ist die Mensa geschlossen.', live_src:'Fristen und Termine: Stand {stand}', brand_sub:'Inoffizieller Prototyp', live_here:'Du bist am Ziel: {b}', step_walk_live:'Etwa {m} zu Fuß bis {b}, rund {min} Min.', cafe_src:'Quelle: Studierendenwerk Stuttgart, Stand Oktober 2026', more:'Mehr', today:'Heute', mensa_closed_t:'Keine Mensa mit warmen Gerichten', seats:'{n} Sitzplätze', closed_on:'Geschlossen: {d}', menu_link:'Aktueller Speiseplan',
     walk_min:'{n} Min. zu Fuß', bus_min:'{n} Min. mit dem Bus', pos_approx:'Die Gebäudeposition ist angenähert.', map_tiles_fail:'Kartenbilder konnten nicht geladen werden. Gebäude und Standort siehst du trotzdem.',
     st_geo_pilot:'Freiwillig: Meinen Standort verwenden, solange Campi geöffnet ist, und auf etwa 10 m gerundet speichern.',
     chat_intro:'Hallo Lena, ich bin Campi, dein Campus-Assistent für die {uni}. Frag mich zu Räumen, Mensa, Fristen oder zum Leben in {city}. Ich antworte in deiner Sprache, nur aus geprüften Quellen, und zeige dir immer, woher die Antwort stammt.',
     st_text:'Campi ist der Prototyp einer App für Studierende der Hochschule Esslingen, kein offizielles Angebot der Hochschule. Du löst drei kleine Aufgaben und beantwortest danach ein paar kurze Fragen. Getestet wird die App, nicht du. Gebäude und Öffnungszeiten sind echt, einzelne Räume, Gerichte und Termine sind Beispieldaten.',
     rooms_src:'Quelle: Gebäudeübersichten der Hochschule Esslingen · einzelne Räume sind Beispieldaten', mensa_src:'Quelle: Studierendenwerk Stuttgart, Stand Oktober 2026 · Gerichte sind Beispieldaten', footnote:'Prototyp · Räume, Gerichte und Termine teils Beispieldaten'},
-  en: {brand_sub:'Unofficial prototype', live_here:'You’ve arrived: {b}', step_walk_live:'About {m} on foot to {b}, roughly {min} min', cafe_src:'Source: Studierendenwerk Stuttgart, October 2026', more:'More', today:'Today', mensa_closed_t:'No Mensa with hot meals', seats:'{n} seats', closed_on:'Closed: {d}', menu_link:'Current menu',
+  en: {mensa_src_live:'Source: Studierendenwerk Stuttgart (via OpenMensa) · updated {stand}', no_menu_day:'There’s no menu for this day yet.', closed_day:'The Mensa is closed on this day.', live_src:'Deadlines and events: updated {stand}', brand_sub:'Unofficial prototype', live_here:'You’ve arrived: {b}', step_walk_live:'About {m} on foot to {b}, roughly {min} min', cafe_src:'Source: Studierendenwerk Stuttgart, October 2026', more:'More', today:'Today', mensa_closed_t:'No Mensa with hot meals', seats:'{n} seats', closed_on:'Closed: {d}', menu_link:'Current menu',
     walk_min:'{n} min on foot', bus_min:'{n} min by bus', pos_approx:'The building position is approximate.', map_tiles_fail:'Map images couldn’t be loaded. You can still see the buildings and your position.',
     st_geo_pilot:'Optional: use my location while Campi is open and store it rounded to about 10 m.',
     chat_intro:'Hi Lena, I’m Campi, your campus assistant for {uni}. Ask me about rooms, the Mensa, deadlines or life in {city}. I answer in your language, only from verified sources, and always show you where the answer comes from.',
     st_text:'Campi is a prototype app for students at Esslingen University, not an official university service. You will solve three small tasks and then answer a few short questions. We are testing the app, not you. Buildings and opening hours are real; some rooms, dishes and dates are sample data.',
     rooms_src:'Source: Esslingen University building overviews · some rooms are sample data', mensa_src:'Source: Studierendenwerk Stuttgart, October 2026 · dishes are sample data', footnote:'Prototype · some rooms, dishes and dates are sample data'},
-  es: {brand_sub:'Prototipo no oficial', live_here:'Has llegado: {b}', step_walk_live:'Unos {m} a pie hasta {b}, unos {min} min', cafe_src:'Fuente: Studierendenwerk Stuttgart, octubre de 2026', more:'Más', today:'Hoy', mensa_closed_t:'Sin Mensa con platos calientes', seats:'{n} plazas', closed_on:'Cerrado: {d}', menu_link:'Menú actual',
+  es: {mensa_src_live:'Fuente: Studierendenwerk Stuttgart (vía OpenMensa) · actualizado {stand}', no_menu_day:'Todavía no hay menú para este día.', closed_day:'Ese día la Mensa está cerrada.', live_src:'Plazos y eventos: actualizado {stand}', brand_sub:'Prototipo no oficial', live_here:'Has llegado: {b}', step_walk_live:'Unos {m} a pie hasta {b}, unos {min} min', cafe_src:'Fuente: Studierendenwerk Stuttgart, octubre de 2026', more:'Más', today:'Hoy', mensa_closed_t:'Sin Mensa con platos calientes', seats:'{n} plazas', closed_on:'Cerrado: {d}', menu_link:'Menú actual',
     walk_min:'{n} min a pie', bus_min:'{n} min en autobús', pos_approx:'La posición del edificio es aproximada.', map_tiles_fail:'No se pudieron cargar las imágenes del mapa. Aun así ves los edificios y tu posición.',
     st_geo_pilot:'Opcional: usar mi ubicación mientras Campi esté abierta y guardarla redondeada a unos 10 m.',
     chat_intro:'Hola Lena, soy Campi, tu asistente de campus para la {uni}. Pregúntame por aulas, la Mensa, plazos o la vida en {city}. Respondo en tu idioma, solo con fuentes verificadas, y siempre te muestro de dónde viene la respuesta.',
     st_text:'Campi es el prototipo de una app para estudiantes de la Hochschule Esslingen; no es un servicio oficial de la universidad. Resolverás tres pequeñas tareas y luego responderás unas preguntas breves. Se prueba la app, no a ti. Los edificios y horarios son reales; algunas aulas, platos y fechas son datos de ejemplo.',
     rooms_src:'Fuente: planos de edificios de la Hochschule Esslingen · algunas aulas son de ejemplo', mensa_src:'Fuente: Studierendenwerk Stuttgart, octubre de 2026 · los platos son de ejemplo', footnote:'Prototipo · algunas aulas, platos y fechas son de ejemplo'},
-  it: {brand_sub:'Prototipo non ufficiale', live_here:'Sei arrivato: {b}', step_walk_live:'Circa {m} a piedi fino a {b}, circa {min} min', cafe_src:'Fonte: Studierendenwerk Stuttgart, ottobre 2026', more:'Altro', today:'Oggi', mensa_closed_t:'Nessuna mensa con piatti caldi', seats:'{n} posti a sedere', closed_on:'Chiuso: {d}', menu_link:'Menù attuale',
+  it: {mensa_src_live:'Fonte: Studierendenwerk Stuttgart (tramite OpenMensa) · aggiornato {stand}', no_menu_day:'Per questo giorno non c’è ancora un menù.', closed_day:'In questo giorno la mensa è chiusa.', live_src:'Scadenze ed eventi: aggiornato {stand}', brand_sub:'Prototipo non ufficiale', live_here:'Sei arrivato: {b}', step_walk_live:'Circa {m} a piedi fino a {b}, circa {min} min', cafe_src:'Fonte: Studierendenwerk Stuttgart, ottobre 2026', more:'Altro', today:'Oggi', mensa_closed_t:'Nessuna mensa con piatti caldi', seats:'{n} posti a sedere', closed_on:'Chiuso: {d}', menu_link:'Menù attuale',
     walk_min:'{n} min a piedi', bus_min:'{n} min in autobus', pos_approx:'La posizione dell’edificio è approssimativa.', map_tiles_fail:'Impossibile caricare le immagini della mappa. Vedi comunque gli edifici e la tua posizione.',
     st_geo_pilot:'Facoltativo: usare la mia posizione mentre Campi è aperta e salvarla arrotondata a circa 10 m.',
     chat_intro:'Ciao Lena, sono Campi, il tuo assistente di campus per la {uni}. Chiedimi di aule, mensa, scadenze o della vita a {city}. Rispondo nella tua lingua, solo da fonti verificate, e ti mostro sempre da dove viene la risposta.',
     st_text:'Campi è il prototipo di un’app per gli studenti della Hochschule Esslingen, non un servizio ufficiale dell’università. Risolverai tre piccoli compiti e poi risponderai ad alcune domande brevi. Si testa l’app, non te. Edifici e orari sono reali; alcune aule, piatti e date sono dati di esempio.',
     rooms_src:'Fonte: planimetrie degli edifici della Hochschule Esslingen · alcune aule sono di esempio', mensa_src:'Fonte: Studierendenwerk Stuttgart, ottobre 2026 · i piatti sono di esempio', footnote:'Prototipo · alcune aule, piatti e date sono di esempio'},
-  fr: {brand_sub:'Prototype non officiel', live_here:'Tu es arrivé : {b}', step_walk_live:'Environ {m} à pied jusqu’à {b}, soit environ {min} min', cafe_src:'Source : Studierendenwerk Stuttgart, octobre 2026', more:'Plus', today:'Aujourd’hui', mensa_closed_t:'Pas de Mensa avec plats chauds', seats:'{n} places assises', closed_on:'Fermé : {d}', menu_link:'Menu actuel',
+  fr: {mensa_src_live:'Source : Studierendenwerk Stuttgart (via OpenMensa) · mis à jour {stand}', no_menu_day:'Pas encore de menu pour ce jour.', closed_day:'La Mensa est fermée ce jour-là.', live_src:'Délais et événements : mis à jour {stand}', brand_sub:'Prototype non officiel', live_here:'Tu es arrivé : {b}', step_walk_live:'Environ {m} à pied jusqu’à {b}, soit environ {min} min', cafe_src:'Source : Studierendenwerk Stuttgart, octobre 2026', more:'Plus', today:'Aujourd’hui', mensa_closed_t:'Pas de Mensa avec plats chauds', seats:'{n} places assises', closed_on:'Fermé : {d}', menu_link:'Menu actuel',
     walk_min:'{n} min à pied', bus_min:'{n} min en bus', pos_approx:'La position du bâtiment est approximative.', map_tiles_fail:'Les images de la carte n’ont pas pu être chargées. Tu vois quand même les bâtiments et ta position.',
     st_geo_pilot:'Facultatif : utiliser ma position tant que Campi est ouverte et l’enregistrer arrondie à environ 10 m.',
     chat_intro:'Salut Lena, je suis Campi, ton assistant de campus pour la {uni}. Pose-moi des questions sur les salles, la Mensa, les délais ou la vie à {city}. Je réponds dans ta langue, uniquement à partir de sources vérifiées, et je te montre toujours d’où vient la réponse.',
     st_text:'Campi est le prototype d’une application pour les étudiants de la Hochschule Esslingen, pas un service officiel de l’université. Tu vas réaliser trois petites tâches puis répondre à quelques questions courtes. On teste l’application, pas toi. Les bâtiments et horaires sont réels ; certaines salles, certains plats et certaines dates sont des exemples.',
     rooms_src:'Source : plans des bâtiments de la Hochschule Esslingen · certaines salles sont des exemples', mensa_src:'Source : Studierendenwerk Stuttgart, octobre 2026 · les plats sont des exemples', footnote:'Prototype · certaines salles, certains plats et certaines dates sont des exemples'},
-  tr: {brand_sub:'Resmî olmayan prototip', live_here:'Hedeftesin: {b}', step_walk_live:'{b}: yürüyerek yaklaşık {m}, yaklaşık {min} dakika', cafe_src:'Kaynak: Studierendenwerk Stuttgart, Ekim 2026', more:'Daha fazla', today:'Bugün', mensa_closed_t:'Sıcak yemekli yemekhane yok', seats:'{n} kişilik oturma yeri', closed_on:'Kapalı: {d}', menu_link:'Güncel menü',
+  tr: {mensa_src_live:'Kaynak: Studierendenwerk Stuttgart (OpenMensa üzerinden) · güncelleme {stand}', no_menu_day:'Bu gün için henüz menü yok.', closed_day:'Yemekhane bu gün kapalı.', live_src:'Son tarihler ve etkinlikler: güncelleme {stand}', brand_sub:'Resmî olmayan prototip', live_here:'Hedeftesin: {b}', step_walk_live:'{b}: yürüyerek yaklaşık {m}, yaklaşık {min} dakika', cafe_src:'Kaynak: Studierendenwerk Stuttgart, Ekim 2026', more:'Daha fazla', today:'Bugün', mensa_closed_t:'Sıcak yemekli yemekhane yok', seats:'{n} kişilik oturma yeri', closed_on:'Kapalı: {d}', menu_link:'Güncel menü',
     walk_min:'Yürüyerek {n} dk', bus_min:'Otobüsle {n} dk', pos_approx:'Bina konumu yaklaşıktır.', map_tiles_fail:'Harita görüntüleri yüklenemedi. Binaları ve konumunu yine de görebilirsin.',
     st_geo_pilot:'İsteğe bağlı: Campi açıkken konumumu kullan ve yaklaşık 10 m’ye yuvarlanmış olarak kaydet.',
-    chat_intro:'Merhaba Lena, ben Campi, {uni} için kampüs asistanınım. Bana odalar, yemekhane, son tarihler veya {city}. Senin dilinde, yalnızca doğrulanmış kaynaklardan yanıt veririm ve yanıtın nereden geldiğini her zaman gösteririm.',
+    chat_intro:'Merhaba Lena, ben Campi, {uni} için kampüs asistanınım. Bana odalar, yemekhane, son tarihler veya {city} hayatı hakkında soru sorabilirsin. Senin dilinde, yalnızca doğrulanmış kaynaklardan yanıt veririm ve yanıtın nereden geldiğini her zaman gösteririm.',
     st_text:'Campi, Hochschule Esslingen öğrencileri için bir uygulama prototipidir; üniversitenin resmî hizmeti değildir. Üç küçük görevi çözecek, ardından birkaç kısa soruyu yanıtlayacaksın. Test edilen sen değil, uygulama. Binalar ve çalışma saatleri gerçektir; bazı odalar, yemekler ve tarihler örnek veridir.',
     rooms_src:'Kaynak: Hochschule Esslingen bina planları · bazı odalar örnek veridir', mensa_src:'Kaynak: Studierendenwerk Stuttgart, Ekim 2026 · yemekler örnek veridir', footnote:'Prototip · bazı odalar, yemekler ve tarihler örnek veridir'}
 };
@@ -1118,7 +1118,10 @@ const HINT = {
 };
 const ALG = {Gluten:X('Gluten','gluten','gluten','glutine','gluten','gluten'), Milch:X('Milch','milk','leche','latte','lait','süt'), Ei:X('Ei','egg','huevo','uova','œuf','yumurta'),
   Senf:X('Senf','mustard','mostaza','senape','moutarde','hardal'), Sellerie:X('Sellerie','celery','apio','sedano','céleri','kereviz'), Soja:X('Soja','soy','soja','soia','soja','soya'),
-  Sesam:X('Sesam','sesame','sésamo','sesamo','sésame','susam'), Fisch:X('Fisch','fish','pescado','pesce','poisson','balık')};
+  Sesam:X('Sesam','sesame','sésamo','sesamo','sésame','susam'), Fisch:X('Fisch','fish','pescado','pesce','poisson','balık'),
+  Krebstiere:X('Krebstiere','crustaceans','crustáceos','crostacei','crustacés','kabuklular'), Nuesse:X('Schalenfrüchte','tree nuts','frutos de cáscara','frutta a guscio','fruits à coque','sert kabuklu yemişler'),
+  Erdnuss:X('Erdnüsse','peanuts','cacahuetes','arachidi','arachides','yer fıstığı'), Sulfite:X('Sulfite','sulphites','sulfitos','solfiti','sulfites','sülfitler'),
+  Lupine:X('Lupinen','lupin','altramuces','lupini','lupin','acı bakla'), Weichtiere:X('Weichtiere','molluscs','moluscos','molluschi','mollusques','yumuşakçalar')};
 
 /* example dishes (Studierendenwerk menus change daily) */
 const DISH = {
@@ -1164,11 +1167,11 @@ const FL_PLAN = {
     eW2:{b:'2', dir:'W', bf:true, lvl:'geb'}, eGt:{b:'G', dir:'N', bf:true}, eH:{b:'H', dir:'S'}, eJl:{b:'J', dir:'W'}, eJb:{b:'J', dir:'S', bf:true}, eJr:{b:'J', dir:'E'}
   },
   /* georeference of the plan (estimate): plan point -> lat/lon, north up */
-  geo:{px:[207,400], ll:[48.74480, 9.32140]}
+  geo:{px:[207,400], ll:[48.744675, 9.323096]}
 };
 function flPlanLL(px){ const g = FL_PLAN.geo; return offLL(g.ll, (px[0] - g.px[0]) * FL_PLAN.mpp, -(px[1] - g.px[1]) * FL_PLAN.mpp); }
 
-const SM_BASE = [48.73800, 9.31100], GP_BASE = [48.696999, 9.656131];
+const SM_BASE = [48.73882, 9.31159], GP_BASE = [48.696999, 9.656131];
 const CAMPUS = {
   SM: {
     id:'SM', letter:'S', city:'Esslingen', zoom:17,
@@ -1190,7 +1193,7 @@ const CAMPUS = {
       '13':{addr:'Neckarstraße 63', ll:offLL(SM_BASE, 0, -80)},
       '14':{addr:'Neckarstraße 65/1', ll:offLL(SM_BASE, 20, -60)},
       '15':{addr:'Mühlstraße 16', ll:offLL(SM_BASE, 30, 120)},
-      '16':{addr:'Kanalstraße 27', ll:offLL(SM_BASE, -105, -20), what:X('Mensa Stadtmitte','Mensa (canteen) Stadtmitte','Comedor (Mensa) Stadtmitte','Mensa Stadtmitte','Restaurant universitaire (Mensa) Stadtmitte','Stadtmitte yemekhanesi (Mensa)')},
+      '16':{addr:'Kanalstraße 27', ll:[48.73864, 9.31016], est:false, what:X('Mensa Stadtmitte','Mensa (canteen) Stadtmitte','Comedor (Mensa) Stadtmitte','Mensa Stadtmitte','Restaurant universitaire (Mensa) Stadtmitte','Stadtmitte yemekhanesi (Mensa)')},
       '17':{addr:'Kanalstraße 12/1', ll:offLL(SM_BASE, -160, -60), what:X('International Centre, Career Centre, Studienberatung','International Centre, Career Centre, student advisory service','International Centre, Career Centre, orientación académica','International Centre, Career Centre, orientamento allo studio','International Centre, Career Centre, conseil aux études','International Centre, Kariyer Merkezi, öğrenci danışmanlığı')},
       '18':{addr:'Neckarstraße 71', ll:offLL(SM_BASE, 80, -60)},
       '19':{addr:'Kiesstraße 6', ll:offLL(SM_BASE, 120, 30)}
@@ -1206,7 +1209,7 @@ const CAMPUS = {
     cafes:[],
     next:{time:'10:00', room:'SM-01105', course:X('Technische Mechanik 1','Engineering Mechanics 1','Mecánica técnica 1','Meccanica tecnica 1','Mécanique technique 1','Teknik Mekanik 1')},
     change:{course:X('Mathematik 1','Mathematics 1','Matemáticas 1','Matematica 1','Mathématiques 1','Matematik 1'), now:'SM-08101', was:'SM-01105'},
-    quick:['SM-01105','SM-08101','SM-MENSA','SM-SSV','SM-PA','SM-IC'], t1:'SM-09203', ex:'01.105'
+    quick:['SM-01105','SM-08101','SM-MENSA','SM-SSV','SM-PA','SM-IC'], t1:'SM-09203', ex:'S 01.105'
   },
   FL: {
     id:'FL', letter:'F', city:'Esslingen', zoom:17, plan:FL_PLAN,
@@ -1233,7 +1236,7 @@ const CAMPUS = {
     cafes:[],
     next:{time:'10:00', room:'FL-01203', course:X('Grundlagen der Informatik','Introduction to Computer Science','Fundamentos de informática','Fondamenti di informatica','Introduction à l’informatique','Bilgisayar Bilimine Giriş')},
     change:{course:X('Statistik','Statistics','Estadística','Statistica','Statistiques','İstatistik'), now:'FL-01112', was:'FL-01004'},
-    quick:['FL-01203','FL-01112','FL-BIB','FL-MENSA','FL-02102','FL-IT'], t1:'FL-02115', ex:'01.203'
+    quick:['FL-01203','FL-01112','FL-BIB','FL-MENSA','FL-02102','FL-IT'], t1:'FL-02115', ex:'F 01.203'
   },
   GP: {
     id:'GP', letter:'G', city:'Göppingen', zoom:17,
@@ -1260,13 +1263,13 @@ const CAMPUS = {
       url:'https://www.studierendenwerk-stuttgart.de/en/food/canteens-and-cafeterias/cafeteria-goeppingen'}],
     next:{time:'10:00', room:'GP-05012', course:X('Grundlagen der Mechatronik','Fundamentals of Mechatronics','Fundamentos de mecatrónica','Fondamenti di meccatronica','Fondamentaux de la mécatronique','Mekatroniğin Temelleri')},
     change:{course:X('Elektrotechnik 1','Electrical Engineering 1','Electrotecnia 1','Elettrotecnica 1','Électrotechnique 1','Elektroteknik 1'), now:'GP-02012', was:'GP-05012'},
-    quick:['GP-05012','GP-02012','GP-BIB','GP-CAF','GP-SSV','GP-ASTA'], t1:'GP-02105', ex:'02.105'
+    quick:['GP-05012','GP-02012','GP-BIB','GP-CAF','GP-SSV','GP-ASTA'], t1:'GP-02105', ex:'G 02.105'
   }
 };
 CAMPUS.GP.starts.G4.ll = CAMPUS.GP.buildings['4'].ll;
 const CAMPUS_IDS = ['SM','FL','GP'];
 /* estimated positions of the Flandernstraße plan points (buildings and stops) */
-Object.keys(CAMPUS.FL.buildings).forEach(k => { const b = CAMPUS.FL.buildings[k]; b.ll = flPlanLL(b.at); b.est = true; });
+Object.keys(CAMPUS.FL.buildings).forEach(k => { const b = CAMPUS.FL.buildings[k]; b.ll = flPlanLL(b.at); b.est = k !== 'J'; });
 Object.keys(CAMPUS.FL.starts).forEach(k => { const s = CAMPUS.FL.starts[k]; s.ll = flPlanLL(FL_PLAN.nodes[s.node]); });
 ['SM','GP'].forEach(c => Object.keys(CAMPUS[c].buildings).forEach(k => { const b = CAMPUS[c].buildings[k]; if(b.est === undefined) b.est = true; }));
 
@@ -1316,6 +1319,8 @@ const ROOM_LIST = [
 ];
 const ROOMS = {};
 ROOM_LIST.forEach(r => {
+  r.nr = r.code;
+  if(r.code) r.code = CAMPUS[r.c].letter + ' ' + r.code;
   if(r.lib) r.al = ['bibliothek','library','biblioteca','bibliotheque','kutuphane','bib','bibliothek abholstelle'];
   if(r.mensa) r.al = (r.al || []).concat(['mensa','cafeteria','canteen','comedor','cafeteria','cantina','caffetteria','cantine','cafeteria','yemekhane','kafeterya']);
   ROOMS[r.id] = r;
@@ -1341,12 +1346,12 @@ function roomHours(r, lang, sep){ return r.oh ? fmtOH(r.oh, lang, sep) : ''; }
 
 /* deadlines, contacts and events (example data unless stated) */
 const DEADLINES = [
-  {d:'2026-11-02', t:X('Prüfungsanmeldung Wintersemester','Exam registration, winter semester','Inscripción a exámenes, semestre de invierno','Iscrizione agli esami, semestre invernale','Inscription aux examens, semestre d’hiver','Kış dönemi sınav kaydı'),
-    s:X('02.11. bis 16.11.2026 · im Campus-Portal','2 to 16 Nov 2026 · in the campus portal','del 2 al 16 nov. de 2026 · en el portal del campus','dal 2 al 16 nov. 2026 · nel portale del campus','du 2 au 16 nov. 2026 · sur le portail du campus','2–16 Kasım 2026 · kampüs portalında')},
-  {d:'2027-01-15', t:X('Rückmeldung Sommersemester 2027','Re-registration, summer semester 2027','Renovación de matrícula, semestre de verano 2027','Rinnovo dell’iscrizione, semestre estivo 2027','Réinscription, semestre d’été 2027','2027 yaz dönemi kayıt yenileme'),
-    s:X('Semesterbeitrag überweisen · Studierendenservice','Pay the semester fee · student services','Pagar la tasa semestral · servicios al estudiante','Pagare il contributo semestrale · segreteria studenti','Payer les frais semestriels · scolarité','Dönem harcını yatır · öğrenci işleri')},
-  {d:'2027-01-29', t:X('Ende der Vorlesungszeit','Last day of lectures','Fin del periodo de clases','Fine delle lezioni','Fin des cours','Derslerin sona ermesi'),
-    s:X('Wintersemester 2026/27','Winter semester 2026/27','Semestre de invierno 2026/27','Semestre invernale 2026/27','Semestre d’hiver 2026/27','2026/27 kış dönemi')}
+  {key:'pruefungsanmeldung', von:'2026-11-02', bis:'2026-11-16', t:X('Prüfungsanmeldung Wintersemester','Exam registration, winter semester','Inscripción a exámenes, semestre de invierno','Iscrizione agli esami, semestre invernale','Inscription aux examens, semestre d’hiver','Kış dönemi sınav kaydı'),
+    wo:X('im Campus-Portal','in the campus portal','en el portal del campus','nel portale del campus','sur le portail du campus','kampüs portalında')},
+  {key:'rueckmeldung', bis:'2027-01-15', t:X('Rückmeldung Sommersemester 2027','Re-registration, summer semester 2027','Renovación de matrícula, semestre de verano 2027','Rinnovo dell’iscrizione, semestre estivo 2027','Réinscription, semestre d’été 2027','2027 yaz dönemi kayıt yenileme'),
+    wo:X('Semesterbeitrag überweisen · Studierendenservice','Pay the semester fee · student services','Pagar la tasa semestral · servicios al estudiante','Pagare il contributo semestrale · segreteria studenti','Payer les frais semestriels · scolarité','Dönem harcını yatır · öğrenci işleri')},
+  {key:'vorlesungsende', von:'2027-01-29', t:X('Ende der Vorlesungszeit','Last day of lectures','Fin del periodo de clases','Fine delle lezioni','Fin des cours','Derslerin sona ermesi'),
+    wo:X('Wintersemester 2026/27','Winter semester 2026/27','Semestre de invierno 2026/27','Semestre invernale 2026/27','Semestre d’hiver 2026/27','2026/27 kış dönemi')}
 ];
 const CONTACTS = [
   {n:'SM-SSV'}, {n:'SM-PA'}, {n:'SM-IC'}, {n:'SM-SB'},
@@ -1357,7 +1362,7 @@ const EVENTS = [
   {when:'today', time:'19:00', c:'SM', n:X('Ersti-Kneipentour','First-semester pub tour','Ruta de bares para novatos','Giro dei pub per matricole','Tournée des bars pour les nouveaux','Birinci sınıflar için bar turu'),
     s:X('Treffpunkt vor der Mensa Stadtmitte','Meeting point in front of Mensa Stadtmitte','Punto de encuentro frente a la Mensa Stadtmitte','Ritrovo davanti alla mensa Stadtmitte','Rendez-vous devant la Mensa Stadtmitte','Buluşma noktası: Stadtmitte yemekhanesinin önü')},
   {when:'tue', time:'18:00', c:'FL', n:X('Hochschulsport: Bouldern','University sports: bouldering','Deporte universitario: búlder','Sport universitario: bouldering','Sport universitaire : bloc','Üniversite sporu: bouldering'),
-    s:X('Treffpunkt Sportraum 02.010, Flandernstraße · ohne Anmeldung','Meeting point sports room 02.010, Flandernstraße · no sign-up','Punto de encuentro: sala de deporte 02.010, Flandernstraße · sin inscripción','Ritrovo: palestra 02.010, Flandernstraße · senza iscrizione','Rendez-vous salle de sport 02.010, Flandernstraße · sans inscription','Buluşma: 02.010 spor salonu, Flandernstraße · kayıt gerekmez')},
+    s:X('Treffpunkt Sportraum F 02.010, Flandernstraße · ohne Anmeldung','Meeting point sports room F 02.010, Flandernstraße · no sign-up','Punto de encuentro: sala de deporte F 02.010, Flandernstraße · sin inscripción','Ritrovo: palestra F 02.010, Flandernstraße · senza iscrizione','Rendez-vous salle de sport F 02.010, Flandernstraße · sans inscription','Buluşma: F 02.010 spor salonu, Flandernstraße · kayıt gerekmez')},
   {when:'2026-11-12', time:'10:00', c:'SM', n:X('Karrieremesse','Careers fair','Feria de empleo','Fiera del lavoro','Salon de l’emploi','Kariyer fuarı'),
     s:X('Gebäude 1, Stadtmitte · 40 Unternehmen','Building 1, Stadtmitte · 40 companies','Edificio 1, Stadtmitte · 40 empresas','Edificio 1, Stadtmitte · 40 aziende','Bâtiment 1, Stadtmitte · 40 entreprises','1 numaralı bina, Stadtmitte · 40 şirket')},
   {when:'thu', time:'20:00', c:'GP', n:X('Spieleabend im Café Campus','Games night at Café Campus','Noche de juegos en el Café Campus','Serata giochi al Café Campus','Soirée jeux au Café Campus','Café Campus’te oyun gecesi'),
@@ -1410,6 +1415,118 @@ function ortList(){
   });
   return out;
 }
+
+
+/* ================= Aktuelle Daten aus daten.json =================
+   Ein GitHub-Workflow (.github/workflows/daten-aktualisieren.yml) schreibt jede Nacht um 1 Uhr deutscher Zeit
+   den Speiseplan (Studierendenwerk Stuttgart über OpenMensa), Fristen und Veranstaltungen in daten.json.
+   Claude übersetzt dabei die Gerichte und prüft Fristen und Termine auf hs-esslingen.de.
+   Fehlt die Datei oder ist sie fehlerhaft, zeigt die App die eingebauten Beispieldaten. */
+const LIVE = {ok:false, stand:null, quelle:'', mensa:false, fristen:false, termine:false};
+const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
+const DISH_TYPES = ['vegan', 'vegetarisch', 'fleisch', 'fisch'];
+function isoDay(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function cleanX(o, max){
+  max = max || 200;
+  if(typeof o === 'string') return o.trim() ? {de: o.trim().slice(0, max)} : null;
+  if(!o || typeof o !== 'object' || typeof o.de !== 'string' || !o.de.trim()) return null;
+  const out = {};
+  LANGS.forEach(l => { if(typeof o[l] === 'string' && o[l].trim()) out[l] = o[l].trim().slice(0, max); });
+  return out;
+}
+function isOH(s){ return typeof s === 'string' && s.length < 120 && /^([A-Za-z]{2}([-,][A-Za-z]{2})*\s+\d{2}:\d{2}-\d{2}:\d{2}(,\d{2}:\d{2}-\d{2}:\d{2})*)(;\s*[A-Za-z]{2}([-,][A-Za-z]{2})*\s+\d{2}:\d{2}-\d{2}:\d{2}(,\d{2}:\d{2}-\d{2}:\d{2})*)*$/.test(s.trim()); }
+function cleanUrl(u){ return typeof u === 'string' && /^https:\/\/[^\s"<>]+$/.test(u) && u.length < 300 ? u : null; }
+function applyDaten(j){
+  if(!j || typeof j !== 'object' || j.version !== 1 || typeof j.stand !== 'string' || isNaN(Date.parse(j.stand))) return false;
+  /* menus */
+  ['SM', 'FL'].forEach(k => {
+    const m = j.mensa && j.mensa[k], cm = CAMPUS[k].mensa; if(!m || !cm) return;
+    const tage = {};
+    (Array.isArray(m.tage) ? m.tage : []).slice(0, 21).forEach(tg => {
+      if(!tg || !ISO_RE.test(tg.datum)) return;
+      const dishes = (Array.isArray(tg.gerichte) ? tg.gerichte : []).slice(0, 24).map((g, i) => {
+        const n = g && cleanX(g.name, 160); if(!n) return null;
+        const p = Number(g.preis), pb = Number(g.preis_bedienstete);
+        return {id: 'live' + i, n, k: cleanX(g.kategorie, 60), t: DISH_TYPES.includes(g.typ) ? g.typ : null,
+          p: isFinite(p) && p > 0 && p < 50 ? p : null, pb: isFinite(pb) && pb > 0 && pb < 50 ? pb : null,
+          a: (Array.isArray(g.allergene) ? g.allergene : []).filter((a, x, arr) => ALG[a] && arr.indexOf(a) === x).slice(0, 14), live: true};
+      }).filter(Boolean);
+      tage[tg.datum] = {closed: tg.geschlossen === true, dishes};
+    });
+    if(Object.keys(tage).length){ cm.live = tage; LIVE.mensa = true; }
+    if(isOH(m.oeffnungszeiten)) cm.open = m.oeffnungszeiten.trim();
+    if(isOH(m.essensausgabe)) cm.serve = m.essensausgabe.trim();
+    if(typeof m.geschlossen === 'string' && m.geschlossen.length < 80) cm.closed = m.geschlossen;
+  });
+  /* deadlines */
+  if(Array.isArray(j.fristen)){
+    j.fristen.slice(0, 12).forEach(f => {
+      if(!f || typeof f.key !== 'string' || !/^[a-z_]{2,40}$/.test(f.key)) return;
+      const von = ISO_RE.test(f.von) ? f.von : null, bis = ISO_RE.test(f.bis) ? f.bis : null, tt = cleanX(f.titel, 120);
+      if(!tt || !(von || bis)) return;
+      const old = DEADLINES.find(d => d.key === f.key);
+      const entry = {key: f.key, von, bis, t: tt, wo: cleanX(f.hinweis, 160) || (old && old.wo) || null, url: cleanUrl(f.quelle), live: true};
+      if(old) Object.assign(old, entry); else DEADLINES.push(entry);
+      LIVE.fristen = true;
+    });
+  }
+  /* events */
+  if(Array.isArray(j.termine)){
+    const ev = j.termine.slice(0, 16).map(e => {
+      if(!e || !ISO_RE.test(e.datum)) return null;
+      const n = cleanX(e.titel, 120); if(!n) return null;
+      return {when: e.datum, time: /^\d{2}:\d{2}$/.test(e.zeit) ? e.zeit : '', c: CAMPUS[e.campus] ? e.campus : null, n, s: cleanX(e.ort, 160) || {de: ''}, url: cleanUrl(e.url), live: true};
+    }).filter(Boolean);
+    if(ev.length){ EVENTS.length = 0; ev.forEach(x => EVENTS.push(x)); LIVE.termine = true; }
+  }
+  LIVE.ok = LIVE.mensa || LIVE.fristen || LIVE.termine;
+  LIVE.stand = j.stand; LIVE.quelle = typeof j.quelle === 'string' ? j.quelle.slice(0, 200) : '';
+  return LIVE.ok;
+}
+/* where to look: config.js (datenUrl), daten.json next to the page, and on GitHub Pages the newest copy in the repository */
+function datenQuellen(){
+  const out = [];
+  const cfg = window.CAMPI_CONFIG && typeof window.CAMPI_CONFIG === 'object' ? window.CAMPI_CONFIG : {};
+  if(typeof cfg.datenUrl === 'string' && /^https:\/\//.test(cfg.datenUrl)) out.push(cfg.datenUrl);
+  if(/^https?:$/.test(location.protocol)) out.push('daten.json');
+  const h = location.hostname;
+  if(/\.github\.io$/i.test(h)){
+    const user = h.split('.')[0], seg = location.pathname.split('/').filter(Boolean)[0];
+    const repo = seg && !/\.html?$/i.test(seg) ? seg : h;
+    out.push('https://raw.githubusercontent.com/' + encodeURIComponent(user) + '/' + encodeURIComponent(repo) + '/HEAD/daten.json');
+  }
+  return out;
+}
+async function loadDaten(){
+  let best = null;
+  for(const url of datenQuellen()){
+    try {
+      const r = await fetch(url, {cache: 'no-cache'});
+      if(!r.ok) continue;
+      const j = await r.json();
+      if(j && j.version === 1 && typeof j.stand === 'string' && !isNaN(Date.parse(j.stand)) && (!best || Date.parse(j.stand) > Date.parse(best.stand))) best = j;
+      if(best && isoDay(new Date(best.stand)) === isoDay(new Date())) break;
+    } catch(e){}
+  }
+  if(best && applyDaten(best) && state.mode === 'app' && ['start', 'mensa', 'discover', 'chat'].includes(state.tab)) renderScreen(true);
+}
+/* menu of one campus for one day: live data when available, otherwise the example week */
+function mensaDay(c, date){
+  const m = c.mensa; if(!m) return null;
+  if(m.live){ const d = m.live[isoDay(date)]; return d ? Object.assign({live: true}, d) : {live: true, missing: true, dishes: []}; }
+  const idx = (date.getDay() + 6) % 7;
+  return idx < 5 ? {dishes: m.menu[idx]} : {closed: true, dishes: []};
+}
+function isMainDish(d){ return !(d.k && /(beilage|dessert|nachtisch|buffet|vorspeise|suppe|salat|sauce|so(ss|ß)e|getr(a|ä)nk)/i.test(d.k.de)); }
+function menuDate(){ return WEEKEND ? WEEK[0] : NOW; }
+function fristByKey(k){ return DEADLINES.find(d => d.key === k) || null; }
+function fmtDateL(iso, lang){ try { return new Date(iso + 'T12:00:00').toLocaleDateString(LOCALES[lang || LANG], {day:'numeric', month:'long', year:'numeric'}); } catch(e){ return iso; } }
+function fmtRangeL(von, bis, lang){
+  if(!von) return fmtDateL(bis, lang); if(!bis || von === bis) return fmtDateL(von, lang);
+  try { const f = new Intl.DateTimeFormat(LOCALES[lang || LANG], {day:'numeric', month:'long', year:'numeric'}); if(f.formatRange) return f.formatRange(new Date(von + 'T12:00:00'), new Date(bis + 'T12:00:00')); } catch(e){}
+  return fmtDateL(von, lang) + ' – ' + fmtDateL(bis, lang);
+}
+function standText(lang){ if(!LIVE.stand) return ''; try { const d = new Date(LIVE.stand); return d.toLocaleDateString(LOCALES[lang || LANG], {day:'numeric', month:'numeric'}) + ', ' + d.toLocaleTimeString(LOCALES[lang || LANG], {hour:'2-digit', minute:'2-digit'}); } catch(e){ return ''; } }
 
 
 /* ================= Icons ================= */
@@ -1469,6 +1586,16 @@ const WEEK = weekDates();
 function isoWeek(d){ const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const n = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - n); const y = new Date(Date.UTC(t.getUTCFullYear(),0,1)); return Math.ceil(((t - y) / 864e5 + 1) / 7); }
 function dateLabel(){ try { return NOW.toLocaleDateString(LOCALES[LANG], {weekday:'long', day:'numeric', month:'long'}); } catch(e){ return NOW.toDateString(); } }
 function dayMonth(iso, lang){ const d = new Date(iso + 'T12:00:00'); return d.getDate() + '. ' + tl('months', lang)[d.getMonth()]; }
+function deadlineList(){
+  const today = isoDay(NOW), all = DEADLINES.filter(d => d.bis || d.von).slice().sort((a, b) => (a.bis || a.von).localeCompare(b.bis || b.von));
+  const next = all.filter(d => (d.bis || d.von) >= today);
+  return next.length ? next : all;
+}
+function eventList(){
+  const today = isoDay(NOW);
+  const ev = EVENTS.filter(e => !ISO_RE.test(e.when) || e.when >= today);
+  return ev.slice().sort((a, b) => (b.c === state.campus) - (a.c === state.campus) || String(ISO_RE.test(a.when) ? a.when : '0').localeCompare(ISO_RE.test(b.when) ? b.when : '0'));
+}
 function eventWhen(e, lang){
   if(e.when === 'today') return t('today', null, lang);
   if(e.when === 'tue' || e.when === 'thu') return OH_DAYS[lang || LANG].split('|')[e.when === 'tue' ? 1 : 3];
@@ -1555,17 +1682,21 @@ function renderAppbar(){
 
 function greeting(){ const h = NOW.getHours(); return t(h < 11 ? 'greet_m' : (h < 18 ? 'greet_d' : 'greet_e')); }
 function tile(ic, title, sub, attrs){ return '<button class="tile" type="button" ' + attrs + '><span class="tico">' + icon(ic) + '</span><span><b>' + esc(title) + '</b><span class="tsub">' + esc(sub) + '</span></span></button>'; }
-function typeLabel(ty){ return t('ty_' + ty); }
+function typeLabel(ty, lang){ return t('ty_' + ty, null, lang); }
 function campusPill(){ return '<button class="campus-pill" type="button" data-act="sheet" data-sheet="campus" aria-label="' + esc(t('campus_btn')) + ': ' + esc(L(C().name)) + '">' + icon('pin') + '<span>' + esc(L(C().short)) + '</span>' + icon('chev') + '</button>'; }
 function screenHead(title, sub){ return '<div class="screen-head"><div class="sh-row"><h1>' + esc(title) + '</h1>' + campusPill() + '</div>' + (sub ? '<p class="muted">' + esc(sub) + '</p>' : '') + '</div>'; }
 
+function dishSub(d, lang){ return [d.t ? typeLabel(d.t, lang) : '', d.o ? t('counter', {n: d.o}, lang) : (d.k ? L(d.k, lang) : '')].filter(Boolean).join(' · '); }
+function mainDishes(day){ const m = day.dishes.filter(isMainDish); return m.length ? m : day.dishes; }
+function dayEmptyText(day){ return t(day.closed ? 'closed_day' : (day.missing ? 'no_menu_day' : 'no_dish')); }
 function mensaPreviewHTML(){
   const c = C();
   if(c.mensa){
-    const dishes = c.mensa.menu[TODAY_IDX].slice(0, 2);
-    return '<section class="card"><div class="sec-head"><h3>' + esc(t(WEEKEND ? 'mensa_monday' : 'mensa_today')) + '</h3><button class="link" type="button" data-act="tab" data-tab="mensa">' + esc(t('all_dishes')) + '</button></div><div class="rows">' +
-      dishes.map(d => '<div class="row"><div class="rt"><b>' + esc(L(d.n)) + '</b><span>' + esc(typeLabel(d.t)) + ' · ' + esc(t('counter', {n:d.o})) + '</span></div><span class="rv">' + euro(d.p) + '</span></div>').join('') +
-    '</div></section>';
+    const day = mensaDay(c, menuDate()), dishes = mainDishes(day).slice(0, 2);
+    return '<section class="card"><div class="sec-head"><h3>' + esc(t(WEEKEND ? 'mensa_monday' : 'mensa_today')) + '</h3><button class="link" type="button" data-act="tab" data-tab="mensa">' + esc(t('all_dishes')) + '</button></div>' +
+      (dishes.length ? '<div class="rows">' + dishes.map(d => '<div class="row"><div class="rt"><b>' + esc(L(d.n)) + '</b><span>' + esc(dishSub(d)) + '</span></div><span class="rv">' + (d.p ? euro(d.p) : '') + '</span></div>').join('') + '</div>'
+        : '<p class="muted">' + esc(dayEmptyText(day)) + '</p>') +
+    '</section>';
   }
   const cf = c.cafes[0];
   return '<section class="card"><div class="sec-head"><h3>' + esc(cf.name) + '</h3><button class="link" type="button" data-act="tab" data-tab="mensa">' + esc(t('more')) + '</button></div>' +
@@ -1573,7 +1704,7 @@ function mensaPreviewHTML(){
 }
 function screenStart(){
   const c = C(), nx = ROOMS[c.next.room], ch = c.change, nw = ROOMS[ch.now], was = ROOMS[ch.was];
-  const evs = EVENTS.slice().sort((a, b) => (b.c === state.campus) - (a.c === state.campus)).slice(0, 2);
+  const evs = eventList().slice(0, 2);
   return '<div class="pad stack">' + installCardHTML() +
     '<section class="hero"><div class="hero-top"><p class="hero-date">' + esc(dateLabel()) + '</p>' + campusPill() + '</div><h1 class="hero-title">' + esc(greeting()) + ', Lena</h1>' +
       '<form class="ask" data-form="ask-home">' + icon('spark') + '<label class="sr-only" for="ask-home">' + esc(t('ask_label')) + '</label><input id="ask-home" name="q" placeholder="' + esc(t('ask_ph')) + '" autocomplete="off" enterkeyhint="send"><button type="submit" aria-label="' + esc(t('ask_send')) + '">' + icon('send') + '</button></form></section>' +
@@ -1588,7 +1719,7 @@ function screenStart(){
     '</div></section>' +
     mensaPreviewHTML() +
     '<section class="card"><div class="sec-head"><h3>' + esc(t('soon')) + '</h3><button class="link" type="button" data-act="discover" data-seg="studi">' + esc(t('all_dates')) + '</button></div><div class="rows">' +
-      evs.map(e => '<div class="row"><div class="rt"><b>' + esc(L(e.n)) + '</b><span>' + esc(L(e.s)) + '</span></div><span class="rv">' + esc(eventWhen(e) + ', ' + e.time) + '</span></div>').join('') +
+      evs.map(e => '<div class="row"><div class="rt"><b>' + esc(L(e.n)) + '</b><span>' + esc(L(e.s)) + '</span></div><span class="rv">' + esc(eventWhen(e) + (e.time ? ', ' + e.time : '')) + '</span></div>').join('') +
     '</div></section>' +
     pilotFootHTML() + '<p class="foot-note">' + esc(t('footnote')) + '</p>' +
   '</div>';
@@ -1723,7 +1854,7 @@ function fold(s){ return String(s).toLowerCase().replace(/œ/g, 'oe').replace(/�
 function norm(s){ return fold(s); }
 function roomKeys(r){
   const keys = [];
-  if(r.code){ const k = r.code.replace(/\./g, ''); keys.push(k, k.replace(/^0/, ''), (CAMPUS[r.c].letter + k).toLowerCase(), (CAMPUS[r.c].letter + k.replace(/^0/, '')).toLowerCase()); }
+  if(r.nr){ const k = r.nr.replace(/\./g, ''), l = CAMPUS[r.c].letter.toLowerCase(); keys.push(k, k.replace(/^0/, ''), l + k, l + k.replace(/^0/, '')); }
   LANGS.forEach(l => keys.push(fold(roomName(r, l)).replace(/[\s.]/g, '')));
   (r.al || []).forEach(a => keys.push(fold(a).replace(/[\s.]/g, '')));
   return keys;
@@ -1757,8 +1888,8 @@ function screenMensa(){
       '</section>' +
       '<p class="src">' + icon('doc') + esc(t('cafe_src')) + '</p></div>';
   }
-  const f = state.filters;
-  const list = m.menu[state.day].filter(d => {
+  const f = state.filters, day = mensaDay(c, WEEK[state.day]);
+  const list = day.dishes.filter(d => {
     if(f.vegan && d.t !== 'vegan') return false;
     if(f.veggie && !(d.t === 'vegan' || d.t === 'vegetarisch')) return false;
     if(f.nogluten && d.a.includes('Gluten')) return false;
@@ -1775,15 +1906,15 @@ function screenMensa(){
     '<div class="chips" aria-label="' + esc(t('filter')) + '">' + chip('vegan', t('f_vegan')) + chip('veggie', t('f_veggie')) + chip('nogluten', t('f_gluten')) + '</div>' +
     '<div class="dishes">' + (list.length ? list.map(d =>
       '<article class="card"><div class="dish"><div><h3>' + esc(L(d.n)) + '</h3><div class="tags">' +
-        '<span class="tag' + (veg(d.t) ? ' veg' : '') + '">' + (veg(d.t) ? icon('leaf') : '') + esc(typeLabel(d.t)) + '</span>' +
-        '<span class="tag">' + esc(t('counter', {n:d.o})) + '</span></div></div>' +
-        '<div class="price"><b>' + euro(d.p) + '</b><span>' + esc(t('staff', {p: euro(d.p + 3)})) + '</span></div></div>' +
-        '<p class="allergen">' + esc(t('allergens', {a: d.a.map(a => L(ALG[a])).join(', ')})) + '</p></article>').join('')
-      : '<div class="card"><p class="muted">' + esc(t('no_dish')) + '</p></div>') + '</div>' +
+        (d.t ? '<span class="tag' + (veg(d.t) ? ' veg' : '') + '">' + (veg(d.t) ? icon('leaf') : '') + esc(typeLabel(d.t)) + '</span>' : '') +
+        (d.o ? '<span class="tag">' + esc(t('counter', {n:d.o})) + '</span>' : d.k ? '<span class="tag">' + esc(L(d.k)) + '</span>' : '') + '</div></div>' +
+        (d.p ? '<div class="price"><b>' + euro(d.p) + '</b>' + ((d.pb || !d.live) ? '<span>' + esc(t('staff', {p: euro(d.pb || d.p + 3)})) + '</span>' : '') + '</div>' : '') + '</div>' +
+        (d.a.length ? '<p class="allergen">' + esc(t('allergens', {a: d.a.map(a => L(ALG[a])).join(', ')})) + '</p>' : '') + '</article>').join('')
+      : '<div class="card"><p class="muted">' + esc(day.dishes.length ? t('no_dish') : dayEmptyText(day)) + '</p></div>') + '</div>' +
     '<section class="card"><p class="note-line">' + icon('calendar') + '<span>' + esc(t('open_hours', {h: fmtOH(m.open)})) + '</span></p>' +
       '<p class="note-line">' + icon('info') + '<span>' + esc(t('closed_on', {d: m.closed})) + '</span></p>' +
       '<div class="btn-row"><button class="btn btn-soft" type="button" data-act="route" data-room="' + c.id + '-MENSA">' + icon('pin') + esc(t('show_route')) + '</button><a class="btn btn-soft" href="' + esc(m.url) + '" target="_blank" rel="noopener" data-act="ext" data-ext="speiseplan">' + icon('ext') + esc(t('menu_link')) + '</a></div></section>' +
-    '<p class="src">' + icon('doc') + esc(t('mensa_src')) + '</p>' +
+    '<p class="src">' + icon('doc') + esc(m.live ? t('mensa_src_live', {stand: standText()}) : t('mensa_src')) + '</p>' +
   '</div>';
 }
 
@@ -1797,16 +1928,17 @@ function screenDiscover(){
   let body;
   if(studi){
     const mon = tl('months');
-    const evs = EVENTS.slice().sort((a, b) => (b.c === state.campus) - (a.c === state.campus));
+    const evs = eventList();
     body = '<section class="card"><div class="sec-head"><h3>' + esc(t('deadlines')) + '</h3></div><div class="rows">' +
-      DEADLINES.map(d => { const dt = new Date(d.d + 'T12:00:00'); return '<div class="row"><div class="rt"><b>' + esc(L(d.t)) + '</b><span>' + esc(L(d.s)) + '</span></div><span class="datebox"><b>' + dt.getDate() + '</b><span>' + esc(mon[dt.getMonth()]) + '</span></span></div>'; }).join('') + '</div></section>' +
+      deadlineList().map(d => { const dt = new Date((d.bis || d.von) + 'T12:00:00'); return '<div class="row"><div class="rt"><b>' + esc(L(d.t)) + '</b><span>' + esc(fmtRangeL(d.von, d.bis) + (d.wo && L(d.wo) ? ' · ' + L(d.wo) : '')) + '</span></div><span class="datebox"><b>' + dt.getDate() + '</b><span>' + esc(mon[dt.getMonth()]) + '</span></span></div>'; }).join('') + '</div></section>' +
       '<section class="card"><div class="sec-head"><h3>' + esc(t('contacts')) + '</h3></div><div class="rows">' +
       CONTACTS.map(k => {
         if(k.n){ const r = ROOMS[k.n], h = roomHours(r); return '<div class="row"><div class="rt"><b>' + esc(roomName(r)) + '</b><span>' + esc((r.code ? r.code + ' · ' : '') + buildingLabel(r) + ', ' + L(CAMPUS[r.c].short) + (h ? ' · ' + h : '')) + '</span></div><button class="link contact-btn" type="button" data-act="route" data-room="' + r.id + '">' + esc(t('route_short')) + '</button></div>'; }
         return '<div class="row"><div class="rt"><b>' + esc(L(k.name)) + '</b><span>' + esc(L(k.s)) + '</span></div></div>';
       }).join('') + '</div></section>' +
       '<section class="card"><div class="sec-head"><h3>' + esc(t('events')) + '</h3></div><div class="rows">' +
-      evs.map(e => '<div class="row"><div class="rt"><b>' + esc(L(e.n)) + '</b><span>' + esc(L(e.s)) + '</span></div><span class="rv">' + esc(eventWhen(e) + ', ' + e.time) + '</span></div>').join('') + '</div></section>';
+      evs.map(e => '<div class="row"><div class="rt"><b>' + esc(L(e.n)) + '</b><span>' + esc(L(e.s)) + '</span></div><span class="rv">' + esc(eventWhen(e) + (e.time ? ', ' + e.time : '')) + '</span></div>').join('') + '</div></section>' +
+      (LIVE.fristen || LIVE.termine ? '<p class="src">' + icon('doc') + esc(t('live_src', {stand: standText()})) + '</p>' : '');
   } else {
     const all = PLACES[cityName()] || [];
     const cats = PLACE_CATS.filter(k => k === 'alle' || all.some(p => p.c === k));
@@ -1887,12 +2019,12 @@ function suggestHTML(){
 
 /* language of a question: characters and frequent short words of the six languages */
 const SW = {
-  de:'wo was wann wie ist der die das ich mein meine kann gibt heute und ein eine hat komme man gibts zur zum im bis muss mich fur auf nicht es den dem welche welcher wer warum ob bei mit morgen abend heute raum essen wieso hier mir dir du',
-  en:'where what when how can is the my do does i which today are to for of in there get find need have should until open register room eat food you me any tonight library much',
-  es:'donde que cuando como puedo hay el los las mi es esta hoy para un una del me tengo hasta cual quiero comer abre abierto aula inscribirme examenes noche llego busco hola gracias por favor esta',
-  it:'dove cosa quando come posso c e il lo gli mio mia oggi per un una di del della devo fino quale voglio mangiare aperta aperto iscrivermi esami esame stasera arrivo trovo sono ciao grazie che',
-  fr:'ou quoi quand comment puis peux je le les mon ma est aujourd hui pour une du des dois jusqu quel quelle veux manger ouvert ouverte salle inscrire examens soir aller trouve qu bonjour merci ce cest',
-  tr:'nerede ne zaman nasil bugun ve bir mi mu var yok ben benim icin kadar hangi oda sinif sinav sinavlar kayit yemek acik kutuphane nereye aksam son tarih nedir misin miyim istiyorum nereden saat kac merhaba tesekkurler nasıl'
+  de:'wo was wann wie ist der die das ich mein meine kann gibt heute und ein eine hat komme man gibts zur zum im bis muss mich fur auf nicht es den dem welche welcher wer warum ob bei mit morgen abend raum essen wieso hier mir dir du gibt kannst habe brauche spatestens noch schon melde klausur klausuren prufung prufungen eintragen anmelden anmeldung bibliothek hochschule vorlesung danke hallo moin servus tschuss bitte veranstaltung veranstaltungen woche diese',
+  en:'where what when how can is the my do does i which today are to for of in there get find need have should until open register room eat food you me any tonight library much who helps help with exam exams deadline registration lunch canteen sign up last day connect student union lectures end there thanks thank lot please pls hello hi not working work isnt doesnt dont cant any this week events event week',
+  es:'donde que cuando como puedo hay el los las mi es esta hoy para un una del me tengo hasta cual quiero comer abre abierto aula inscribirme examenes noche llego busco hola gracias por favor esta dia plazo apuntarme fecha limite de la se paga horario aparcar semana fiestas estoy enfermo inscripcion menu muchas necesito eventos evento',
+  it:'dove cosa quando come posso c e il lo gli mio mia oggi per un una di del della devo fino quale voglio mangiare aperta aperto iscrivermi esami esame stasera arrivo trovo sono ciao grazie che mi si ci collego chi aiuta trova scadenza prenotare la orari orario iscrizione iscrizioni trasferito registrarmi feste malato spostare mangia chiudono eventi evento settimana questa',
+  fr:'ou quoi quand comment puis peux je le les mon ma est aujourd hui pour une du des dois jusqu quel quelle veux manger mange ouvert ouverte salle inscrire examens soir aller trouve qu bonjour merci ce cest au aux connecter faire obtenir declarer partiels delai il y on un de la cherche cours horaires sortir jour beaucoup frais payer ne pas marche fonctionne salut quels quelles cette semaine evenement evenements demain',
+  tr:'nerede ne zaman nasil bugun ve bir mi mu var yok ben benim icin kadar hangi oda sinif sinav sinavlar kayit yemek acik kutuphane nereye aksam son tarih nedir misin miyim istiyorum nereden saat kac merhaba tesekkurler gidebilirim giderim baglanirim alirim etkinlik etkinlikler hafta'
 };
 const SW_SETS = {}; Object.keys(SW).forEach(l => SW_SETS[l] = new Set(SW[l].split(' ')));
 function detectLang(q, fallback){
@@ -1908,6 +2040,10 @@ function detectLang(q, fallback){
   if(/[áíóú]/.test(raw)) sc.es += 1.5;
   if(/\b(qu|j|d|l|n|c|s)['’]/.test(raw)) sc.fr += 1.2;
   if(/\b(dell|all|dall|nell|un|l)['’]/.test(raw)) sc.it += 1;
+  if(/[é]/.test(raw)){ sc.fr += 0.6; sc.es += 0.4; }
+  if(/\bil y a\b|est-ce|c['’]est|j['’]ai|aujourd['’]hui|s['’]il|qu['’]on|m['’]inscrire/.test(raw)) sc.fr += 2;
+  if(/c['’]è|dov['’]è|cos['’]è|qual è|ci sono|un['’]/.test(raw)) sc.it += 2;
+  if(/\bhay\b|¿/.test(raw)) sc.es += 1;
   n.split(/[^a-z0-9]+/).filter(Boolean).forEach(w => LANGS.forEach(l => { if(SW_SETS[l].has(w)) sc[l] += 1; }));
   if(/\w(mi|mu|misin|miyim|dir|nerede)\b/.test(n) || /\b\w+(da|de|ta|te|dan|den)\b.*\?/.test(n) && sc.tr > 0) sc.tr += 0.5;
   const fb = fallback || LANG;
@@ -1938,12 +2074,7 @@ const TPL = {
   from: X('Ab {from} sind es etwa {m}, rund {min} Min. zu Fuß.','From {from} it’s about {m}, roughly {min} min on foot.','Desde {from} hay unos {m}, unos {min} min a pie.','Partenza: {from}. Circa {m}, circa {min} min a piedi.','Depuis {from}, il y a environ {m}, soit environ {min} min à pied.','Başlangıç: {from}. Yaklaşık {m}, yürüyerek yaklaşık {min} dakika.'),
   no_room: X('Den Raum {code} finde ich im Raumplan nicht, deshalb rate ich nicht. Prüf bitte die Nummer, zum Beispiel {ex}, oder frag beim Studierendenservice nach.','I can’t find room {code} in the room plan, so I won’t guess. Please check the number, for example {ex}, or ask student services.','No encuentro el aula {code} en el plano, así que no voy a adivinar. Comprueba el número, por ejemplo {ex}, o pregunta en servicios al estudiante.','Non trovo l’aula {code} nella piantina, quindi non tiro a indovinare. Controlla il numero, ad esempio {ex}, o chiedi alla segreteria studenti.','Je ne trouve pas la salle {code} dans le plan, donc je ne devine pas. Vérifie le numéro, par exemple {ex}, ou demande à la scolarité.','{code} numaralı odayı oda planında bulamıyorum, bu yüzden tahmin etmeyeceğim. Lütfen numarayı kontrol et (örneğin {ex}) ya da öğrenci işlerine sor.'),
   hello: X('Hallo! Frag mich zu Räumen, Mensa, Fristen oder zum Leben in {city}.','Hi! Ask me about rooms, the Mensa, deadlines or life in {city}.','¡Hola! Pregúntame por aulas, la Mensa, plazos o la vida en {city}.','Ciao! Chiedimi di aule, mensa, scadenze o della vita a {city}.','Salut ! Pose-moi tes questions sur les salles, la Mensa, les délais ou la vie à {city}.','Merhaba! Bana odalar, yemekhane, son tarihler ya da {city}’deki hayat hakkında sor.'),
-  exam: X('Die Prüfungsanmeldung für das Wintersemester läuft vom 2. bis 16. November 2026 im Campus-Portal. Danach geht es nur noch über das Prüfungsamt (Raum {room}, Gebäude 1, Stadtmitte, {h}).',
-    'Exam registration for the winter semester runs from 2 to 16 November 2026 in the campus portal. After that, only the examination office can register you (room {room}, building 1, Stadtmitte, {h}).',
-    'La inscripción a los exámenes del semestre de invierno está abierta del 2 al 16 de noviembre de 2026 en el portal del campus. Después solo es posible a través de la oficina de exámenes (sala {room}, edificio 1, Stadtmitte, {h}).',
-    'L’iscrizione agli esami del semestre invernale è aperta dal 2 al 16 novembre 2026 nel portale del campus. Dopo è possibile solo tramite l’ufficio esami (stanza {room}, edificio 1, Stadtmitte, {h}).',
-    'L’inscription aux examens du semestre d’hiver est ouverte du 2 au 16 novembre 2026 sur le portail du campus. Ensuite, seul le service des examens peut t’inscrire (salle {room}, bâtiment 1, Stadtmitte, {h}).',
-    'Kış dönemi sınav kaydı 2–16 Kasım 2026 tarihleri arasında kampüs portalında yapılır. Bu tarihten sonra kayıt yalnızca sınav ofisi üzerinden mümkündür ({room} numaralı oda, 1 numaralı bina, Stadtmitte, {h}).'),
+  exam: X('Prüfungsanmeldung: {range}, im Campus-Portal. Danach geht es nur noch über das Prüfungsamt (Raum {room}, Gebäude 1, Stadtmitte, {h}).','Exam registration: {range}, in the campus portal. After that, only the examination office can register you (room {room}, building 1, Stadtmitte, {h}).','Inscripción a exámenes: {range}, en el portal del campus. Después solo es posible a través de la oficina de exámenes (sala {room}, edificio 1, Stadtmitte, {h}).','Iscrizione agli esami: {range}, nel portale del campus. Dopo è possibile solo tramite l’ufficio esami (stanza {room}, edificio 1, Stadtmitte, {h}).','Inscription aux examens : {range}, sur le portail du campus. Ensuite, seul le service des examens peut t’inscrire (salle {room}, bâtiment 1, Stadtmitte, {h}).','Sınav kaydı: {range}, kampüs portalında. Bu tarihten sonra kayıt yalnızca sınav ofisi üzerinden mümkündür ({room} numaralı oda, 1 numaralı bina, Stadtmitte, {h}).'),
   addr: X('Deinen Wohnsitz meldest du innerhalb von zwei Wochen nach dem Einzug beim Bürgeramt {city} an. Buch vorher online einen Termin und bring Ausweis und die Wohnungsgeberbestätigung deines Vermieters mit.',
     'Register your address at the Bürgeramt (citizens’ office) of {city} within two weeks of moving in. Book an appointment online first and bring your passport or ID and the landlord’s confirmation (Wohnungsgeberbestätigung).',
     'Debes empadronarte en el Bürgeramt (oficina de atención ciudadana) de {city} en las dos semanas siguientes a la mudanza. Pide cita en línea y lleva tu pasaporte o DNI y la confirmación del casero (Wohnungsgeberbestätigung).',
@@ -1954,26 +2085,28 @@ const TPL = {
   mensa_weekend: X('Am Wochenende ist die Mensa geschlossen. Am Montag gibt es in der {mensa}:','The Mensa is closed at the weekend. On Monday, {mensa} serves:','La Mensa cierra el fin de semana. El lunes, en la {mensa} habrá:','Nel fine settimana la mensa è chiusa. Lunedì alla {mensa} ci sarà:','La Mensa est fermée le week-end. Lundi, à la {mensa}, il y aura :','Hafta sonu yemekhane kapalı. Pazartesi {mensa} menüsü:'),
   mensa_none: X('Heute steht dort kein passendes Gericht auf dem Plan.','There’s no matching dish on the menu today.','Hoy no hay ningún plato que encaje en el menú.','Oggi non c’è un piatto adatto nel menù.','Aujourd’hui, aucun plat ne correspond au menu.','Bugün menüde uygun bir yemek yok.'),
   serve: X('Essensausgabe {h}.','Food is served {h}.','Horario de comidas: {h}.','Distribuzione pasti: {h}.','Service des repas : {h}.','Yemek servisi: {h}.'),
-  deadline: X('Die Rückmeldung für das Sommersemester 2027 läuft bis zum 15. Januar 2027. Dafür überweist du den Semesterbeitrag; die Kontodaten findest du im Campus-Portal.',
-    'Re-registration for the summer semester 2027 runs until 15 January 2027. To re-register, pay the semester fee; the bank details are in the campus portal.',
-    'La renovación de matrícula para el semestre de verano 2027 está abierta hasta el 15 de enero de 2027. Para ello, transfiere la tasa semestral; los datos bancarios están en el portal del campus.',
-    'Il rinnovo dell’iscrizione per il semestre estivo 2027 è possibile fino al 15 gennaio 2027. Basta versare il contributo semestrale; i dati bancari sono nel portale del campus.',
-    'La réinscription pour le semestre d’été 2027 est possible jusqu’au 15 janvier 2027. Il suffit de virer les frais semestriels ; les coordonnées bancaires sont sur le portail du campus.',
-    '2027 yaz dönemi kayıt yenileme 15 Ocak 2027’ye kadar sürer. Bunun için dönem harcını yatırman yeterli; banka bilgileri kampüs portalında.'),
+  deadline: X('Rückmeldung für das nächste Semester: bis {date}. Dafür überweist du den Semesterbeitrag; die Kontodaten findest du im Campus-Portal.','Re-registration for next semester: by {date}. To re-register, pay the semester fee; the bank details are in the campus portal.','Renovación de matrícula para el próximo semestre: hasta el {date}. Para ello, transfiere la tasa semestral; los datos bancarios están en el portal del campus.','Rinnovo dell’iscrizione per il prossimo semestre: entro il {date}. Basta versare il contributo semestrale; i dati bancari sono nel portale del campus.','Réinscription pour le prochain semestre : jusqu’au {date}. Il suffit de virer les frais semestriels ; les coordonnées bancaires sont sur le portail du campus.','Gelecek dönem için kayıt yenileme: {date} tarihine kadar. Bunun için dönem harcını yatırman yeterli; banka bilgileri kampüs portalında.'),
   lib_sm: X('Am Standort Stadtmitte gibt es nur eine Abholstelle; Bibliotheken mit Lernplätzen findest du an der Flandernstraße und in Göppingen.','At Stadtmitte there is only a pick-up point; the libraries with study spaces are at Flandernstraße and in Göppingen.','En Stadtmitte solo hay un punto de recogida; las bibliotecas con puestos de estudio están en Flandernstraße y en Göppingen.','A Stadtmitte c’è solo un punto di ritiro; le biblioteche con posti studio sono a Flandernstraße e a Göppingen.','À Stadtmitte, il n’y a qu’un point de retrait ; les bibliothèques avec places de travail sont à Flandernstraße et à Göppingen.','Stadtmitte’de yalnızca bir teslim noktası var; çalışma alanlı kütüphaneler Flandernstraße’de ve Göppingen’de.'),
   wifi: X('Auf dem Campus nutzt du eduroam. Du meldest dich mit deinem Hochschul-Account und deinem Passwort an; Anleitungen für dein Gerät gibt es beim Rechenzentrum.','On campus you use eduroam. Log in with your university account and password; the IT centre has setup guides for your device.','En el campus se usa eduroam. Inicia sesión con tu cuenta de la universidad y tu contraseña; el centro de informática tiene guías para tu dispositivo.','Nel campus si usa eduroam. Accedi con il tuo account universitario e la password; il centro di calcolo ha le guide per il tuo dispositivo.','Sur le campus, on utilise eduroam. Connecte-toi avec ton compte de l’université et ton mot de passe ; le centre informatique propose des guides pour ton appareil.','Kampüste eduroam kullanılır. Üniversite hesabın ve şifrenle giriş yap; cihazın için kurulum kılavuzları bilgi işlem merkezinde.'),
-  night_es: X('Heute Abend startet um 19 Uhr die Ersti-Kneipentour, Treffpunkt vor der Mensa Stadtmitte. Sonst lohnt sich die Altstadt rund um den Marktplatz mit Cafés, Kneipen und Weinstuben, oder ein Konzert im Kulturzentrum Dieselstraße.',
-    'Tonight at 7 pm the first-semester pub tour starts, meeting point in front of Mensa Stadtmitte. Otherwise, head to the old town around the market square with its cafés, pubs and wine bars, or catch a concert at Kulturzentrum Dieselstraße.',
-    'Esta noche a las 19:00 empieza la ruta de bares para novatos, punto de encuentro frente a la Mensa Stadtmitte. Si no, merece la pena el casco antiguo alrededor de la plaza del mercado, con cafés, bares y tabernas de vino, o un concierto en el Kulturzentrum Dieselstraße.',
-    'Stasera alle 19 parte il giro dei pub per matricole, ritrovo davanti alla mensa Stadtmitte. Altrimenti c’è il centro storico intorno alla piazza del mercato con caffè, pub ed enoteche, oppure un concerto al Kulturzentrum Dieselstraße.',
-    'Ce soir à 19 h commence la tournée des bars pour les nouveaux, rendez-vous devant la Mensa Stadtmitte. Sinon, la vieille ville autour de la place du marché a des cafés, des bars et des bars à vin, ou il y a des concerts au Kulturzentrum Dieselstraße.',
-    'Bu akşam saat 19:00’da birinci sınıflar için bar turu başlıyor, buluşma noktası Stadtmitte yemekhanesinin önü. Bunun dışında pazar meydanı çevresindeki eski şehirde kafeler, barlar ve şarap mekânları var; ya da Kulturzentrum Dieselstraße’de bir konsere gidebilirsin.'),
-  night_gp: X('Donnerstags ist Spieleabend im Café Campus (Gebäude 3). Sonst findest du Cafés und Bars rund um den Marktplatz in der Innenstadt.','On Thursdays there’s a games night at Café Campus (building 3). Otherwise you’ll find cafés and bars around the market square in the town centre.','Los jueves hay noche de juegos en el Café Campus (edificio 3). Si no, hay cafés y bares alrededor de la plaza del mercado, en el centro.','Il giovedì c’è la serata giochi al Café Campus (edificio 3). Altrimenti trovi caffè e bar intorno alla piazza del mercato in centro.','Le jeudi, c’est soirée jeux au Café Campus (bâtiment 3). Sinon, il y a des cafés et des bars autour de la place du marché en centre-ville.','Perşembe günleri Café Campus’te (3 numaralı bina) oyun gecesi var. Bunun dışında şehir merkezinde pazar meydanının çevresinde kafeler ve barlar bulursun.'),
-  sport: X('Hochschulsport: Bouldern dienstags um 18 Uhr, Treffpunkt Sportraum 02.010 an der Flandernstraße, ohne Anmeldung. Alle weiteren Kurse findest du im Portal des Hochschulsports.','University sports: bouldering on Tuesdays at 6 pm, meeting point sports room 02.010 at Flandernstraße, no sign-up needed. All other courses are listed in the university sports portal.','Deporte universitario: búlder los martes a las 18:00, punto de encuentro en la sala de deporte 02.010 de Flandernstraße, sin inscripción. El resto de cursos están en el portal de deporte universitario.','Sport universitario: bouldering il martedì alle 18, ritrovo nella palestra 02.010 a Flandernstraße, senza iscrizione. Tutti gli altri corsi sono nel portale dello sport universitario.','Sport universitaire : bloc le mardi à 18 h, rendez-vous salle de sport 02.010 à Flandernstraße, sans inscription. Tous les autres cours sont sur le portail du sport universitaire.','Üniversite sporu: salı günleri saat 18:00’de bouldering, buluşma Flandernstraße’deki 02.010 spor salonu, kayıt gerekmez. Diğer tüm kurslar üniversite sporu portalında.'),
+  night_es: X('Abends lohnt sich die Esslinger Altstadt rund um den Marktplatz mit Cafés, Kneipen und Weinstuben, oder ein Konzert im Kulturzentrum Dieselstraße.',
+    'In the evening, head to Esslingen’s old town around the market square with its cafés, pubs and wine bars, or catch a concert at Kulturzentrum Dieselstraße.',
+    'Por la noche merece la pena el casco antiguo de Esslingen, alrededor de la plaza del mercado, con cafés, bares y tabernas de vino, o un concierto en el Kulturzentrum Dieselstraße.',
+    'La sera vale la pena il centro storico di Esslingen intorno alla piazza del mercato, con caffè, pub ed enoteche, oppure un concerto al Kulturzentrum Dieselstraße.',
+    'Le soir, la vieille ville d’Esslingen autour de la place du marché a des cafés, des bars et des bars à vin, et il y a des concerts au Kulturzentrum Dieselstraße.',
+    'Akşamları Esslingen’in pazar meydanı çevresindeki eski şehrinde kafeler, barlar ve şarap mekânları var; ya da Kulturzentrum Dieselstraße’de bir konsere gidebilirsin.'),
+  night_gp: X('In Göppingen findest du abends Cafés und Bars rund um den Marktplatz in der Innenstadt.','In Göppingen you’ll find cafés and bars around the market square in the town centre.','En Göppingen hay cafés y bares alrededor de la plaza del mercado, en el centro.','A Göppingen trovi caffè e bar intorno alla piazza del mercato in centro.','À Göppingen, il y a des cafés et des bars autour de la place du marché en centre-ville.','Göppingen’de şehir merkezinde pazar meydanının çevresinde kafeler ve barlar bulursun.'),
+  events_today: X('Heute: {list}.','Today: {list}.','Hoy: {list}.','Oggi: {list}.','Aujourd’hui : {list}.','Bugün: {list}.'),
+  sport: X('Hochschulsport: Bouldern dienstags um 18 Uhr, Treffpunkt Sportraum F 02.010 an der Flandernstraße, ohne Anmeldung. Alle weiteren Kurse findest du im Portal des Hochschulsports.','University sports: bouldering on Tuesdays at 6 pm, meeting point sports room F 02.010 at Flandernstraße, no sign-up needed. All other courses are listed in the university sports portal.','Deporte universitario: búlder los martes a las 18:00, punto de encuentro en la sala de deporte F 02.010 de Flandernstraße, sin inscripción. El resto de cursos están en el portal de deporte universitario.','Sport universitario: bouldering il martedì alle 18, ritrovo nella palestra F 02.010 a Flandernstraße, senza iscrizione. Tutti gli altri corsi sono nel portale dello sport universitario.','Sport universitaire : bloc le mardi à 18 h, rendez-vous salle de sport F 02.010 à Flandernstraße, sans inscription. Tous les autres cours sont sur le portail du sport universitaire.','Üniversite sporu: salı günleri saat 18:00’de bouldering, buluşma Flandernstraße’deki F 02.010 spor salonu, kayıt gerekmez. Diğer tüm kurslar üniversite sporu portalında.'),
   cert: X('Deine Studienbescheinigung lädst du selbst im Campus-Portal unter „Dokumente“ herunter. Für alles andere hilft der Studierendenservice: Raum {room}, Gebäude 1, Stadtmitte, {h}.','You can download your enrolment certificate yourself in the campus portal under “Documents”. For anything else, student services can help: room {room}, building 1, Stadtmitte, {h}.','Puedes descargar tu certificado de matrícula en el portal del campus, en «Documentos». Para todo lo demás, te ayudan en servicios al estudiante: sala {room}, edificio 1, Stadtmitte, {h}.','Puoi scaricare il certificato di iscrizione nel portale del campus, alla voce «Documenti». Per tutto il resto ti aiuta la segreteria studenti: stanza {room}, edificio 1, Stadtmitte, {h}.','Tu peux télécharger ton certificat de scolarité sur le portail du campus, rubrique « Documents ». Pour le reste, la scolarité t’aide : salle {room}, bâtiment 1, Stadtmitte, {h}.','Öğrenci belgeni kampüs portalında “Belgeler” bölümünden kendin indirebilirsin. Diğer her konuda öğrenci işleri yardımcı olur: {room} numaralı oda, 1 numaralı bina, Stadtmitte, {h}.'),
   intl: X('Hier bekommst du Hilfe zu Visum, Aufenthalt, Auslandssemester und Erasmus.','They help with visas, residence permits, semesters abroad and Erasmus.','Te ayudan con visados, permisos de residencia, semestres en el extranjero y Erasmus.','Ti aiutano con visti, permessi di soggiorno, semestri all’estero ed Erasmus.','On t’y aide pour les visas, les titres de séjour, les semestres à l’étranger et Erasmus.','Vize, oturma izni, yurt dışı dönemi ve Erasmus konularında yardım alırsın.'),
   hours: X('Geöffnet {h}.','Open {h}.','Abierto {h}.','Aperto {h}.','Ouvert {h}.','Açık: {h}.'),
   unsure: X('Dazu habe ich keine geprüfte Quelle, deshalb rate ich nicht. Frag am besten direkt nach: {office}, {where}.','I don’t have a verified source for that, so I won’t guess. Best ask directly: {office}, {where}.','No tengo una fuente verificada sobre eso, así que no voy a adivinar. Lo mejor es preguntar directamente: {office}, {where}.','Non ho una fonte verificata su questo, quindi non tiro a indovinare. Meglio chiedere direttamente: {office}, {where}.','Je n’ai pas de source vérifiée à ce sujet, donc je ne devine pas. Le mieux est de demander directement : {office}, {where}.','Bu konuda doğrulanmış bir kaynağım yok, bu yüzden tahmin etmeyeceğim. En iyisi doğrudan sor: {office}, {where}.'),
+  exam_past: X('Die Prüfungsanmeldung ({range}) ist vorbei. Jetzt geht es nur noch über das Prüfungsamt (Raum {room}, Gebäude 1, Stadtmitte, {h}).','Exam registration ({range}) has closed. Now only the examination office can help (room {room}, building 1, Stadtmitte, {h}).','La inscripción a exámenes ({range}) ya ha terminado. Ahora solo es posible a través de la oficina de exámenes (sala {room}, edificio 1, Stadtmitte, {h}).','L’iscrizione agli esami ({range}) è chiusa. Ora è possibile solo tramite l’ufficio esami (stanza {room}, edificio 1, Stadtmitte, {h}).','L’inscription aux examens ({range}) est terminée. Il faut maintenant passer par le service des examens (salle {room}, bâtiment 1, Stadtmitte, {h}).','Sınav kaydı ({range}) sona erdi. Artık yalnızca sınav ofisi üzerinden mümkün ({room} numaralı oda, 1 numaralı bina, Stadtmitte, {h}).'),
+  lectures_end: X('Die Vorlesungszeit endet am {date}.','Lectures end on {date}.','El periodo de clases termina el {date}.','Le lezioni terminano il {date}.','Les cours se terminent le {date}.','Dersler {date} tarihinde sona eriyor.'),
+  thanks: X('Gern geschehen! Frag mich jederzeit wieder.','You’re welcome! Ask me anytime.','¡De nada! Pregúntame cuando quieras.','Prego! Chiedimi quando vuoi.','Avec plaisir ! Pose-moi d’autres questions quand tu veux.','Rica ederim! İstediğin zaman tekrar sor.'),
+  events_list: X('Als Nächstes: {list}.','Coming up: {list}.','Próximamente: {list}.','Prossimamente: {list}.','À venir : {list}.','Yaklaşan etkinlikler: {list}.'),
+  events_none: X('Gerade stehen keine Veranstaltungen im Kalender. Unter Entdecken › Stadtleben findest du Tipps für deine Freizeit.','There are no events in the calendar right now. Discover › City life has tips for your free time.','Ahora mismo no hay eventos en el calendario. En Descubrir › Ciudad encontrarás ideas para tu tiempo libre.','Al momento non ci sono eventi in calendario. In Scopri › Città trovi idee per il tempo libero.','Aucun événement au calendrier pour le moment. Dans Découvrir › En ville, tu trouveras des idées pour ton temps libre.','Şu anda takvimde etkinlik yok. Keşfet › Şehir bölümünde boş zaman önerileri var.'),
+  which_room: X('Welchen Raum suchst du? Gib die Raumnummer ein, zum Beispiel {ex}, oder einen Ort wie Bibliothek oder Mensa.','Which room are you looking for? Type the room number, for example {ex}, or a place like library or Mensa.','¿Qué aula buscas? Escribe el número, por ejemplo {ex}, o un lugar como biblioteca o Mensa.','Quale aula cerchi? Scrivi il numero, ad esempio {ex}, o un luogo come biblioteca o mensa.','Quelle salle cherches-tu ? Indique le numéro, par exemple {ex}, ou un lieu comme la bibliothèque ou la Mensa.','Hangi odayı arıyorsun? Oda numarasını yaz (örneğin {ex}) ya da kütüphane veya yemekhane gibi bir yer.'),
   housing_where: X('Studierendenwerk Stuttgart, Wohnen und BAföG','Studierendenwerk Stuttgart, housing and BAföG','Studierendenwerk Stuttgart, alojamiento y BAföG','Studierendenwerk Stuttgart, alloggi e BAföG','Studierendenwerk Stuttgart, logement et BAföG','Studierendenwerk Stuttgart, konut ve BAföG')
 };
 function fill(s, vars){ return s.replace(/\{(\w+)\}/g, (m, k) => vars[k] !== undefined ? vars[k] : m); }
@@ -1981,25 +2114,26 @@ function T(key, lang, vars){ return fill(L(TPL[key], lang), vars || {}); }
 function capFirst(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
 
 function campusFromText(n){
-  if(/stadtmitte|kanalstr|city cent|centro|centre-ville|sehir merkezi/.test(n)) return 'SM';
+  if(/stadtmitte|kanalstr|city cent|centro citta|centre ville|sehir merkezi/.test(n)) return 'SM';
   if(/flandern/.test(n)) return 'FL';
   if(/goppingen|goeppingen/.test(n)) return 'GP';
   return null;
 }
 function roomFromText(q, hay){
-  const m = String(q).match(/(?:^|[^\w])(?:([sfg])\s?)?(\d{1,2})\s?[.,]\s?(\d{3})(?!\d)/i);
+  const m = String(q).match(/(?:^|[^\w])(?:([sfg])\s?(\d{1,2})\s?[.,]?\s?(\d{3})|(\d{1,2})\s?[.,]\s?(\d{3}))(?!\d)/i);
   if(!m) return null;
-  const code = String(m[2]).padStart(2, '0') + '.' + m[3];
+  const nr = String(m[2] || m[4]).padStart(2, '0') + '.' + (m[3] || m[5]);
   const letter = m[1] ? m[1].toUpperCase() : null;
   const want = letter ? CAMPUS_IDS.find(k => CAMPUS[k].letter === letter) : (campusFromText(hay) || null);
-  const hits = ROOM_LIST.filter(r => r.code === code && (!want || r.c === want));
+  const hits = ROOM_LIST.filter(r => r.nr === nr && (!want || r.c === want));
   hits.sort((a, b) => (b.c === state.campus) - (a.c === state.campus));
-  return {id: hits.length ? hits[0].id : null, code};
+  return {id: hits.length ? hits[0].id : null, code: (letter ? letter + ' ' : '') + nr};
 }
-function placeFromText(hay){
+function placeFromText(hay, prefer){
   const nameHit = r => r.name && LANGS.some(l => { const k = fold(L(r.name, l)).replace(/\s*\(.*\)$/, ''); return k.length >= 6 && hay.includes(k); });
   const cands = ROOM_LIST.filter(r => (r.al || []).some(a => hay.includes(fold(a))) || nameHit(r));
-  cands.sort((a, b) => (b.c === state.campus) - (a.c === state.campus));
+  const pc = prefer || state.campus;
+  cands.sort((a, b) => (b.c === pc) - (a.c === pc));
   return cands.length ? cands[0].id : null;
 }
 function fromSentence(r, lang){
@@ -2011,94 +2145,129 @@ function fromSentence(r, lang){
 function routeAnswer(r, lang, topic){
   const c = CAMPUS[r.c], h = roomHours(r, lang, ', ');
   const name = r.name && r.code ? roomName(r, lang) + ' · ' + r.code : roomName(r, lang);
-  const text = T('place_at', lang, {name, campus: L(c.name, lang), where: roomWhere(r, lang)}) +
+  let text = T('place_at', lang, {name, campus: L(c.name, lang), where: roomWhere(r, lang)}) +
     ' ' + fromSentence(r, lang) + (h ? ' ' + T('hours', lang, {h}) : '');
-  return {topic: topic || 'Raumsuche', ok:true, msg:{role:'bot', lang, text, source: L(SRC.rooms, lang), action:{act:'route', room:r.id, icon:'pin', label: t('show_route', null, lang)}}};
+  if(r.lib && r.c === 'SM') text += ' ' + T('lib_sm', lang);
+  return {topic: topic || 'Raumsuche', ok:true, msg:{role:'bot', lang, text, source: L(r.lib ? SRC.library : SRC.rooms, lang), action:{act:'route', room:r.id, icon:'pin', label: t('show_route', null, lang)}}};
 }
-function dishLine(d, lang){ return L(d.n, lang) + ' (' + euro(d.p, lang) + ', ' + t('counter', {n: d.o}, lang) + ')'; }
+function placeAnswer(r, lang){
+  if(r.id === 'SM-IC'){ const res = routeAnswer(r, lang, 'International'); res.msg.text += ' ' + T('intl', lang); res.msg.source = L(SRC.intl, lang); return res; }
+  if(/-ASTA$/.test(r.id)){ const res = routeAnswer(r, lang, 'AStA'); res.msg.source = L(SRC.asta, lang); return res; }
+  return routeAnswer(r, lang, r.lib ? 'Bibliothek' : 'Raumsuche');
+}
+function dishLine(d, lang){
+  const k = d.k && !/^(haupt)?(gericht|essen|men(u|ü)|linie|ausgabe|theke|tagesgericht)(?=[\s\d.:-]|$)/i.test(d.k.de) ? L(d.k, lang) : '';
+  const extra = [d.p ? euro(d.p, lang) : '', d.o ? t('counter', {n: d.o}, lang) : k].filter(Boolean).join(', ');
+  return L(d.n, lang) + (extra ? ' (' + extra + ')' : '');
+}
+function mensaAnswer(c, lang, U){
+  const msg = o => Object.assign({role:'bot', lang}, o);
+  if(!c.mensa){
+    const cf = c.cafes[0];
+    return {topic:'Mensa', ok:true, msg: msg({text: L(c.mensaNote, lang) + ' ' + cf.name + ': ' + L(cf.offer, lang) + ' ' + T('hours', lang, {h: fmtOH(cf.open, lang, ', ')}) + ' ' + capFirst(L(HINT.temp_caf, lang)) + '.', source: L(SRC.mensa, lang), action:{act:'tab', tab:'mensa', icon:'cutlery', label: t('cafeteria', null, lang)}})};
+  }
+  const vegan = U.c.has('VEGAN'), veg = U.c.has('VEGGIE');
+  const day = mensaDay(c, menuDate());
+  const pool = (vegan || veg) ? day.dishes : mainDishes(day);
+  const list = (vegan ? pool.filter(d => d.t === 'vegan') : veg ? pool.filter(d => d.t === 'vegan' || d.t === 'vegetarisch') : pool).slice(0, 5);
+  const pre = T(WEEKEND ? 'mensa_weekend' : 'mensa_today', lang, {mensa: c.mensa.name});
+  const body = list.length ? ' ' + list.map(d => dishLine(d, lang)).join('; ') + '.' : ' ' + (day.closed ? t('closed_day', null, lang) : day.missing ? t('no_menu_day', null, lang) : T('mensa_none', lang));
+  return {topic:'Mensa', ok:true, msg: msg({text: pre + body + ' ' + T('serve', lang, {h: fmtOH(c.mensa.serve, lang, ', ')}), source: c.mensa.live ? t('mensa_src_live', {stand: standText(lang)}, lang).replace(/^[^:]*:\s*/, '') : L(SRC.mensa, lang), action:{act:'tab', tab:'mensa', icon:'cutlery', label: t('all_dishes', null, lang)}})};
+}
+/* evening: what is on today in this town (from the event calendar), then general tips */
+function nightAnswer(c, lang){
+  const today = isoDay(NOW);
+  const ev = eventList().filter(e => (e.when === 'today' || e.when === today) && (!e.time || e.time >= '16:00') && (!e.c || CAMPUS[e.c].city === c.city)).slice(0, 2);
+  const line = e => { const x = [e.time, e.s && L(e.s, lang)].filter(Boolean).join(', '); return L(e.n, lang) + (x ? ' (' + x + ')' : ''); };
+  const pre = ev.length ? T('events_today', lang, {list: ev.map(line).join('; ')}) + ' ' : '';
+  return {topic:'Stadtleben', ok:true, msg:{role:'bot', lang, text: pre + T(c.city === 'Göppingen' ? 'night_gp' : 'night_es', lang), source: L(SRC.events, lang), action:{act:'discover', seg:'stadt', icon:'city', label: t('seg_city', null, lang)}}};
+}
+function eventsAnswer(c, lang, night){
+  const msg = o => Object.assign({role:'bot', lang}, o);
+  const list = eventList().slice(0, 3);
+  if(!list.length){
+    if(night) return nightAnswer(c, lang);
+    return {topic:'Veranstaltungen', ok:true, msg: msg({text: T('events_none', lang), source: L(SRC.events, lang), action:{act:'discover', seg:'stadt', icon:'city', label: t('seg_city', null, lang)}})};
+  }
+  const line = e => eventWhen(e, lang) + (e.time ? ', ' + e.time : '') + ': ' + L(e.n, lang) + (e.s && L(e.s, lang) ? ' (' + L(e.s, lang) + ')' : '');
+  const live = list.some(e => e.live);
+  return {topic:'Veranstaltungen', ok:true, msg: msg({text: T('events_list', lang, {list: list.map(line).join('; ')}), source: live ? t('live_src', {stand: standText(lang)}, lang).replace(/^[^:]*:\s*/, '') + ' · hs-esslingen.de' : L(SRC.events, lang), action:{act:'discover', seg:'studi', icon:'calendar', label: t('events', null, lang)}})};
+}
+function examAnswer(lang){
+  const pa = ROOMS['SM-PA'], f = fristByKey('pruefungsanmeldung');
+  const vars = {room: pa.code, h: roomHours(pa, lang, ', '), range: f ? fmtRangeL(f.von, f.bis, lang) : ''};
+  const past = f && (f.bis || f.von) < isoDay(NOW);
+  return {topic:'Prüfungen', ok:true, msg:{role:'bot', lang, text: T(past ? 'exam_past' : 'exam', lang, vars), source: L(SRC.exams, lang), action:{act:'discover', seg:'studi', icon:'calendar', label: t('deadlines', null, lang)}}};
+}
 
 function answer(q){
   const lang = detectLang(q), n = fold(q);
   const hay = n + ' | ' + n.replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u');
-  const c = CAMPUS[campusFromText(hay) || state.campus], city = c.city;
+  const named = campusFromText(hay);
+  const c = CAMPUS[named || state.campus], city = c.city;
   const msg = o => Object.assign({role:'bot', lang}, o);
-  const routeQ = /\b(wo|where|weg|wie komm|how do i get|finde|find|donde|dove|nerede|ou est|ou se trouve|ou sont|come arrivo|como llego|nasil gid|wohin)\b/.test(hay);
+  const U = understand(q), has = k => U.c.has(k);
+  const topicWords = ['EXAM','FOOD','FOODPLACE','VEGAN','VEGGIE','REREG','LIBRARY','WIFI','NIGHT','EVENTS','SPORT','CERT','INTL','ASTA','ADDROFF','TRANSIT','TERM','ROOMW'];
+  const anyTopic = topicWords.some(has);
 
   const rm = roomFromText(q, hay);
   if(rm){
     if(rm.id) return routeAnswer(ROOMS[rm.id], lang, 'Raumsuche');
     return {topic:'Raumsuche', ok:false, msg: msg({unsure:true, text: T('no_room', lang, {code: rm.code, ex: C().ex}), action:{act:'tab', tab:'rooms', icon:'search', label: t('rooms_title', null, lang)}})};
   }
-  if(/^\W*(hallo|hi|hey|moin|servus|hello|hola|buenas|ciao|salve|buongiorno|bonjour|salut|coucou|merhaba|selam|gunaydin)\b/.test(n) && n.length < 25){
-    return {topic:'Begrüßung', ok:true, msg: msg({text: T('hello', lang, {city})})};
-  }
-  const examWord = /(prufung|klausur|exam|esam|sinav)/.test(hay);
-  if(examWord && /(verschieb|postpone|reschedul|aplaz|rinvi|spostar|report|decal|ertele|krank|sick|enferm|malat|malad|hastay|hastalan)/.test(hay)){
-    return unsureAnswer('pa', lang, 'Prüfungen: verschieben');
-  }
-  if(/prufungsanmeld/.test(hay) || (examWord && /(anmeld|regist|inscri|iscri|kayit|kaydol|frist|deadline|plazo|scadenz|limite|delai|son tarih|bis wann|until when|hasta cuando|entro quando|jusqu|ne zaman|wann)/.test(hay))){
-    const pa = ROOMS['SM-PA'];
-    return {topic:'Prüfungen', ok:true, msg: msg({text: T('exam', lang, {room: pa.code, h: roomHours(pa, lang, ', ')}), source: L(SRC.exams, lang), action:{act:'discover', seg:'studi', icon:'calendar', label: t('deadlines', null, lang)}})};
-  }
-  if(/(burgeramt|ummeld|wohnsitz|meldebeschein|meldeamt|register (my )?address|address registration|registration office|empadron|domicilio|residenza|anagrafe|domicile|declarer mon adresse|adres kay|ikamet|adresimi)/.test(hay)){
+  if(has('THANKS') && !anyTopic && U.words <= 6) return {topic:'Begrüßung', ok:true, msg: msg({text: T('thanks', lang)})};
+  if((has('GREET') || has('HELP')) && !anyTopic && U.words <= 6) return {topic:'Begrüßung', ok:true, msg: msg({text: T('hello', lang, {city})})};
+  /* exams: problems (postpone, illness, grades) go to the examination office, registration questions get the dates */
+  if(has('EXAM') && has('POSTPONE')) return unsureAnswer('pa', lang, 'Prüfungen: verschieben');
+  if(has('EXAM') && (has('REGISTER') || has('DEADLINE') || has('WHEN'))) return examAnswer(lang);
+  const place = placeFromText(hay, named);
+  /* "where is …" for a known place: show the way, unless the question is about something the place offers */
+  const ownTopic = ['EXAM','FOOD','VEGAN','VEGGIE','CERT','REREG','DEADLINE','ADDROFF','WIFI','NIGHT','EVENTS','SPORT','TERM'].some(has);
+  if(place && has('WHERE') && !ownTopic) return placeAnswer(ROOMS[place], lang);
+  if(has('EXAM')) return place ? placeAnswer(ROOMS[place], lang) : unsureAnswer('pa', lang, 'Prüfungen: sonstiges');
+  if(has('ADDROFF') || (has('REGISTER') && has('ADDRESS')) || (has('REGISTER') && has('WHERE') && !['LIBRARY','SPORT','INTL','ASTA','FOOD','FOODPLACE','CERT'].some(has))){
     return {topic:'Wohnen und Stadt', ok:true, msg: msg({text: T('addr', lang, {city}), source: fill(L(SRC.city, lang), {city})})};
   }
-  if(/(mensa|vegan|vegetar|vejetar|speiseplan|mittagessen|\bessen\b|\bmittag|hunger|lunch|\bfood\b|cafeteria|canteen|\beat\b|comida|comer|almuerzo|comedor|pranzo|mangiare|\bcibo|repas|manger|dejeuner|cantine|yemek|ogle|kafeterya|kahvalti)/.test(hay)){
-    if(!c.mensa){
-      const cf = c.cafes[0];
-      return {topic:'Mensa', ok:true, msg: msg({text: L(c.mensaNote, lang) + ' ' + cf.name + ': ' + L(cf.offer, lang) + ' ' + T('hours', lang, {h: fmtOH(cf.open, lang, ', ')}) + ' ' + capFirst(L(HINT.temp_caf, lang)) + '.', source: L(SRC.mensa, lang), action:{act:'tab', tab:'mensa', icon:'cutlery', label: t('cafeteria', null, lang)}})};
-    }
-    const vegan = /vegan|vegano|vegana/.test(hay), veg = /vegetar|vejetar/.test(hay);
-    const day = c.mensa.menu[TODAY_IDX];
-    const list = vegan ? day.filter(d => d.t === 'vegan') : veg ? day.filter(d => d.t === 'vegan' || d.t === 'vegetarisch') : day;
-    const pre = T(WEEKEND ? 'mensa_weekend' : 'mensa_today', lang, {mensa: c.mensa.name});
-    const body = list.length ? ' ' + list.map(d => dishLine(d, lang)).join('; ') + '.' : ' ' + T('mensa_none', lang);
-    return {topic:'Mensa', ok:true, msg: msg({text: pre + body + ' ' + T('serve', lang, {h: fmtOH(c.mensa.serve, lang, ', ')}), source: L(SRC.mensa, lang), action:{act:'tab', tab:'mensa', icon:'cutlery', label: t('all_dishes', null, lang)}})};
-  }
-  if(/(ruckmeld|semesterbeitrag|\bfrist|deadline|re-?regist|semester fee|renovar|renovacion|plazo|matricula|rinnovo|scadenz|reinscri|frais semest|date limite|kayit yenile|harc|son tarih)/.test(hay)){
-    return {topic:'Fristen und Rückmeldung', ok:true, msg: msg({text: T('deadline', lang), source: L(SRC.deadlines, lang), action:{act:'discover', seg:'studi', icon:'calendar', label: t('deadlines', null, lang)}})};
-  }
-  if(/(bibliothek|library|biblioteca|bibliotheque|kutuphane|\bbib\b|lernplatz|study space|puesto de estudio|posti studio)/.test(hay)){
-    const r = ROOM_LIST.find(x => x.lib && x.c === c.id);
-    const res = routeAnswer(r, lang, 'Bibliothek');
-    res.msg.source = L(SRC.library, lang);
-    if(c.id === 'SM') res.msg.text += ' ' + T('lib_sm', lang);
-    return res;
-  }
-  if(/(wlan|wifi|wi-fi|eduroam|internet|kablosuz)/.test(hay)){
-    return {topic:'IT', ok:true, msg: msg({text: T('wifi', lang), source: L(SRC.wifi, lang)})};
-  }
-  if(/(ausgehen|party|kneipe|feiern|\bclub|nightlife|going out|tonight|heute abend|weggehen|\bbars?\b|fiesta|salir|esta noche|marcha|\bfesta|uscire|stasera|serata|sortir|soiree|ce soir|\bfete|gece|eglence|parti\b|aksam)/.test(hay)){
-    return {topic:'Stadtleben', ok:true, msg: msg({text: T(city === 'Göppingen' ? 'night_gp' : 'night_es', lang), source: L(SRC.events, lang), action:{act:'discover', seg:'stadt', icon:'city', label: t('seg_city', null, lang)}})};
-  }
-  if(/(hochschulsport|\bsport|bouldern|boulder|fitness|volleyball|\bgym\b|deporte|gimnasio|palestra|\bspor\b|calcio|futbol)/.test(hay)){
-    return {topic:'Hochschulsport', ok:true, msg: msg({text: T('sport', lang), source: L(SRC.sport, lang), action:{act:'route', room:'FL-02010', icon:'pin', label: t('show_route', null, lang)}})};
-  }
-  if(/(bescheinigung|immatrikulation|enrol+ment|certificate|certificado|certificato|attestation|certificat|ogrenci belgesi|\bbelge)/.test(hay)){
+  if(has('FOOD') || has('FOODPLACE') || has('VEGAN') || has('VEGGIE')) return mensaAnswer(c, lang, U);
+  if(has('CERT')){
     const s = ROOMS['SM-SSV'];
     return {topic:'Studienorganisation', ok:true, msg: msg({text: T('cert', lang, {room: s.code, h: roomHours(s, lang, ', ')}), source: L(SRC.ssv, lang), action:{act:'route', room:s.id, icon:'pin', label: t('show_route', null, lang)}})};
   }
-  if(/(international|auslands|erasmus|\bvisa|visum|aufenthalt|residence permit|extranjer|estero|etranger|uluslararasi|yurt ?disi|\bvize)/.test(hay)){
+  if(has('TERM')){
+    const f = fristByKey('vorlesungsende');
+    if(f) return {topic:'Fristen und Rückmeldung', ok:true, msg: msg({text: T('lectures_end', lang, {date: fmtDateL(f.von || f.bis, lang)}), source: L(SRC.deadlines, lang), action:{act:'discover', seg:'studi', icon:'calendar', label: t('deadlines', null, lang)}})};
+  }
+  if(has('REREG') || has('DEADLINE')){
+    const f = fristByKey('rueckmeldung');
+    return {topic:'Fristen und Rückmeldung', ok:true, msg: msg({text: T('deadline', lang, {date: f ? fmtDateL(f.bis || f.von, lang) : ''}), source: L(SRC.deadlines, lang), action:{act:'discover', seg:'studi', icon:'calendar', label: t('deadlines', null, lang)}})};
+  }
+  if(has('LIBRARY')){
+    const r = (named && ROOM_LIST.find(x => x.lib && x.c === named)) || ROOM_LIST.find(x => x.lib && x.c === c.id);
+    return routeAnswer(r, lang, 'Bibliothek');
+  }
+  if(has('WIFI')) return {topic:'IT', ok:true, msg: msg({text: T('wifi', lang), source: L(SRC.wifi, lang)})};
+  if(has('EVENTS') && !has('SPORT')) return eventsAnswer(c, lang, has('NIGHT'));
+  if(has('NIGHT')) return nightAnswer(c, lang);
+  if(has('SPORT')) return {topic:'Hochschulsport', ok:true, msg: msg({text: T('sport', lang), source: L(SRC.sport, lang), action:{act:'route', room:'FL-02010', icon:'pin', label: t('show_route', null, lang)}})};
+  if(has('INTL')){
     const res = routeAnswer(ROOMS['SM-IC'], lang, 'International');
     res.msg.text += ' ' + T('intl', lang); res.msg.source = L(SRC.intl, lang);
     return res;
   }
-  if(/(\basta\b|studierendenvertretung|studentenvertretung|student union|representacion estudiantil|rappresentanza|association etudiante|ogrenci birligi)/.test(hay)){
+  if(has('ASTA')){
     const r = ROOM_LIST.find(x => x.id === c.id + '-ASTA') || ROOMS['SM-ASTA'];
     const res = routeAnswer(r, lang, 'AStA'); res.msg.source = L(SRC.asta, lang);
     return res;
   }
-  const place = placeFromText(hay);
-  if(place && (routeQ || fold(q).split(/\s+/).length <= 3)) return routeAnswer(ROOMS[place], lang, 'Raumsuche');
-  if(/(wie komm|anfahrt|anreise|\bbus\b|bahnhof|how (do i|to) get|directions|como llego|como llegar|llegar al|come arrivo|come arrivare|comment aller|comment venir|comment se rendre|nasil gid|ulasim|otobus|kampuse)/.test(hay)){
+  if(place && (has('WHERE') || has('HOURS') || has('TRANSIT') || U.words <= 4)) return placeAnswer(ROOMS[place], lang);
+  if(has('TRANSIT') || (has('WHERE') && named)){
     return {topic:'Anfahrt', ok:true, msg: msg({text: L(c.name, lang) + ' (' + c.addr + '): ' + L(c.transit, lang), source: L(SRC.transit, lang), action:{act:'tab', tab:'rooms', icon:'pin', label: t('rooms_title', null, lang)}})};
   }
-  if(place) return routeAnswer(ROOMS[place], lang, 'Raumsuche');
+  if(place) return placeAnswer(ROOMS[place], lang);
+  if(has('ROOMW') && (has('WHERE') || U.words <= 4)) return {topic:'Raumsuche', ok:true, msg: msg({text: T('which_room', lang, {ex: C().ex}), action:{act:'tab', tab:'rooms', icon:'search', label: t('rooms_title', null, lang)}})};
+  if((has('GREET') || has('HELP') || has('THANKS')) && U.words <= 8) return {topic:'Begrüßung', ok:true, msg: msg({text: T('hello', lang, {city})})};
   /* no verified source: refer to the responsible office */
-  let office = 'ssv';
-  if(examWord || /(note|noten|grade|attest|nota|voti|calificacion)/.test(hay)) office = 'pa';
-  else if(/(passwort|password|login|kennung|account|e-mail|email|drucken|print|contrasena|stampa|imprim|sifre|yazdir)/.test(hay)) office = 'it';
-  else if(/(wohnheim|wohnung|zimmer|dorm|housing|bafog|miete|alojamiento|residencia|alloggio|affitto|logement|loyer|yurt|kira|ev )/.test(hay)) office = 'housing';
+  const office = has('POSTPONE') ? 'pa' : has('IT') ? 'it' : has('HOUSING') ? 'housing' : 'ssv';
   return unsureAnswer(office, lang, 'Ohne Quelle');
 }
 function unsureAnswer(office, lang, topic){
@@ -2182,6 +2351,122 @@ function mountApp(){
   renderScreen(false);
   renderSheet();
   tick();
+}
+
+
+/* ================= Fragen verstehen (ohne KI-Dienst) =================
+   Jedes Thema hat Begriffe in sechs Sprachen. Eine Frage wird in Wörter zerlegt und mit den Begriffen verglichen:
+   Wortanfang ("prufung*" passt auf "Prüfungsanmeldung"), Wortteile in deutschen Zusammensetzungen ("~frist" in
+   "Anmeldefrist"), feste Wendungen ("bis wann") und kleine Tippfehler (ab 6 Buchstaben ein Fehler erlaubt).
+   So führen verschiedene Formulierungen derselben Frage zur selben Antwort. */
+const LEX = {
+  EXAM: ['prufung*', '~prufung', 'prufung', 'prufungen', 'klausur*', '~klausur', 'klausur', 'klausuren', 'final', 'finals', 'final exam*', 'exam*', 'examen*', 'esam*', 'sinav*', 'partiel*', 'midterm*', 'prueba*', 'verifica'],
+  REGISTER: ['anmeld*', '~anmeld', 'anmelden', 'anmeldung', 'eintragen', 'eintrag*', 'eintragen', '~eintrag', 'einschreib*', '~einschreib', 'registr*', 'regist*', 'signup', 'sign up', 'enrol*', 'enroll*', 'inscri*', 'iscri*', 'kayit*', 'kaydol*', 'kaydi', 'kayd*', 'apunt*', 'prenot*', 'book', 'booking', 'zulassung*', 'melden', 'melde', 'anmeldung', 'registrierung', 'declar*'],
+  DEADLINE: ['frist*', '~frist', 'deadline*', 'spatest*', 'anmeldeschluss', 'schluss', 'bis wann', 'until when', 'last day', 'last date', 'due date', 'cutoff', 'cut off', 'closing date', 'plazo*', 'fecha limite', 'hasta cuando', 'ultimo dia', 'scadenz*', 'entro quando', 'ultimo giorno', 'termine ultimo', 'data limite', 'delai*', 'date limite', 'jusqu a quand', 'dernier jour', 'date butoir', 'son tarih', 'son gun', 'ne zamana kadar', 'zeitraum', 'zeitfenster', 'bis zum', 'bis spatestens', 'by when', 'hasta que dia', 'fino a quando'],
+  WHEN: ['wann', 'when', 'cuando', 'quando', 'quand', 'ne zaman', 'hangi tarih', 'which date', 'what date', 'ab wann', 'datum', 'termin', 'termine', 'fecha', 'date', 'tarih*'],
+  POSTPONE: ['verschieb*', '~verschieb', 'verleg*', 'nachschreib*', 'rucktritt*', 'zurucktret*', 'abmeld*', '~abmeld', 'krank*', 'attest*', 'postpon*', 'reschedul*', 'withdraw*', 'sick', 'ill', 'aplaz*', 'cancel*', 'anular*', 'rinvi*', 'sposta*', 'annull*', 'ritir*', 'reporter', 'decal*', 'desinscri*', 'malad*', 'ertele*', 'iptal*', 'hastay*', 'hastalan*', 'enfermo', 'enferma', 'malato', 'malata', 'wiederhol*', 'retake', 'repeat', 'bestehen', 'durchgefallen', 'nicht bestanden', 'fail*', 'note', 'noten', 'grade*', 'nota', 'voti', 'not ortalama*', 'austrag*', '~austrag', 'abmelden'],
+  FOODPLACE: ['mensa', 'mensen', '~mensa', 'cafeteria*', 'canteen*', 'comedor*', 'cantina', 'cantine', 'resto u', 'restaurant universitaire', 'yemekhane*', 'kafeterya*', 'kantin*', 'caffetteria', 'cafetaria'],
+  FOOD: ['essen', '~mittagessen', 'mittag*', 'speiseplan*', '~speiseplan', 'gericht*', 'hunger*', 'hungrig', 'was gibts', 'was gibt es', 'lunch*', 'food', 'eat', 'eating', 'menu*', 'meal*', 'dish*', 'comida*', 'comer', 'almuerz*', 'plato', 'platos', 'pranz*', 'mangiar*', 'cibo', 'piatt*', 'repas', 'manger', 'mange', 'manges', 'mangent', 'dejeuner', 'plat', 'plats', 'yemek*', 'ogle yemeg*', 'kahvalti*', 'fruhstuck*', 'breakfast', 'snack*', 'kaffee', 'coffee', 'tagesgericht*', 'heute zu essen', 'mahlzeit*'],
+  VEGAN: ['vegan*', 'pflanzlich*', 'plant based', 'sin carne', 'senza carne', 'sans viande', 'etsiz', 'ohne tierische', 'hayvansal'],
+  VEGGIE: ['vegetar*', 'vejetar*', 'veggie*', 'ohne fleisch', 'no meat', 'meatless', 'fleischlos*'],
+  REREG: ['ruckmeld*', '~ruckmeld', 'zuruckmeld*', 'semesterbeitrag*', '~beitrag', 'semestergebuhr*', 'gebuhr*', 're regist*', 'reregist*', 're enrol*', 'reenrol*', 'semester fee*', 'tuition*', 'renovar*', 'renovacion*', 'tasa', 'tasas', 'rinnov*', 'tassa', 'tasse universitarie', 'reinscri*', 'frais', 'kayit yenile*', 'harc*', 'katki pay*', 'uberweis*', 'semestergeld', 'matricula'],
+  LIBRARY: ['bibliothek*', '~bibliothek', 'bibliothek', 'bib', 'bibo', 'bucherei*', 'library', 'libraries', 'biblioteca*', 'bibliotheque*', 'biblio', 'kutuphane*', 'lernplatz*', '~lernplatz', 'lernraum*', 'study space*', 'study room*', 'prestamo*', 'prestit*', 'emprunt*', 'bucher', 'books', 'borrow*', 'ausleih*'],
+  WIFI: ['wlan*', 'wifi', 'wi fi', 'wireless', 'eduroam', 'internet*', 'netzwerk', 'red inalambrica', 'reseau', 'kablosuz', 'vpn', 'netz'],
+  NIGHT: ['ausgeh*', 'party*', 'partys', 'parties', 'partying', 'kneipe*', '~kneipe', 'feier*', 'club', 'clubs', 'disco*', 'bar', 'bars', 'heute abend', 'abends', 'nightlife', 'going out', 'go out', 'tonight', 'pub', 'pubs', 'fiesta*', 'salir', 'esta noche', 'marcha', 'copas', 'festa', 'feste', 'uscire', 'stasera', 'serata', 'locali', 'sortir', 'soiree', 'ce soir', 'fete', 'boite', 'gece*', 'eglence*', 'parti', 'partiler', 'disari cik*', 'aksam*', 'was kann man', 'what to do', 'que hacer', 'cosa fare', 'que faire', 'ne yapabilirim', 'freizeit', 'weggeh*'],
+  EVENTS: ['veranstaltung*', '~veranstaltung', 'event', 'events', 'termine', 'was ist los', 'was ist heute los', 'was geht', 'was lauft', 'was passiert', 'whats on', 'what s on', 'what is on', 'whats happening', 'what s happening', 'what is happening', 'happening', 'evento', 'eventos', 'actividades', 'que hay hoy', 'que pasa', 'eventi', 'cosa c e', 'cosa succede', 'evenement*', 'quoi de neuf', 'qu est ce qui se passe', 'se passe', 'etkinlik*', 'neler var', 'neler oluyor'],
+  SPORT: ['hochschulsport', '~hochschulsport', 'sport', 'sports', 'sportkurs*', 'boulder*', 'fitness*', 'gym', 'volleyball', 'fussball', 'basketball', 'yoga', 'schwimm*', 'laufen', 'deporte*', 'gimnasio', 'palestra', 'spor', 'sporlar', 'futbol', 'calcio', 'salle de sport', 'swim*', 'natacion', 'nuoto', 'natation', 'yuzme', 'klettern'],
+  CERT: ['bescheinigung*', '~bescheinigung', 'immatrikulationsbescheinigung', 'studienbescheinigung', 'nachweis*', 'certificate*', 'proof of enrol*', 'enrolment certificate', 'enrollment verification', 'certificado*', 'certificat*', 'attestation*', 'certificato*', 'ogrenci belgesi', 'belge*', 'immatrikulation*'],
+  TRANSIT: ['anfahrt*', 'anreise*', 'bus', 'busse', 'buslinie*', 'bahn', 's bahn', 'zug', 'haltestelle*', 'bahnhof*', 'parken', 'parkplatz*', 'parkhaus', 'aparcar', 'parcheggiare', 'garer', 'stationner', 'park my car', 'park the car', 'hinkommen', 'hinfahren', 'directions', 'public transport', 'train', 'station', 'bus stop', 'parking', 'autobus', 'tren', 'parada', 'aparcamiento', 'treno', 'fermata', 'stazione', 'parcheggio', 'gare', 'arret', 'otobus', 'durak', 'otopark', 'ulasim', 'nasil gid*', 'nasil ulas*', 'wie komme ich', 'wie kommt man', 'how do i get', 'how to get', 'get to', 'como llego', 'como llegar', 'come arrivo', 'come arrivare', 'come raggiung*', 'comment aller', 'comment venir', 'comment se rendre', 'comment arriver', 'adresse', 'address', 'direccion', 'indirizzo', 'adres'],
+  INTL: ['international*', 'auslandsamt', 'auslands*', '~auslands', 'erasmus', 'visa', 'visum', 'aufenthalt*', 'residence permit', 'study abroad', 'semester abroad', 'exchange', 'austausch*', 'extranjer*', 'intercambio', 'permiso de residencia', 'estero', 'scambio', 'permesso di soggiorno', 'etranger', 'echange', 'titre de sejour', 'uluslararasi', 'yurt disi', 'yurtdisi', 'vize', 'oturma izni', 'degisim'],
+  ASTA: ['asta', 'studierendenvertretung', 'studentenvertretung', 'fachschaft*', 'student union', 'student council', 'students union', 'representacion estudiantil', 'consejo de estudiantes', 'rappresentanza*', 'association etudiante', 'bde', 'ogrenci birligi', 'ogrenci konseyi'],
+  ADDROFF: ['burgeramt', '~burgeramt', 'ummeld*', 'wohnsitz*', 'meldebeschein*', 'meldeamt', 'einwohnermeldeamt', 'address registration', 'registration office', 'citizens office', 'empadron*', 'padron', 'anagrafe', 'mairie', 'ikamet*', 'nufus mudurlugu', 'adres kaydi', 'adresimi', 'residenza'],
+  ADDRESS: ['adresse', 'adress*', 'address', 'wohnung*', 'wohnort', 'domicilio', 'direccion', 'indirizzo', 'domicile', 'adres', 'apartment', 'flat', 'umzug', 'umgezogen', 'eingezogen', 'zugezogen', 'moved', 'mudanza', 'mudad*', 'me mude', 'trasloco', 'trasferit*', 'demenage*', 'tasindim', 'tasin*', 'neu in', 'neu hier', 'new in', 'new here', 'nuevo en', 'nueva en', 'nuovo a', 'nuova a', 'nouveau a', 'nouvelle a', 'yeni geldim'],
+  TERM: ['vorlesungszeit*', '~vorlesungszeit', 'vorlesungsende', 'vorlesungsfrei*', '~vorlesungsfrei', 'semesterende', 'semesterferien', '~ferien', 'ferien', 'end of lectures', 'lecture period', 'end of semester', 'end of the semester', 'semester break', 'holidays', 'vacaciones', 'fin de clases', 'periodo de clases', 'vacanze', 'fine delle lezioni', 'vacances', 'fin des cours', 'tatil*', 'donem sonu', 'ders bitis*', 'derslerin bit*', 'letzte vorlesung', 'last lecture', 'lectures end', 'lecture end', 'end of classes', 'classes end', 'semester end', 'vorlesungen enden', 'vorlesungen aufhoren', 'clases terminan', 'lezioni finiscono', 'cours finissent', 'dersler bit*'],
+  HOURS: ['offnungszeit*', '~offnungszeit', 'geoffnet', 'offen', 'aufhaben', 'opening hours', 'open', 'opens', 'closes', 'closed', 'horario*', 'abierto', 'abierta', 'abre', 'cierra', 'orario', 'orari', 'aperto', 'aperta', 'apre', 'chiude', 'horaire*', 'ouvert', 'ouverte', 'ferme', 'acik', 'kapali', 'kapan*', 'saat kacta', 'calisma saat*', 'hours', 'sprechzeit*', 'sprechstunde*'],
+  ROOMW: ['raum', 'raume', 'zimmer', 'horsaal*', '~horsaal', 'seminarraum*', 'labor', 'room', 'rooms', 'lecture hall', 'classroom', 'aula', 'aulas', 'sala', 'salle', 'oda', 'odasi', 'derslik*', 'sinif*', 'amfi', 'vorlesung*', 'lecture', 'clase', 'lezione', 'cours', 'ders'],
+  WHERE: ['wo', 'wohin', 'where', 'donde', 'dove', 'ou', 'nerede', 'nereye', 'finde', 'finden', 'find', 'location', 'ubicacion', 'emplacement', 'konum', 'weg', 'route', 'way', 'dov e', 'ou est', 'ou se trouve', 'trovo', 'encuentro', 'trouve', 'bulabilirim', 'bulurum'],
+  GREET: ['hallo', 'hi', 'hey', 'moin', 'servus', 'guten tag', 'guten morgen', 'hello', 'good morning', 'hola', 'buenas', 'buenos dias', 'ciao', 'salve', 'buongiorno', 'bonjour', 'salut', 'coucou', 'merhaba', 'selam', 'gunaydin', 'iyi gunler'],
+  THANKS: ['danke*', 'dankeschon', 'vielen dank', 'thanks', 'thank you', 'thx', 'gracias', 'grazie', 'merci', 'tesekkur*', 'sagol', 'sag ol'],
+  HELP: ['was kannst du', 'hilfe', 'help', 'what can you do', 'ayuda', 'que puedes hacer', 'aiuto', 'cosa sai fare', 'aide', 'que peux tu faire', 'yardim', 'neler yapabilirsin'],
+  IT: ['passwort*', 'password*', 'login', 'kennung', 'account', 'e mail', 'email', 'drucken', 'drucker', 'print*', 'contrasena', 'stampa*', 'imprim*', 'sifre*', 'yazdir*', 'moodle', 'portal', 'zugangsdaten'],
+  HOUSING: ['wohnheim*', 'wohnung*', 'zimmer suchen', 'dorm*', 'housing', 'bafog', 'miete*', 'alojamiento', 'residencia', 'alloggio', 'affitto', 'logement', 'loyer', 'yurt', 'kira*', 'studentenwohnheim*', 'wg']
+};
+/* words that must not count for a topic (office names contain "Prüfung", "example" starts like "exam") */
+const LEX_EXCLUDE = {EXAM: ['prufungsamt', 'pruefungsamt', 'exampl', 'testen', 'testat'], FOOD: ['essential'], WIFI: ['netzt'], ROOMW: ['salle de sport']};
+const NLU = (() => {
+  const out = {};
+  Object.keys(LEX).forEach(c => {
+    const o = {words: new Set(), stems: [], subs: [], phrases: []};
+    LEX[c].forEach(e => {
+      if(e.includes(' ')) o.phrases.push(' ' + e.replace(/\*$/, '') + (e.endsWith('*') ? '' : ' '));
+      else if(e[0] === '~') o.subs.push(e.slice(1));
+      else if(e.endsWith('*')) o.stems.push(e.slice(0, -1));
+      else o.words.add(e);
+    });
+    out[c] = o;
+  });
+  return out;
+})();
+/* Damerau-Levenshtein distance with an early stop */
+function editDist(a, b, max){
+  if(Math.abs(a.length - b.length) > max) return max + 1;
+  const d = [];
+  for(let i = 0; i <= a.length; i++){ d[i] = [i]; }
+  for(let j = 0; j <= b.length; j++) d[0][j] = j;
+  for(let i = 1; i <= a.length; i++){
+    let rowMin = Infinity;
+    for(let j = 1; j <= b.length; j++){
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if(i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      if(d[i][j] < rowMin) rowMin = d[i][j];
+    }
+    if(rowMin > max) return max + 1;
+  }
+  return d[a.length][b.length];
+}
+function nluText(q){
+  let s = fold(q).replace(/[^a-z0-9]+/g, ' ').trim();
+  /* names of offices are places, not topics */
+  s = s.replace(/\b(prufungsamt\w*|pruefungsamt\w*|examination office|exam office|examinations office|oficina de examenes|ufficio esami|service des examens|sinav ofisi|sinav burosu)\b/g, ' pamt ');
+  /* German separable verbs: "melde mich … ab" means "abmelden", "trage mich … aus" means "austragen" */
+  if(/\b(melde|meldet|melden|meldest)\b.*\bab\b/.test(s)) s += ' abmelden';
+  if(/\b(trage|tragt|tragen|tragst)\b.*\baus\b/.test(s)) s += ' austragen';
+  if(/\b(trage|tragt|tragen|tragst)\b.*\bein\b/.test(s)) s += ' eintragen';
+  if(/\b(melde|meldet|melden|meldest)\b.*\ban\b/.test(s)) s += ' anmelden';
+  return s.replace(/\s+/g, ' ').trim();
+}
+function understand(q){
+  const base = nluText(q), variant = base.replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u');
+  const text = ' ' + base + ' ' + (variant !== base ? variant + ' ' : '');
+  const toks = Array.from(new Set(text.split(' ').filter(Boolean)));
+  const found = new Set(), explained = new Set();
+  const concepts = Object.keys(NLU);
+  /* pass 1: exact words, word beginnings, compound parts and phrases */
+  concepts.forEach(c => {
+    const L0 = NLU[c], ex = LEX_EXCLUDE[c] || [];
+    if(L0.phrases.some(p => text.includes(p))){ found.add(c); }
+    toks.forEach(tk => {
+      if(ex.some(x => tk.startsWith(x))) return;
+      if(L0.words.has(tk) || L0.stems.some(st => tk.startsWith(st)) || L0.subs.some(st => tk.length > st.length && tk.includes(st))){ found.add(c); explained.add(tk); }
+    });
+  });
+  /* pass 2: small typos, only for words that matched nothing exactly */
+  toks.filter(tk => tk.length >= 6 && !explained.has(tk) && !/\d/.test(tk)).forEach(tk => {
+    concepts.forEach(c => {
+      if(found.has(c)) return;
+      const L0 = NLU[c], ex = LEX_EXCLUDE[c] || [];
+      if(ex.some(x => tk.startsWith(x))) return;
+      const tol = tk.length >= 9 ? 2 : 1;
+      for(const w of L0.words){ if(w.length >= 6 && editDist(tk, w, tol) <= tol){ found.add(c); return; } }
+      for(const st of L0.stems){
+        if(st.length < 6 || tk.length < st.length - 1) continue;
+        const part = tk.length >= st.length ? tk.slice(0, st.length) : tk, t2 = st.length >= 9 ? 2 : 1;
+        if(editDist(part, st, t2) <= t2){ found.add(c); return; }
+      }
+    });
+  });
+  return {c: found, words: base ? base.split(' ').length : 0, text: base};
 }
 
 /* ================= Settings view (Hochschul-Bereich) ================= */
@@ -3536,6 +3821,10 @@ if(state.mode === 'app'){
   else if(studyWanted() || (CFG.studie && !studyDone() && !pilotWanted())) startStudy(false);
 }
 if(REMOTE && pendingCount()) flush();
+/* current menu, deadlines and events (daten.json, updated every night) */
+loadDaten();
+/* hook for automated tests of the chat (only when a test page sets window.__CAMPI_TEST__ before loading) */
+if(window.__CAMPI_TEST__ && typeof window.__CAMPI_TEST__ === 'object') Object.assign(window.__CAMPI_TEST__, {answer, detectLang, understand, roomMatches, applyDaten, state});
 /* calibrated building positions (admin page, table "orte") */
 if(REMOTE){
   SB.get('orte?select=id,lat,lon').then(rows => {
