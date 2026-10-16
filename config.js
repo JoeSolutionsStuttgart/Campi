@@ -1,18 +1,9 @@
 // =====================================================================
 // Campi · Einstellungen für App-Test und Pilotphase
-//
-// Trage hier die Werte aus deinem Supabase-Projekt ein
-// (Project Settings > API Keys bzw. Data API):
-//   supabaseUrl: die Project URL, z. B. https://abcdefgh.supabase.co
-//   supabaseKey: der "publishable" Key (beginnt mit sb_publishable_)
-//                oder der alte "anon" Key (beginnt mit eyJ)
-//
-// Dieser Schlüssel darf öffentlich sein: Die Datenbank ist über Regeln
-// geschützt. NIEMALS den "secret" oder "service_role" Key eintragen!
 // =====================================================================
 window.CAMPI_CONFIG = {
-  supabaseUrl: 'https://DEINPROJEKT.supabase.co',
-  supabaseKey: 'DEIN_PUBLISHABLE_KEY',
+  supabaseUrl: 'https://qxexshbmajwcyrytfcsi.supabase.co',
+  supabaseKey: 'sb_publishable_NZp0QdRsg9dTe4RsDfQB-w_kIB5CWsY',
 
   // true = der App-Test (3 Aufgaben + Fragebogen) startet beim Öffnen automatisch
   // false = nur die App (Test dann über einen Link, der auf #studie endet)
