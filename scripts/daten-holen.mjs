@@ -29,6 +29,8 @@ function berlinTeile(d = new Date()){
 const HEUTE = /^\d{4}-\d{2}-\d{2}$/.test(process.env.HEUTE || '') ? process.env.HEUTE : berlinTeile().datum;
 function plusTage(iso, n){ const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
 const BIS = plusTage(HEUTE, TAGE);
+/* Montag dieser Woche: frühere Tage der laufenden Woche bleiben aus dem letzten Lauf erhalten (die App zeigt Mo–Fr) */
+const MONTAG = plusTage(HEUTE, -((new Date(HEUTE + 'T12:00:00Z').getUTCDay() + 6) % 7));
 
 /* ---------- Texte ---------- */
 function sauber(s, max){
@@ -152,12 +154,14 @@ async function main(){
   const mensa = {};
   for(const [k, id] of Object.entries(MENSEN)){
     const vorher = alt.mensa && alt.mensa[k] && typeof alt.mensa[k] === 'object' ? alt.mensa[k] : {};
-    const vorherTage = (Array.isArray(vorher.tage) ? vorher.tage : []).filter(t => t && t.datum >= HEUTE);
+    const vorherTage = (Array.isArray(vorher.tage) ? vorher.tage : []).filter(t => t && t.datum >= MONTAG);
     let tage;
     try {
       tage = await holeMensa(id);
       /* einzelne Tage, die nicht geladen werden konnten: alten Stand behalten */
       tage = tage.map(t => t.fehler ? (vorherTage.find(v => v.datum === t.datum) || null) : t).filter(Boolean);
+      /* vergangene Tage dieser Woche aus dem letzten Lauf davor setzen */
+      tage = vorherTage.filter(v => v.datum < HEUTE && !tage.some(t => t.datum === v.datum)).concat(tage);
       status[k] = tage.length ? 'aktuell' : 'kein Speiseplan veröffentlicht';
       console.log(`Mensa ${k} (OpenMensa ${id}): ${tage.length} Tage, ${tage.reduce((s, t) => s + t.gerichte.length, 0)} Gerichte`);
     } catch(e){

@@ -399,7 +399,7 @@ async function loadData(){
       api('fragen?select=*&order=position.asc,erstellt.asc'),
       fetchAll('ereignisse?select=sitzung_id,erstellt,zeitpunkt,zeit_ms,typ,schritt,ansicht,daten&order=sitzung_id.asc,zeit_ms.asc,id.asc')
         .catch(() => fetchAll('ereignisse?select=sitzung_id,erstellt,zeit_ms,typ,schritt,ansicht,daten&order=sitzung_id.asc,zeit_ms.asc,id.asc')),
-      opt(api('interviews?select=*&order=datum.desc.nullslast,erstellt.desc')),
+      opt(api('interviews?select=id')),   /* nur noch, um alte Interviews (Version 2) löschen zu können */
       opt(api('orte?select=*'))
     ]);
     S.data = {sitzungen, ergebnisse, antworten, fragen: fragen || [], ereignisse, interviews, orte};
@@ -515,7 +515,7 @@ function viewOverview(v0){
   const v = testView(v0);
   const n = v.sess.length, done = v.res.length;
   const last = v.sess.length ? v.sess[0].erstellt : null;
-  let html = '<div class="biz-head" style="margin-top:0"><h2>Hypothesen</h2><span class="note">Interviews, App-Test und Pilotphase</span></div><div class="grid g2">' + businessHyps(v0).map(bizCard).join('') + '</div>' +
+  let html = '<div class="biz-head" style="margin-top:0"><h2>Hypothesen</h2><span class="note">Nur Daten aus der App: App-Test und Pilotphase</span></div><div class="grid g2">' + businessHyps(v0).map(bizCard).join('') + '</div>' +
     '<div class="biz-head"><h2>App-Test</h2><span class="note">Nur Test-Teilnahmen, gefiltert wie oben · Pilotdaten unter „Pilot“</span></div><div class="grid g4">' + tile('Teilnahmen', nf(n, 0), 'mit Einwilligung') + tile('Abgeschlossen', nf(done, 0), n ? pct(done, n) + ' % der Teilnahmen' : '') +
     tile('Dauer (Median)', dur(median(v.res.map(r => Number(r.dauer_sekunden)))), 'vom Start bis zum Absenden') + tile('Letzte Teilnahme', last ? when(last) : '–', last ? dt(last) : '') + '</div>';
   if(!n) return html + '<div class="alert" style="margin-top:16px"><b>Noch keine Teilnahmen im Filter</b>Teile den Link zur Testseite: <span class="code">' + esc(testUrl()) + '</span><br>Mit <span class="code">?quelle=instagram</span> am Ende siehst du später, woher die Leute kamen.</div>';
@@ -741,9 +741,10 @@ function exportSessions(v){
 }
 
 
-/* ================= Erweiterung: Hypothesen H1a/H1b/H2a/H2b, Interviews, Pilot, Personen, Orte ================= */
+/* ================= Erweiterung: Hypothesen H2a/H2b, Pilot, Personen, Orte =================
+   Ausgewertet wird nur, was die App selbst erhebt (App-Test und Pilotphase). */
 const ESS = {"campus":{"SM":{"name":"Campus Esslingen Stadtmitte","short":"Stadtmitte","center":[48.739,9.311045],"zoom":17,"addr":"Kanalstraße 33, 73728 Esslingen am Neckar","street":"Kanalstraße 33","plz":"73728","city":"Esslingen am Neckar","plan":false,"groups":null,"parts":null},"FL":{"name":"Campus Esslingen Flandernstraße","short":"Flandernstraße","center":[48.744855,9.32315],"zoom":17,"addr":"Flandernstraße 101, 73732 Esslingen am Neckar","street":"Flandernstraße 101","plz":"73732","city":"Esslingen am Neckar","plan":true,"groups":{"1":{"addr":"Flandernstraße 101","parts":"A–E"},"2":{"addr":"Flandernstraße 103","parts":"F–H"},"3":{"addr":"Flandernstraße 107","parts":"J"}},"parts":{"A":"1","B":"1","C":"1","D":"1","E":"1","F":"2","G":"2","H":"2","J":"3"}},"GP":{"name":"Campus Göppingen","short":"Göppingen","center":[48.697089,9.656403],"zoom":17,"addr":"Robert-Bosch-Straße 1, 73037 Göppingen","street":"Robert-Bosch-Straße 1","plz":"73037","city":"Göppingen","plan":false,"groups":null,"parts":null}},"orte":[{"id":"SM:b:1","campus":"SM","label":"Gebäude 1","addr":"Kanalstraße 33","ll":[48.73882,9.31159],"est":true},{"id":"SM:b:2","campus":"SM","label":"Gebäude 2","addr":"Mühlstraße 1","ll":[48.739269,9.310773],"est":true},{"id":"SM:b:3","campus":"SM","label":"Gebäude 3","addr":"Mühlstraße 5","ll":[48.739449,9.311181],"est":true},{"id":"SM:b:4","campus":"SM","label":"Gebäude 4","addr":"Mühlstraße 5","ll":[48.739494,9.311318],"est":true},{"id":"SM:b:5","campus":"SM","label":"Gebäude 5","addr":"Mühlstraße 7","ll":[48.739611,9.311454],"est":true},{"id":"SM:b:6","campus":"SM","label":"Gebäude 6","addr":"Obertorstraße 16","ll":[48.739628,9.309955],"est":true},{"id":"SM:b:7","campus":"SM","label":"Gebäude 7","addr":"Mühlstraße 3","ll":[48.739359,9.310977],"est":true},{"id":"SM:b:8","campus":"SM","label":"Gebäude 8","addr":"Mühlstraße 9","ll":[48.739718,9.311726],"est":true},{"id":"SM:b:9","campus":"SM","label":"Gebäude 9","addr":"Kanalstraße 31","ll":[48.73873,9.311113],"est":true},{"id":"SM:b:10","campus":"SM","label":"Gebäude 10","addr":"Kanalstraße 29","ll":[48.738685,9.310637],"est":true},{"id":"SM:b:12","campus":"SM","label":"Gebäude 12","addr":"Neckarstraße 67","ll":[48.738191,9.312135],"est":true},{"id":"SM:b:13","campus":"SM","label":"Gebäude 13","addr":"Neckarstraße 63","ll":[48.738101,9.31159],"est":true},{"id":"SM:b:14","campus":"SM","label":"Gebäude 14","addr":"Neckarstraße 65/1","ll":[48.738281,9.311862],"est":true},{"id":"SM:b:15","campus":"SM","label":"Gebäude 15","addr":"Mühlstraße 16","ll":[48.739898,9.311999],"est":true},{"id":"SM:b:16","campus":"SM","label":"Gebäude 16","addr":"Kanalstraße 27","ll":[48.73864,9.31016],"est":false},{"id":"SM:b:17","campus":"SM","label":"Gebäude 17","addr":"Kanalstraße 12/1","ll":[48.738281,9.309411],"est":true},{"id":"SM:b:18","campus":"SM","label":"Gebäude 18","addr":"Neckarstraße 71","ll":[48.738281,9.31268],"est":true},{"id":"SM:b:19","campus":"SM","label":"Gebäude 19","addr":"Kiesstraße 6","ll":[48.739089,9.313225],"est":true},{"id":"SM:s:BF","campus":"SM","label":"Start: Bahnhof","addr":"","ll":[48.73861,9.3],"est":true},{"id":"SM:s:G1","campus":"SM","label":"Start: Gebäude 1","addr":"","ll":[48.73882,9.31159],"est":true},{"id":"FL:b:A","campus":"FL","label":"Bauteil A (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.744859,9.322517],"est":true},{"id":"FL:b:B","campus":"FL","label":"Bauteil B (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.745025,9.322885],"est":true},{"id":"FL:b:C","campus":"FL","label":"Bauteil C (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.744715,9.322313],"est":true},{"id":"FL:b:D","campus":"FL","label":"Bauteil D (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.74503,9.322313],"est":true},{"id":"FL:b:E","campus":"FL","label":"Bauteil E (Gebäude 1)","addr":"Flandernstraße 101","ll":[48.745349,9.322061],"est":true},{"id":"FL:b:F","campus":"FL","label":"Bauteil F (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.744738,9.3233],"est":true},{"id":"FL:b:G","campus":"FL","label":"Bauteil G (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.745048,9.323539],"est":true},{"id":"FL:b:H","campus":"FL","label":"Bauteil H (Gebäude 2)","addr":"Flandernstraße 103","ll":[48.745322,9.323089],"est":true},{"id":"FL:b:J","campus":"FL","label":"Bauteil J (Gebäude 3)","addr":"Flandernstraße 107","ll":[48.744545,9.323866],"est":false},{"id":"FL:s:B105","campus":"FL","label":"Start: Bus 105","addr":"","ll":[48.744289,9.322933],"est":true},{"id":"FL:s:B111N","campus":"FL","label":"Start: Bus 111 Nord","addr":"","ll":[48.745609,9.323729],"est":true},{"id":"FL:s:B111S","campus":"FL","label":"Start: Bus 111 Süd","addr":"","ll":[48.744289,9.324574],"est":true},{"id":"FL:s:PH","campus":"FL","label":"Start: Parkhaus","addr":"","ll":[48.744715,9.321958],"est":true},{"id":"GP:b:1","campus":"GP","label":"Gebäude 1","addr":"Robert-Bosch-Straße 1","ll":[48.696999,9.656131],"est":false},{"id":"GP:b:2","campus":"GP","label":"Gebäude 2","addr":"Robert-Bosch-Straße 4","ll":[48.697358,9.657084],"est":true},{"id":"GP:b:3","campus":"GP","label":"Gebäude 3","addr":"Robert-Bosch-Straße 3","ll":[48.696595,9.656948],"est":true},{"id":"GP:b:4","campus":"GP","label":"Gebäude 4","addr":"Robert-Bosch-Straße 2","ll":[48.697403,9.655382],"est":true},{"id":"GP:b:5","campus":"GP","label":"Gebäude 5","addr":"Heinrich-Landerer-Straße 53","ll":[48.698346,9.658989],"est":true},{"id":"GP:s:G1","campus":"GP","label":"Start: Gebäude 1","addr":"","ll":[48.696999,9.656131],"est":true},{"id":"GP:s:G4","campus":"GP","label":"Start: Bibliothek","addr":"","ll":[48.697403,9.655382],"est":true}],"t1":{"SM":"S 09.203","FL":"F 02.115","GP":"G 02.105"},"rooms":{"SM-01105":"S 01.105","SM-08101":"S 08.101","SM-09203":"S 09.203","SM-13012":"S 13.012","SM-SSV":"S 01.010","SM-PA":"S 01.014","SM-IC":"S 17.010","SM-SB":"S 17.105","SM-CC":"S 17.110","SM-MENSA":"Mensa Stadtmitte","SM-RZ":"S 07.010","SM-ASTA":"S 08.005","SM-BIB":"S 05.007","FL-01203":"F 01.203","FL-01112":"F 01.112","FL-01004":"F 01.004","FL-02102":"F 02.102","FL-02115":"F 02.115","FL-02010":"F 02.010","FL-IT":"F 01.002","FL-BIB":"Bibliothek","FL-MENSA":"Mensa Flandernstraße","GP-05012":"G 05.012","GP-02012":"G 02.012","GP-02105":"G 02.105","GP-AULA":"Aula","GP-BIB":"Bibliothek","GP-SSV":"Student Services","GP-RZ":"Rechenzentrum","GP-CAF":"Cafeteria Göppingen","GP-CAFE":"Café Campus (AStA)","GP-ASTA":"AStA (Studierendenvertretung)"}};
-const HYP = {h1a:{n:15, t:60}, h1b:{n:15, t:50}, h2a:{t:30}, h2b:{t:30}};
+const HYP = {h2a:{t:30}, h2b:{t:30}};
 const CAMPUS_NAME = {SM:'Stadtmitte', FL:'Flandernstraße', GP:'Göppingen', andere:'Woanders'};
 const LANG_NAME = {de:'Deutsch', en:'Englisch', es:'Spanisch', it:'Italienisch', fr:'Französisch', tr:'Türkisch'};
 const PILOT_START_KEY = 'campi-admin-pilotstart-v1';
@@ -751,7 +752,6 @@ const OPEN_GAP_MS = 30 * 60 * 1000;
 const DAY = 864e5;
 const isPilot = s => s.modus === 'pilot';
 const isTest = s => s.modus !== 'pilot';
-const yesNoOpts = ['ja', 'eher ja', 'eher nein', 'nein', 'unklar'];
 function startOfDay(t){ const d = new Date(t); d.setHours(0, 0, 0, 0); return d.getTime(); }
 function hms(t){ return new Date(t).toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); }
 function dShort(t){ return new Date(t).toLocaleDateString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit'}); }
@@ -779,14 +779,6 @@ const PAGE_ORDER = ['start', 'raeume', 'chat', 'mensa', 'entdecken-studi', 'entd
 const PAGE_LABEL = {start:'Start', raeume:'Räume', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', einstellungen:'Einstellungen'};
 
 /* ---------- hypotheses ---------- */
-function interviewHyp(rows, isYes, cfg){
-  const n = rows.length, yes = rows.filter(isYes).length, need = Math.ceil(cfg.n * cfg.t / 100), maxNo = cfg.n - need, no = n - yes;
-  let state = 'open';
-  if(n >= cfg.n) state = pct(yes, n) >= cfg.t ? 'ok' : 'fail';
-  else if(yes >= need) state = 'ok-early';
-  else if(no > maxNo) state = 'fail-early';
-  return {n, yes, need, value: pct(yes, n), state, remaining: Math.max(0, cfg.n - n), target: cfg.t, planned: cfg.n};
-}
 function pilotStart(){ const v = lsGet(PILOT_START_KEY); const t = v ? Date.parse(v + 'T00:00:00') : NaN; return isNaN(t) ? null : t; }
 function pilotUsers(d){
   const users = new Map();
@@ -870,9 +862,7 @@ document.addEventListener('change', e => {
 });
 
 function businessHyps(v){
-  const d = S.data, iv = d.interviews || [];
-  const a = interviewHyp(iv.filter(x => x.art === 'hochschule'), x => x.zahlungsbereit === 'ja' || x.zahlungsbereit === 'eher ja', HYP.h1a);
-  const b = interviewHyp(iv.filter(x => x.art === 'servicestelle'), x => Number(x.radar_nuetzlich) >= 4, HYP.h1b);
+  const d = S.data;
   /* H2a: alle Fragen, die im Fragenkatalog H2a zugeordnet sind. Eine Person zählt als Zustimmung,
      wenn mindestens eine ihrer Antworten auf diese Fragen als Zustimmung gilt. */
   const q2a = h2aQuestions(v);
@@ -885,12 +875,6 @@ function businessHyps(v){
     : q2a.length === 1 ? ' (' + q2a[0].wertung.ab + ' oder höher auf der Skala)' : q2a.length > 1 ? ' (Zustimmung bei einer der ' + q2a.length + ' zugeordneten Fragen)' : '';
   const e = h2b(pilotUsers(d));
   return [
-    {key:'h1a', tag:'H1a · Hochschulen', title:'Hochschulen würden für die Campus-App zahlen',
-      crit:'Bestätigt, wenn mindestens 60 % der 15 befragten Hochschulen angeben, dass sie für so eine App zahlen würden („Ja“ oder „Eher ja“).',
-      value: a.value, target: a.target, yes: a.yes, n: a.n, state: a.state, foot: a.n + ' von ' + a.planned + ' Interviews · ' + a.yes + ' würden zahlen · nötig: ' + a.need, link:'interviews'},
-    {key:'h1b', tag:'H1b · Servicestellen', title:'Mitarbeitende finden das Frage-Radar nützlich',
-      crit:'Bestätigt, wenn mindestens 50 % der 15 befragten Mitarbeitenden aus Servicestellen das Radar als nützlich einstufen (4 oder 5 auf der Skala).',
-      value: b.value, target: b.target, yes: b.yes, n: b.n, state: b.state, foot: b.n + ' von ' + b.planned + ' Kurzinterviews · ' + b.yes + ' finden es nützlich · nötig: ' + b.need, link:'interviews'},
     {key:'h2a', tag:'H2a · Studierende', title:'Studierende würden die App herunterladen',
       crit:'Bestätigt, wenn mindestens 30 % der Studierenden im App-Test angeben, dass sie Campi installieren würden' + jaText + '.',
       value: c.value, target: c.target, yes: c.yes, n: c.n, state: c.missing ? 'missing' : (c.n < 10 ? 'few' : (c.value >= c.target ? 'ok' : 'fail')),
@@ -920,84 +904,6 @@ function bizCard(h){
     '<div class="meter" role="img" aria-label="' + esc(pctTxt(h.value) + ' von Ziel ' + h.target + ' %') + '"><i style="width:' + (h.value || 0) + '%"></i><span class="target" style="left:calc(' + h.target + '% - 1px)"></span></div>' +
     '<div class="meter-l"><span>' + esc(h.foot) + '</span><span>Ziel ' + h.target + ' %</span></div>' +
     '<p class="crit-txt">' + esc(h.crit) + ' <button class="btn-link" type="button" data-a="tab" data-t="' + h.link + '">Details</button></p></div>';
-}
-
-/* ---------- interviews ---------- */
-function ivForm(art){
-  const e = S.ivEdit || {};
-  const radio = (name, opts, val) => '<div class="opts">' + opts.map(o => '<label class="opt"><input type="radio" name="' + name + '" value="' + esc(o) + '"' + (String(val) === String(o) ? ' checked' : '') + '><span>' + esc(o) + '</span></label>').join('') + '</div>';
-  const scale = (name, val, lo, hi) => '<div class="opts">' + [1,2,3,4,5].map(n => '<label class="opt"><input type="radio" name="' + name + '" value="' + n + '"' + (Number(val) === n ? ' checked' : '') + '><span>' + n + '</span></label>').join('') + '</div><p class="note">1 = ' + esc(lo) + ' · 5 = ' + esc(hi) + '</p>';
-  const h1a = art === 'hochschule';
-  return '<form class="editor" data-form="iv-save" data-art="' + art + '" novalidate><h3>' + (e.id ? 'Interview bearbeiten' : (h1a ? 'Interview mit einer Hochschule erfassen' : 'Kurzinterview mit einer Servicestelle erfassen')) + '</h3>' +
-    '<div class="row2"><div class="field"><label for="iv-datum">Datum</label><input class="input" type="date" id="iv-datum" name="datum" value="' + esc(e.datum || new Date().toISOString().slice(0, 10)) + '"></div>' +
-    '<div class="field"><label for="iv-org">' + (h1a ? 'Hochschule' : 'Hochschule und Servicestelle') + '</label><input class="input" id="iv-org" name="organisation" maxlength="200" value="' + esc(e.organisation || '') + '" placeholder="' + (h1a ? 'z. B. HS 3 oder Name' : 'z. B. Studierendenservice HS Esslingen') + '"></div></div>' +
-    '<div class="row2"><div class="field"><label for="iv-rolle">Rolle der befragten Person</label><input class="input" id="iv-rolle" name="rolle" maxlength="200" value="' + esc(e.rolle || '') + '" placeholder="' + (h1a ? 'z. B. Kanzler, IT-Leitung, Marketing' : 'z. B. Sachbearbeitung Prüfungsamt') + '"></div>' +
-    '<div class="field"><label for="iv-int">Interviewt von</label><input class="input" id="iv-int" name="interviewer" maxlength="100" value="' + esc(e.interviewer || '') + '"></div></div>' +
-    (h1a
-      ? '<fieldset class="field"><legend class="flabel">Würde die Hochschule für so eine App zahlen? (zählt für H1a)</legend>' + radio('zahlungsbereit', yesNoOpts, e.zahlungsbereit) + '</fieldset>' +
-        '<div class="row2"><div class="field"><label for="iv-betrag">Genannter Betrag pro Jahr in € (freiwillig)</label><input class="input" type="number" min="0" step="100" id="iv-betrag" name="betrag_euro" value="' + esc(e.betrag_euro ?? '') + '"></div></div>' +
-        '<fieldset class="field"><legend class="flabel">Zustimmung: „Der verstreute Zugriff auf Moodle, Mensa-, Raum- und Stundenplan macht Studierende unzufrieden und lässt die Hochschule weniger modern wirken.“</legend>' + scale('problem_zustimmung', e.problem_zustimmung, 'stimme gar nicht zu', 'stimme voll zu') + '</fieldset>'
-      : '<fieldset class="field"><legend class="flabel">Wie nützlich ist das Frage-Radar für die Servicestelle? (zählt für H1b, 4 oder 5 = nützlich)</legend>' + scale('radar_nuetzlich', e.radar_nuetzlich, 'gar nicht nützlich', 'sehr nützlich') + '</fieldset>' +
-        '<fieldset class="field"><legend class="flabel">Würde die Servicestelle das Radar regelmäßig nutzen?</legend>' + radio('radar_nutzen', yesNoOpts, e.radar_nutzen) + '</fieldset>' +
-        '<fieldset class="field"><legend class="flabel">Zustimmung: „Wiederkehrende Fragen und fehlende Informationen erkennen wir heute nicht systematisch.“</legend>' + scale('problem_zustimmung', e.problem_zustimmung, 'stimme gar nicht zu', 'stimme voll zu') + '</fieldset>') +
-    '<div class="field"><label for="iv-not">Notizen und wörtliche Zitate</label><textarea class="input" id="iv-not" name="notizen" maxlength="2000" rows="4">' + esc(e.notizen || '') + '</textarea><p class="note">Bitte keine Namen von Personen speichern.</p></div>' +
-    (S.ivError ? '<p class="err-text" role="alert" style="margin-top:12px">' + esc(S.ivError) + '</p>' : '') +
-    '<div class="editor-actions"><button class="btn" type="submit"' + (S.busy ? ' disabled' : '') + '>' + (S.busy ? 'Wird gespeichert …' : 'Speichern') + '</button><button class="btn-link" type="button" data-a="iv-cancel">Abbrechen</button></div></form>';
-}
-const GUIDE = {
-  hochschule: ['Wie greifen Ihre Studierenden heute auf Moodle, Stundenplan, Mensa und Raumplan zu?', 'Welche Rückmeldungen bekommen Sie dazu von Studierenden?', 'Wie wichtig ist es Ihnen, digital modern zu wirken, etwa bei der Gewinnung neuer Studierender?', '(Demo zeigen) Was überzeugt Sie, was fehlt?', 'Würden Sie für eine solche App zahlen? Wenn ja: welcher Betrag pro Jahr wäre denkbar, und aus welchem Budget?'],
-  servicestelle: ['Welche Fragen hören Sie jede Woche immer wieder?', 'Woran merken Sie heute, dass Informationen fehlen oder schwer zu finden sind?', '(Frage-Radar zeigen) Was sagt Ihnen diese Auswertung?', 'Wie nützlich wäre das Radar für Ihre Arbeit, von 1 bis 5?', 'Würden Sie es regelmäßig nutzen? Was müsste dafür anders sein?']
-};
-function ivSection(art){
-  const d = S.data, rows = (d.interviews || []).filter(x => x.art === art).sort((a, b) => String(b.datum || '').localeCompare(String(a.datum || '')) || Date.parse(b.erstellt) - Date.parse(a.erstellt));
-  const h1a = art === 'hochschule', cfg = h1a ? HYP.h1a : HYP.h1b;
-  const hh = h1a ? interviewHyp(rows, x => x.zahlungsbereit === 'ja' || x.zahlungsbereit === 'eher ja', cfg) : interviewHyp(rows, x => Number(x.radar_nuetzlich) >= 4, cfg);
-  const dist = h1a ? bars(yesNoOpts.map(o => ({label:o, value: rows.filter(x => x.zahlungsbereit === o).length})), {total: rows.length, showZero:true})
-    : bars([5,4,3,2,1].map(k => ({label: k + (k === 5 ? ' (sehr nützlich)' : k === 1 ? ' (gar nicht)' : ''), value: rows.filter(x => Number(x.radar_nuetzlich) === k).length})), {total: rows.length, showZero:true});
-  const amounts = rows.map(x => Number(x.betrag_euro)).filter(x => x > 0);
-  const mini = '<div class="mini"><div><b>' + rows.length + ' / ' + cfg.n + '</b><span>Interviews geführt</span></div><div><b>' + pctTxt(hh.value) + '</b><span>' + (h1a ? 'würden zahlen' : 'finden es nützlich') + '</span></div><div><b>' + hh.need + '</b><span>Zusagen nötig für ' + cfg.t + ' %</span></div>' +
-    (h1a && amounts.length ? '<div><b>' + nf(median(amounts), 0) + ' €</b><span>Median genannter Betrag/Jahr</span></div>' : '') +
-    '<div><b>' + nf(mean(rows.map(x => x.problem_zustimmung === null ? NaN : Number(x.problem_zustimmung)))) + '</b><span>Ø Zustimmung zum Problem (1–5)</span></div></div>';
-  const editing = S.ivEdit && S.ivEdit.art === art;
-  let html = '<section class="card"><div class="card-head"><div><h2>' + (h1a ? 'H1a · Interviews mit Hochschulen' : 'H1b · Kurzinterviews mit Servicestellen') + '</h2><p class="sub">' +
-    (h1a ? 'Zahlungsbereitschaft für die Campus-App. Ziel: mindestens 60 % von 15 Hochschulen.' : 'Nutzen des Frage-Radars. Ziel: mindestens 50 % von 15 Mitarbeitenden stufen es als nützlich ein.') + '</p></div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">' + (h1a ? '' : '<a class="btn btn-2" href="index.html#einstellungen" target="_blank" rel="noopener">' + icon('eye') + 'Frage-Radar zeigen</a>') +
-    '<button class="btn" type="button" data-a="iv-new" data-art="' + art + '"' + (S.ivEdit ? ' disabled' : '') + '>' + icon('plus') + 'Interview erfassen</button></div></div>' +
-    '<div class="hyp-inline">' + bizStatus(hh) + '<div class="meter" role="img" aria-label="' + esc(pctTxt(hh.value) + ' von Ziel ' + cfg.t + ' %') + '"><i style="width:' + (hh.value || 0) + '%"></i><span class="target" style="left:calc(' + cfg.t + '% - 1px)"></span></div></div>' + mini +
-    (editing && !S.ivEdit.id ? ivForm(art) : '') +
-    '<div class="grid g2"><div><h3>' + (h1a ? 'Antworten auf „Würden Sie zahlen?“' : 'Bewertung des Frage-Radars') + '</h3>' + dist + '</div>' +
-    '<details class="guide"><summary>Leitfaden für das Gespräch</summary><ol>' + GUIDE[art].map(q => '<li>' + esc(q) + '</li>').join('') + '</ol></details></div>';
-  html += rows.length ? '<div class="table-wrap" style="margin-top:16px"><table><thead><tr><th>Datum</th><th>' + (h1a ? 'Hochschule' : 'Servicestelle') + '</th><th>Rolle</th><th>' + (h1a ? 'Zahlt?' : 'Nützlich') + '</th>' + (h1a ? '<th class="num">€/Jahr</th>' : '<th>Nutzen?</th>') + '<th class="num">Problem</th><th>Notizen</th><th></th></tr></thead><tbody>' +
-    rows.map(x => (S.ivEdit && S.ivEdit.id === x.id ? '<tr><td colspan="8">' + ivForm(art) + '</td></tr>' :
-      '<tr><td>' + esc(x.datum ? new Date(x.datum + 'T12:00:00').toLocaleDateString('de-DE') : '') + '</td><td>' + esc(x.organisation || '') + '</td><td>' + esc(x.rolle || '') + '</td>' +
-      '<td>' + (h1a ? esc(x.zahlungsbereit || '–') : esc(x.radar_nuetzlich || '–')) + '</td>' + (h1a ? '<td class="num">' + (x.betrag_euro ? nf(Number(x.betrag_euro), 0) : '–') + '</td>' : '<td>' + esc(x.radar_nutzen || '–') + '</td>') +
-      '<td class="num">' + esc(x.problem_zustimmung || '–') + '</td><td class="wrapcell">' + esc(String(x.notizen || '').slice(0, 140)) + '</td>' +
-      '<td><div style="display:flex;gap:6px"><button class="btn btn-2 btn-sm" type="button" data-a="iv-edit" data-id="' + x.id + '"' + (S.ivEdit ? ' disabled' : '') + '>' + icon('edit') + 'Bearbeiten</button><button class="btn-danger" type="button" data-a="iv-del" data-id="' + x.id + '">Löschen</button></div></td></tr>')).join('') +
-    '</tbody></table></div>' : empty('Noch keine Interviews erfasst.');
-  return html + '</section>';
-}
-function viewInterviews(){
-  if(S.data.interviews === null) return '<div class="alert err"><b>Tabelle „interviews“ fehlt</b>Führe die neue Version von <span class="code">supabase-setup.sql</span> im Supabase SQL Editor aus. Deine bisherigen Daten bleiben erhalten.</div>';
-  return '<div class="stack">' + ivSection('hochschule') + ivSection('servicestelle') +
-    '<p class="note">Die Interviews sind nur hier auf der Admin-Seite sichtbar. Testpersonen können sie weder lesen noch ändern.</p></div>';
-}
-async function saveInterview(form){
-  const art = form.dataset.art, fd = new FormData(form), g = k => { const x = fd.get(k); return x === null ? '' : String(x).trim(); };
-  const body = {art, datum: g('datum') || null, organisation: g('organisation').slice(0, 200) || null, rolle: g('rolle').slice(0, 200) || null, interviewer: g('interviewer').slice(0, 100) || null,
-    notizen: g('notizen').slice(0, 2000) || null, problem_zustimmung: g('problem_zustimmung') ? Number(g('problem_zustimmung')) : null};
-  if(art === 'hochschule'){ body.zahlungsbereit = g('zahlungsbereit') || null; body.betrag_euro = g('betrag_euro') ? Number(g('betrag_euro')) : null; }
-  else { body.radar_nuetzlich = g('radar_nuetzlich') ? Number(g('radar_nuetzlich')) : null; body.radar_nutzen = g('radar_nutzen') || null; }
-  Object.assign(S.ivEdit, body);
-  const err = art === 'hochschule' && !body.zahlungsbereit ? 'Bitte wähle aus, ob die Hochschule zahlen würde.' : art === 'servicestelle' && !body.radar_nuetzlich ? 'Bitte gib an, wie nützlich das Radar ist (1 bis 5).' : '';
-  if(err){ S.ivError = err; return render(); }
-  S.busy = true; S.ivError = ''; render();
-  try {
-    if(S.ivEdit.id) await api('interviews?id=eq.' + encodeURIComponent(S.ivEdit.id), {method:'PATCH', body, prefer:'return=minimal'});
-    else await api('interviews', {method:'POST', body, prefer:'return=minimal'});
-    S.data.interviews = await api('interviews?select=*&order=datum.desc.nullslast,erstellt.desc') || [];
-    S.ivEdit = null; S.notice = 'Interview gespeichert.';
-  } catch(x){ S.ivError = 'Speichern hat nicht geklappt: ' + x.message; }
-  S.busy = false; render();
 }
 
 /* ---------- pilot ---------- */
@@ -1323,8 +1229,8 @@ S.del = {v3: null, gesetzt: null, protokoll: null, bereich: 'test', bis: '', zie
 const DEL_ERR = {kennwort: 'Das Kennwort stimmt nicht.', gesperrt: 'Zu viele falsche Versuche. Löschen ist für 15 Minuten gesperrt.',
   kein_kennwort: 'Es ist noch kein Lösch-Kennwort festgelegt.', kein_admin: 'Dieses Konto ist kein Admin.', zu_kurz: 'Das Kennwort braucht mindestens 8 Zeichen.',
   bereich: 'Unbekannter Bereich.', ziel: 'Es fehlt, was gelöscht werden soll.'};
-const DEL_BEREICH = {test: 'Alle App-Test-Teilnahmen', pilot: 'Alle Pilot-Sitzungen', sitzungen: 'Alle Teilnahmen (App-Test und Pilot)', interviews: 'Alle Interviews',
-  alles: 'Alles: Teilnahmen und Interviews', person: 'Eine Pilotperson (Pilot-Nummer)', sitzung: 'Eine Teilnahme', interview: 'Ein Interview',
+const DEL_BEREICH = {test: 'Alle App-Test-Teilnahmen', pilot: 'Alle Pilot-Sitzungen', sitzungen: 'Alle Teilnahmen (App-Test und Pilot)', interviews: 'Interviews aus einer früheren Version',
+  alles: 'Alles löschen', person: 'Eine Pilotperson (Pilot-Nummer)', sitzung: 'Eine Teilnahme', interview: 'Ein Interview',
   'kennwort gesetzt': 'Lösch-Kennwort festgelegt', 'kennwort geändert': 'Lösch-Kennwort geändert'};
 const rpc = (f, body) => api('rpc/' + f, {method: 'POST', body: body || {}});
 function delErr(x){
@@ -1430,7 +1336,7 @@ function viewDelete(){
       '<div class="editor-actions"><button class="btn" type="submit"' + (D.busy ? ' disabled' : '') + '>' + (D.busy ? 'Wird gespeichert …' : 'Kennwort ändern') + '</button></div></form>';
   }
   html += '<form data-form="del-plan" data-keep novalidate><div class="grid g2"><div class="field"><label for="del-bereich">Was soll gelöscht werden?</label><select class="input" id="del-bereich" name="bereich">' +
-      ['test', 'pilot', 'sitzungen', 'interviews', 'alles', 'person'].map(opt).join('') + '</select></div>' +
+      ['test', 'pilot', 'sitzungen'].concat((S.data && S.data.interviews && S.data.interviews.length) ? ['interviews'] : [], ['alles', 'person']).map(opt).join('') + '</select></div>' +
     (D.bereich === 'person'
       ? '<div class="field"><label for="del-ziel">Pilot-Nummer (mindestens die ersten 8 Zeichen)</label><input class="input" id="del-ziel" name="ziel" value="' + esc(D.ziel) + '" autocomplete="off" spellcheck="false" placeholder="z. B. 3f2a9c1b"></div>'
       : '<div class="field"><label for="del-bis">Nur Daten bis einschließlich (leer = alle)</label><input class="input" id="del-bis" name="bis" type="date" value="' + esc(D.bis) + '"></div>') +
@@ -1490,10 +1396,6 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape' && S.pw && !S.
 function extClick(a, b){
   const id = b.dataset.id;
   switch(a){
-    case 'iv-new': S.ivEdit = {art: b.dataset.art}; S.ivError = ''; S.notice = ''; render(); { const i = $('iv-org'); if(i) i.focus(); } return true;
-    case 'iv-edit': { const x = S.data.interviews.find(r => r.id === id); if(x){ S.ivEdit = Object.assign({}, x); S.ivError = ''; render(); } return true; }
-    case 'iv-cancel': S.ivEdit = null; S.ivError = ''; render(); return true;
-    case 'iv-del': openDelete('interview', id); return true;
     case 'p-del': openDelete(id.slice(0, 2) === 'P:' ? 'person' : 'sitzung', id.slice(2)); return true;
     case 'pw-close': if(!(S.pw && S.pw.busy)){ S.pw = null; render(); } return true;
     case 'pw-goto': S.pw = null; S.tab = 'daten'; saveUI(); render(); window.scrollTo(0, 0); { const i = $('pw-neu'); if(i) i.focus(); } return true;
@@ -1531,7 +1433,7 @@ function render(){
   const app = $('app');
   const scrollY = window.scrollY;
   let body = '';
-  const top = (right) => '<header class="top"><div class="brand"><span class="mark" aria-hidden="true">C</span><div><h1>Campi · Auswertung</h1><p>Hypothesen, Interviews, App-Test und Pilotphase</p></div></div><div class="top-actions">' + (right || '') + '</div></header>';
+  const top = (right) => '<header class="top"><div class="brand"><span class="mark" aria-hidden="true">C</span><div><h1>Campi · Auswertung</h1><p>Hypothesen, App-Test und Pilotphase</p></div></div><div class="top-actions">' + (right || '') + '</div></header>';
   if(CONF.problem){
     const msg = {
       fehlt: 'Die Datei <span class="code">config.js</span> wurde nicht gefunden. Lade sie zusammen mit dieser Seite in dein GitHub-Repository.',
@@ -1559,11 +1461,11 @@ function render(){
     return;
   }
   const v = view();
-  const tabs = [['uebersicht','Übersicht'],['interviews','Interviews'],['pilot','Pilot'],['personen','Personen'],['aufgaben','Aufgaben'],['verhalten','Verhalten'],['fragebogen','Fragebogen'],['fragen','Fragen bearbeiten'],['orte','Orte'],['daten','Daten']];
+  const tabs = [['uebersicht','Übersicht'],['pilot','Pilot'],['personen','Personen'],['aufgaben','Aufgaben'],['verhalten','Verhalten'],['fragebogen','Fragebogen'],['fragen','Fragen bearbeiten'],['orte','Orte'],['daten','Daten']];
   const f = S.filter;
   const sel = (name, opts) => '<select name="' + name + '" aria-label="' + ({zeit:'Zeitraum', geraet:'Gerät', gruppe:'Gruppe', modus:'Art'})[name] + '">' + opts.map(o => '<option value="' + o[0] + '"' + (String(f[name]) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
   body += '<div class="tabs" role="tablist">' + tabs.map(t => '<button class="tab" role="tab" type="button" data-a="tab" data-t="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + t[1] + '</button>').join('') + '</div>';
-  if(!['fragen','interviews','pilot','orte'].includes(S.tab)) body += '<div class="filters" data-form="filter">' + sel('zeit', [['alle','Gesamter Zeitraum'],['heute','Heute'],['7','Letzte 7 Tage'],['30','Letzte 30 Tage']]) +
+  if(!['fragen','pilot','orte'].includes(S.tab)) body += '<div class="filters" data-form="filter">' + sel('zeit', [['alle','Gesamter Zeitraum'],['heute','Heute'],['7','Letzte 7 Tage'],['30','Letzte 30 Tage']]) +
     sel('modus', [['alle','Test und Pilot'],['test','Nur App-Test'],['pilot','Nur Pilot']]) +
     sel('geraet', [['alle','Alle Geräte'],['Handy','Handy'],['Tablet','Tablet'],['Computer','Computer']]) + sel('gruppe', [['alle','Beide Gruppen'],['mit Quelle','Gruppe mit Quelle'],['ohne Quelle','Gruppe ohne Quelle']]) +
     '<label class="check"><input type="checkbox" name="fertig"' + (f.fertig ? ' checked' : '') + '>Nur abgeschlossene</label><span class="spacer"></span>' +
@@ -1579,7 +1481,6 @@ function render(){
   else if(S.tab === 'fragebogen') body += viewSurvey(v);
   else if(S.tab === 'fragen') body += viewQuestions();
   else if(S.tab === 'daten') body += viewData(v);
-  else if(S.tab === 'interviews') body += viewInterviews();
   else if(S.tab === 'pilot') body += viewPilot();
   else if(S.tab === 'personen') body += viewPersons(v);
   else if(S.tab === 'orte') body += viewOrte();
@@ -1669,7 +1570,6 @@ document.addEventListener('submit', e => {
   e.preventDefault();
   if(f.dataset.form === 'login') onLogin(f);
   if(f.dataset.form === 'q-save') saveQuestion(f);
-  if(f.dataset.form === 'iv-save') saveInterview(f);
 });
 document.addEventListener('change', e => {
   const t = e.target;
