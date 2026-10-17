@@ -688,7 +688,9 @@ function editorHTML(){
 }
 function viewData(v){
   const rows = v.sess.slice(0, 300);
-  let html = card('Export', 'CSV-Dateien für Excel oder Numbers, mit Semikolon getrennt, gefiltert wie oben',
+  let html = card('Export', 'Alles in einer Excel-Datei: Dashboard mit Diagrammen, Erklärung jeder Spalte und alle Daten (Teilnahmen, Antworten, Verhalten, Pilot). Gefiltert wie oben; die Pilotdaten sind immer vollständig.',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="btn" type="button" data-a="xlsx-all"' + (S.xlBusy ? ' disabled' : '') + '>' + icon('down2') + (S.xlBusy ? 'Excel-Datei wird erstellt …' : 'Alles als Excel (mit Dashboard)') + '</button></div>' +
+    '<p class="note" style="margin-bottom:8px">Einzelne CSV-Dateien, mit Semikolon getrennt:</p>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-2" type="button" data-a="csv-sess">' + icon('down2') + 'Teilnahmen mit Ergebnissen und Antworten</button>' +
     '<button class="btn btn-2" type="button" data-a="csv-ev">' + icon('down2') + 'Alle Ereignisse</button><button class="btn btn-2" type="button" data-a="csv-ans">' + icon('down2') + 'Alle Antworten</button></div>');
   html += viewDelete();
@@ -1327,7 +1329,7 @@ function viewDelete(){
       '<div class="editor-actions"><button class="btn" type="submit"' + (D.busy ? ' disabled' : '') + '>' + (D.busy ? 'Wird gespeichert …' : 'Kennwort festlegen') + '</button></div></form></section>';
   }
   const opt = k => '<option value="' + k + '"' + (D.bereich === k ? ' selected' : '') + '>' + esc(DEL_BEREICH[k]) + '</option>';
-  let html = '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Daten löschen</h2><p class="sub">Nur mit dem Lösch-Kennwort. Gelöschte Daten lassen sich nicht wiederherstellen; lade vorher die CSV-Dateien herunter, wenn du sie behalten willst.</p></div>' +
+  let html = '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Daten löschen</h2><p class="sub">Nur mit dem Lösch-Kennwort. Gelöschte Daten lassen sich nicht wiederherstellen; lade vorher die Excel-Datei (oben, „Alles als Excel“) herunter, wenn du sie behalten willst.</p></div>' +
     '<button class="btn-link" type="button" data-a="pw-change">' + (D.change ? 'Kennwort doch nicht ändern' : 'Kennwort ändern') + '</button></div>';
   if(D.change){
     html += '<form data-form="pw-change" data-keep novalidate class="editor"><h3>Lösch-Kennwort ändern</h3><div class="grid g2"><div class="field"><label for="pw-alt">Bisheriges Kennwort</label><input class="input" id="pw-alt" name="alt" type="password" autocomplete="current-password"></div><div></div>' +
@@ -1404,6 +1406,7 @@ function extClick(a, b){
     case 'csv-person': exportPerson(view()); return true;
     case 'csv-matrix': exportMatrix(view()); return true;
     case 'csv-pilot': exportPilot(); return true;
+    case 'xlsx-all': exportXlsx(); return true;
     case 'copy': try { navigator.clipboard.writeText(b.dataset.text); S.notice = 'Link kopiert.'; } catch(x){ S.notice = 'Bitte den Link markieren und kopieren.'; } render(); return true;
     case 'orte-campus': MAPZ.campus = id; MAPZ.center = ESS.campus[id].center.slice(); MAPZ.z = 17; MAPZ.pan = [0, 0]; render(); return true;
     case 'am-zoom': MAPZ.z = Math.max(14, Math.min(19, MAPZ.z + Number(id))); { const v = $('am-view'); if(v) v.innerHTML = amapInner(); } return true;
@@ -1427,6 +1430,1008 @@ document.addEventListener('change', e => {
   if(a === 'pilot-start'){ if(t.value) lsSet(PILOT_START_KEY, t.value); else lsDel(PILOT_START_KEY); render(); }
   if(a === 'geo-pick'){ const r = S.geo && S.geo.results && S.geo.results[+t.dataset.id]; if(r) r.pick = t.checked; }
 });
+
+
+/* ================= Excel-Datei schreiben (ohne externe Bibliothek) =================
+   Erzeugt eine .xlsx-Datei mit mehreren Blättern, Formeln (mit vorberechneten Werten), Formaten
+   und echten Excel-Diagrammen. Excel, Numbers, LibreOffice und Google Tabellen öffnen sie direkt. */
+const XLW = (() => {
+  const enc = new TextEncoder();
+  const X = s => String(s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f￾￿]/g, '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  function col(i){ let s = ''; i++; while(i > 0){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; }
+  const cell = (c, r) => col(c) + (r + 1);
+  const qs = n => /^[A-Za-z0-9_]+$/.test(n) ? n : "'" + n.replace(/'/g, "''") + "'";
+  const abs = (sheet, c1, r1, c2, r2) => qs(sheet) + '!$' + col(c1) + '$' + (r1 + 1) + (c2 === undefined ? '' : ':$' + col(c2) + '$' + (r2 + 1));
+  /* Excel date number in local time */
+  const serial = ms => (ms - new Date(ms).getTimezoneOffset() * 60000) / 864e5 + 25569;
+
+  /* ---------- styles ---------- */
+  const STYLE = {base:0, head:1, title:2, desc:3, pct:4, dt:5, date:6, dec:7, int:8, kpi:9, kpiLabel:10, kpiPct:11, wrap:12, bold:13, section:14, kpiSec:15, sec:16, note:17, big:18};
+  const STYLES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<numFmts count="4"><numFmt numFmtId="164" formatCode="dd.mm.yyyy hh:mm"/><numFmt numFmtId="165" formatCode="dd.mm.yyyy"/><numFmt numFmtId="166" formatCode="0.0"/><numFmt numFmtId="167" formatCode="0&quot; s&quot;"/></numFmts>' +
+    '<fonts count="8">' +
+      '<font><sz val="10"/><name val="Arial"/><family val="2"/></font>' +
+      '<font><b/><sz val="10"/><name val="Arial"/><family val="2"/></font>' +
+      '<font><b/><sz val="16"/><color rgb="FF253E72"/><name val="Arial"/><family val="2"/></font>' +
+      '<font><i/><sz val="9"/><color rgb="FF52514E"/><name val="Arial"/><family val="2"/></font>' +
+      '<font><b/><sz val="20"/><color rgb="FF253E72"/><name val="Arial"/><family val="2"/></font>' +
+      '<font><sz val="9"/><color rgb="FF52514E"/><name val="Arial"/><family val="2"/></font>' +
+      '<font><b/><sz val="12"/><color rgb="FF253E72"/><name val="Arial"/><family val="2"/></font>' +
+      '<font><sz val="9"/><color rgb="FF52514E"/><name val="Arial"/><family val="2"/></font>' +
+    '</fonts>' +
+    '<fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill>' +
+      '<fill><patternFill patternType="solid"><fgColor rgb="FFEEF1F6"/><bgColor indexed="64"/></patternFill></fill>' +
+      '<fill><patternFill patternType="solid"><fgColor rgb="FFF4F6FA"/><bgColor indexed="64"/></patternFill></fill></fills>' +
+    '<borders count="3"><border><left/><right/><top/><bottom/><diagonal/></border>' +
+      '<border><left/><right/><top/><bottom style="thin"><color rgb="FF9AA3B5"/></bottom><diagonal/></border>' +
+      '<border><left style="thin"><color rgb="FFDDE2EA"/></left><right style="thin"><color rgb="FFDDE2EA"/></right><top style="thin"><color rgb="FFDDE2EA"/></top><bottom style="thin"><color rgb="FFDDE2EA"/></bottom><diagonal/></border></borders>' +
+    '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+    '<cellXfs count="19">' +
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+      '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>' +
+      '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+      '<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+      '<xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
+      '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
+      '<xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
+      '<xf numFmtId="166" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
+      '<xf numFmtId="3" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
+      '<xf numFmtId="3" fontId="4" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center" indent="1"/></xf>' +
+      '<xf numFmtId="0" fontId="5" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center" wrapText="1" indent="1"/></xf>' +
+      '<xf numFmtId="9" fontId="4" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center" indent="1"/></xf>' +
+      '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+      '<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+      '<xf numFmtId="0" fontId="6" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+      '<xf numFmtId="167" fontId="4" fillId="3" borderId="0" xfId="0" applyNumberFormat="1" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="left" vertical="center" indent="1"/></xf>' +
+      '<xf numFmtId="167" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
+      '<xf numFmtId="0" fontId="7" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
+      '<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+    '</cellXfs><cellStyles count="1"><cellStyle name="Standard" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+
+  /* ---------- one worksheet ---------- */
+  /* a cell is null, a string, a number, a boolean, or {v, f, s, t:'d'} (t:'d' = Date in ms) */
+  function cellXML(v, r, c){
+    if(v === null || v === undefined || v === '') return '';
+    const ref = cell(c, r);
+    if(typeof v !== 'object') v = {v};
+    const s = v.s !== undefined ? ' s="' + (typeof v.s === 'number' ? v.s : STYLE[v.s] || 0) + '"' : '';
+    let val = v.v;
+    if(v.t === 'd'){ if(typeof val !== 'number' || !isFinite(val)) return ''; val = serial(val); }
+    if(v.f){
+      const f = '<f>' + X(v.f) + '</f>';
+      if(typeof val === 'number' && isFinite(val)) return '<c r="' + ref + '"' + s + '>' + f + '<v>' + val + '</v></c>';
+      if(typeof val === 'boolean') return '<c r="' + ref + '"' + s + ' t="b">' + f + '<v>' + (val ? 1 : 0) + '</v></c>';
+      return '<c r="' + ref + '"' + s + ' t="str">' + f + '<v>' + X(val === null || val === undefined ? '' : val) + '</v></c>';
+    }
+    if(typeof val === 'number') return isFinite(val) ? '<c r="' + ref + '"' + s + '><v>' + val + '</v></c>' : '';
+    if(typeof val === 'boolean') return '<c r="' + ref + '"' + s + ' t="b"><v>' + (val ? 1 : 0) + '</v></c>';
+    if(val === null || val === undefined || val === '') return s ? '<c r="' + ref + '"' + s + '/>' : '';
+    const str = String(val).slice(0, 32000);
+    return '<c r="' + ref + '"' + s + ' t="inlineStr"><is><t' + (/^\s|\s$|\n/.test(str) ? ' xml:space="preserve"' : '') + '>' + X(str) + '</t></is></c>';
+  }
+  function sheetXML(sh, idx){
+    const rows = sh.rows;
+    let maxC = 0; rows.forEach(r => { if(r && r.length > maxC) maxC = r.length; });
+    const out = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'];
+    if(sh.tab || sh.fit) out.push('<sheetPr>' + (sh.tab ? '<tabColor rgb="FF' + sh.tab + '"/>' : '') + (sh.fit ? '<pageSetUpPr fitToPage="1"/>' : '') + '</sheetPr>');
+    out.push('<dimension ref="A1:' + cell(Math.max(0, maxC - 1), Math.max(0, rows.length - 1)) + '"/>');
+    out.push('<sheetViews><sheetView workbookViewId="0"' + (idx === 0 ? ' tabSelected="1"' : '') + (sh.grid === false ? ' showGridLines="0"' : '') + '>');
+    if(sh.freeze) out.push('<pane ySplit="' + sh.freeze + '" topLeftCell="A' + (sh.freeze + 1) + '" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A' + (sh.freeze + 1) + '" sqref="A' + (sh.freeze + 1) + '"/>');
+    out.push('</sheetView></sheetViews><sheetFormatPr defaultRowHeight="13.2"/>');
+    if(sh.cols && sh.cols.length) out.push('<cols>' + sh.cols.map((w, i) => '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>').join('') + '</cols>');
+    out.push('<sheetData>');
+    for(let r = 0; r < rows.length; r++){
+      const row = rows[r];
+      const ht = sh.heights && sh.heights[r];
+      if(!row || !row.length){ if(ht) out.push('<row r="' + (r + 1) + '" ht="' + ht + '" customHeight="1"/>'); continue; }
+      let cs = '';
+      for(let c = 0; c < row.length; c++) cs += cellXML(row[c], r, c);
+      out.push('<row r="' + (r + 1) + '"' + (ht ? ' ht="' + ht + '" customHeight="1"' : '') + '>' + cs + '</row>');
+    }
+    out.push('</sheetData>');
+    if(sh.filter) out.push('<autoFilter ref="' + sh.filter + '"/>');
+    if(sh.merges && sh.merges.length) out.push('<mergeCells count="' + sh.merges.length + '">' + sh.merges.map(m => '<mergeCell ref="' + m + '"/>').join('') + '</mergeCells>');
+    out.push('<pageMargins left="0.5" right="0.5" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>');
+    if(sh.fit) out.push('<pageSetup paperSize="9" orientation="' + (sh.fit === 'portrait' ? 'portrait' : 'landscape') + '" fitToWidth="1" fitToHeight="0"/>');
+    if(sh.charts && sh.charts.length) out.push('<drawing r:id="rId1"/>');
+    out.push('</worksheet>');
+    return out.join('');
+  }
+
+  /* ---------- charts ---------- */
+  const TXT = (sz, color, bold) => '<c:txPr><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="' + sz + '"' + (bold ? ' b="1"' : '') + '><a:solidFill><a:srgbClr val="' + color + '"/></a:solidFill><a:latin typeface="Arial"/></a:defRPr></a:pPr><a:endParaRPr lang="de-DE"/></a:p></c:txPr>';
+  function strCache(list){ return '<c:strCache><c:ptCount val="' + list.length + '"/>' + list.map((x, i) => '<c:pt idx="' + i + '"><c:v>' + X(x === null || x === undefined ? '' : x) + '</c:v></c:pt>').join('') + '</c:strCache>'; }
+  function numCache(list, fmt){ return '<c:numCache><c:formatCode>' + X(fmt || 'General') + '</c:formatCode><c:ptCount val="' + list.length + '"/>' + list.map((x, i) => (typeof x === 'number' && isFinite(x)) ? '<c:pt idx="' + i + '"><c:v>' + x + '</c:v></c:pt>' : '').join('') + '</c:numCache>'; }
+  function chartXML(ch){
+    const kind = ch.type === 'line' ? 'line' : 'bar';
+    const horiz = ch.type === 'bar';
+    const fmt = ch.pct ? '0%' : (ch.fmt || 'General');
+    const many = ch.series.length > 1;
+    const maxV = Math.max.apply(null, [0].concat(...ch.series.map(x => x.vals.filter(y => typeof y === 'number' && isFinite(y)))));
+    const ser = ch.series.map((s, i) => {
+      const fill = '<a:solidFill><a:srgbClr val="' + s.color + '"/></a:solidFill>';
+      const sp = kind === 'line'
+        ? '<c:spPr><a:ln w="28575" cap="rnd">' + fill + '<a:round/></a:ln></c:spPr><c:marker><c:symbol val="circle"/><c:size val="7"/><c:spPr>' + fill + '<a:ln w="9525"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></a:ln></c:spPr></c:marker>'
+        : '<c:spPr>' + fill + '<a:ln><a:noFill/></a:ln></c:spPr><c:invertIfNegative val="0"/>';
+      const lfmt = many ? (ch.pct ? '0%;-0%;;' : fmt === 'General' ? '#,##0;-#,##0;;' : fmt + ';-' + fmt + ';;') : fmt;
+      const lbl = ch.labels === false ? '' : '<c:dLbls><c:numFmt formatCode="' + X(lfmt) + '" sourceLinked="0"/><c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>' + TXT(800, '333333') +
+        (kind === 'bar' ? '<c:dLblPos val="outEnd"/>' : '<c:dLblPos val="t"/>') + '<c:showLegendKey val="0"/><c:showVal val="1"/><c:showCatName val="0"/><c:showSerName val="0"/><c:showPercent val="0"/><c:showBubbleSize val="0"/></c:dLbls>';
+      const cat = ch.catIsDate
+        ? '<c:cat><c:numRef><c:f>' + X(ch.catRef) + '</c:f>' + numCache(ch.cats, 'dd.mm.') + '</c:numRef></c:cat>'
+        : '<c:cat><c:strRef><c:f>' + X(ch.catRef) + '</c:f>' + strCache(ch.cats) + '</c:strRef></c:cat>';
+      return '<c:ser><c:idx val="' + i + '"/><c:order val="' + i + '"/><c:tx><c:strRef><c:f>' + X(s.nameRef) + '</c:f>' + strCache([s.name]) + '</c:strRef></c:tx>' + sp + lbl + cat +
+        '<c:val><c:numRef><c:f>' + X(s.valRef) + '</c:f>' + numCache(s.vals, fmt) + '</c:numRef></c:val>' + (kind === 'line' ? '<c:smooth val="0"/>' : '') + '</c:ser>';
+    }).join('');
+    const group = kind === 'line'
+      ? '<c:lineChart><c:grouping val="standard"/><c:varyColors val="0"/>' + ser + '<c:marker val="1"/><c:axId val="5001"/><c:axId val="5002"/></c:lineChart>'
+      : '<c:barChart><c:barDir val="' + (horiz ? 'bar' : 'col') + '"/><c:grouping val="' + (ch.stacked ? 'stacked' : 'clustered') + '"/><c:varyColors val="0"/>' + ser +
+        '<c:gapWidth val="' + (many ? 80 : 55) + '"/>' + (ch.stacked ? '<c:overlap val="100"/>' : (many ? '<c:overlap val="-10"/>' : '')) + '<c:axId val="5001"/><c:axId val="5002"/></c:barChart>';
+    const gridLn = '<c:majorGridlines><c:spPr><a:ln w="6350"><a:solidFill><a:srgbClr val="E4E6EA"/></a:solidFill></a:ln></c:spPr></c:majorGridlines>';
+    const axLn = '<c:spPr><a:ln w="9525"><a:solidFill><a:srgbClr val="B8BDC6"/></a:solidFill></a:ln></c:spPr>';
+    const catAx = '<c:catAx><c:axId val="5001"/><c:scaling><c:orientation val="' + (horiz ? 'maxMin' : 'minMax') + '"/></c:scaling><c:delete val="0"/><c:axPos val="' + (horiz ? 'l' : 'b') + '"/>' +
+      '<c:numFmt formatCode="' + (ch.catIsDate ? 'dd.mm.' : 'General') + '" sourceLinked="0"/><c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/>' + axLn + TXT(800, '52514E') +
+      '<c:crossAx val="5002"/><c:crosses val="autoZero"/><c:auto val="1"/><c:lblAlgn val="ctr"/><c:lblOffset val="100"/><c:noMultiLvlLbl val="0"/></c:catAx>';
+    const valAx = '<c:valAx><c:axId val="5002"/><c:scaling><c:orientation val="minMax"/>' + (ch.pct ? '<c:max val="1"/>' : '') + '<c:min val="0"/></c:scaling><c:delete val="0"/><c:axPos val="' + (horiz ? 't' : 'l') + '"/>' + gridLn +
+      '<c:numFmt formatCode="' + X(fmt) + '" sourceLinked="0"/><c:majorTickMark val="none"/><c:minorTickMark val="none"/><c:tickLblPos val="nextTo"/><c:spPr><a:ln><a:noFill/></a:ln></c:spPr>' + TXT(800, '52514E') +
+      '<c:crossAx val="5001"/>' + (horiz ? '<c:crosses val="max"/>' : '<c:crosses val="autoZero"/>') + '<c:crossBetween val="between"/>' + (!ch.pct && maxV <= 6 ? '<c:majorUnit val="1"/>' : '') + '</c:valAx>';
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><c:chartSpace xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      '<c:lang val="de-DE"/><c:roundedCorners val="0"/><c:chart>' +
+      '<c:title><c:tx><c:rich><a:bodyPr/><a:lstStyle/><a:p><a:pPr><a:defRPr sz="1100" b="1"/></a:pPr><a:r><a:rPr lang="de-DE" sz="1100" b="1"><a:solidFill><a:srgbClr val="1F2430"/></a:solidFill><a:latin typeface="Arial"/></a:rPr><a:t>' + X(ch.title) + '</a:t></a:r></a:p></c:rich></c:tx><c:overlay val="0"/></c:title>' +
+      '<c:autoTitleDeleted val="0"/><c:plotArea><c:layout/>' + group + catAx + valAx + '<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr></c:plotArea>' +
+      (many ? '<c:legend><c:legendPos val="b"/><c:overlay val="0"/>' + TXT(800, '333333') + '</c:legend>' : '') +
+      '<c:plotVisOnly val="1"/><c:dispBlanksAs val="gap"/></c:chart>' +
+      '<c:spPr><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill><a:ln w="9525"><a:solidFill><a:srgbClr val="DDE2EA"/></a:solidFill></a:ln></c:spPr>' + TXT(900, '333333') + '</c:chartSpace>';
+  }
+  function drawingXML(charts){
+    return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">' +
+      charts.map((ch, i) => '<xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>' + ch.at[0] + '</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>' + ch.at[1] + '</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>' +
+        '<xdr:to><xdr:col>' + ch.at[2] + '</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>' + ch.at[3] + '</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>' +
+        '<xdr:graphicFrame macro=""><xdr:nvGraphicFramePr><xdr:cNvPr id="' + (i + 2) + '" name="Diagramm ' + (i + 1) + '"/><xdr:cNvGraphicFramePr/></xdr:nvGraphicFramePr><xdr:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/></xdr:xfrm>' +
+        '<a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/chart"><c:chart xmlns:c="http://schemas.openxmlformats.org/drawingml/2006/chart" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId' + (i + 1) + '"/></a:graphicData></a:graphic></xdr:graphicFrame><xdr:clientData/></xdr:twoCellAnchor>').join('') +
+      '</xdr:wsDr>';
+  }
+
+  /* ---------- ZIP (deflate where the browser supports it) ---------- */
+  const CRC = (() => { const t = new Uint32Array(256); for(let n = 0; n < 256; n++){ let c = n; for(let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(b){ let c = 0xFFFFFFFF; for(let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  async function deflate(b){
+    if(typeof CompressionStream === 'undefined') return null;
+    try { const s = new Blob([b]).stream().pipeThrough(new CompressionStream('deflate-raw')); return new Uint8Array(await new Response(s).arrayBuffer()); } catch(e){ return null; }
+  }
+  async function zip(files){
+    const parts = [], central = []; let off = 0;
+    const now = new Date(), dosT = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1), dosD = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+    for(const f of files){
+      const name = enc.encode(f.name), raw = typeof f.data === 'string' ? enc.encode(f.data) : f.data, crc = crc32(raw);
+      const def = await deflate(raw), useDef = def && def.length < raw.length, body = useDef ? def : raw;
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, useDef ? 8 : 0, true); h.setUint16(10, dosT, true); h.setUint16(12, dosD, true);
+      h.setUint32(14, crc, true); h.setUint32(18, body.length, true); h.setUint32(22, raw.length, true); h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+      parts.push(new Uint8Array(h.buffer), name, body);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, useDef ? 8 : 0, true); c.setUint16(12, dosT, true); c.setUint16(14, dosD, true);
+      c.setUint32(16, crc, true); c.setUint32(20, body.length, true); c.setUint32(24, raw.length, true); c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+      central.push(new Uint8Array(c.buffer), name);
+      off += 30 + name.length + body.length;
+    }
+    const cdSize = central.reduce((s, p) => s + p.length, 0);
+    const e = new DataView(new ArrayBuffer(22));
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cdSize, true); e.setUint32(16, off, true);
+    return new Blob(parts.concat(central, [new Uint8Array(e.buffer)]), {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  }
+
+  /* ---------- the workbook ---------- */
+  async function build(sheets, meta){
+    const files = [];
+    let chartNo = 0;
+    const ct = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">',
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/>',
+      '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>',
+      '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>',
+      '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>',
+      '<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>'];
+    const wbRels = [], sheetEls = [], names = [];
+    sheets.forEach((sh, i) => {
+      const n = i + 1;
+      files.push({name: 'xl/worksheets/sheet' + n + '.xml', data: sheetXML(sh, i)});
+      ct.push('<Override PartName="/xl/worksheets/sheet' + n + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>');
+      wbRels.push('<Relationship Id="rId' + n + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + n + '.xml"/>');
+      sheetEls.push('<sheet name="' + X(sh.name) + '" sheetId="' + n + '" r:id="rId' + n + '"/>');
+      if(sh.filter) names.push('<definedName name="_xlnm._FilterDatabase" localSheetId="' + i + '" hidden="1">' + X(qs(sh.name) + '!' + sh.filter.split(':').map(x => x.replace(/([A-Z]+)(\d+)/, '$$$1$$$2')).join(':')) + '</definedName>');
+      if(sh.charts && sh.charts.length){
+        files.push({name: 'xl/worksheets/_rels/sheet' + n + '.xml.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing' + n + '.xml"/></Relationships>'});
+        files.push({name: 'xl/drawings/drawing' + n + '.xml', data: drawingXML(sh.charts)});
+        ct.push('<Override PartName="/xl/drawings/drawing' + n + '.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/>');
+        const rels = [];
+        sh.charts.forEach((chd, j) => {
+          chartNo++;
+          files.push({name: 'xl/charts/chart' + chartNo + '.xml', data: chartXML(chd)});
+          ct.push('<Override PartName="/xl/charts/chart' + chartNo + '.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.chart+xml"/>');
+          rels.push('<Relationship Id="rId' + (j + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart" Target="../charts/chart' + chartNo + '.xml"/>');
+        });
+        files.push({name: 'xl/drawings/_rels/drawing' + n + '.xml.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + rels.join('') + '</Relationships>'});
+      }
+    });
+    wbRels.push('<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>');
+    ct.push('</Types>');
+    const iso = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
+    files.unshift(
+      {name: '[Content_Types].xml', data: ct.join('')},
+      {name: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>'},
+      {name: 'docProps/core.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>' + X(meta.title || 'Auswertung') + '</dc:title><dc:creator>Campi Auswertung</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">' + iso + '</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">' + iso + '</dcterms:modified></cp:coreProperties>'},
+      {name: 'docProps/app.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>Campi Auswertung</Application></Properties>'},
+      {name: 'xl/workbook.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView activeTab="0"/></bookViews><sheets>' + sheetEls.join('') + '</sheets>' + (names.length ? '<definedNames>' + names.join('') + '</definedNames>' : '') + '<calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>'},
+      {name: 'xl/_rels/workbook.xml.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + wbRels.join('') + '</Relationships>'},
+      {name: 'xl/styles.xml', data: STYLES_XML});
+    return zip(files);
+  }
+  return {build, col, cell, abs, qs, serial, STYLE};
+})();
+
+
+/* ================= Excel-Export: alle Daten, Dashboard mit Diagrammen, Erklärungen =================
+   Jede Kennzahl ist eine Formel auf die Datenblätter. Der Wert wird zusätzlich vorberechnet mitgeschrieben,
+   damit Diagramme und Zahlen auch in Vorschauen sofort stimmen. */
+const XL_PAL = ['2A78D6', 'EB6834', '1BAF7A', 'EDA100', 'E87BA4', '008300', '6250D6', 'E34948'];
+const XL_REF = '9AA3B5';
+const XL_DATE = s => s === 'dt' || s === 'date';
+const xlLines = (t, per) => Math.max(1, Math.ceil(String(t || '').length / per));
+const xlShort = (t, n) => { t = String(t || ''); return t.length > n ? t.slice(0, n - 1) + '…' : t; };
+const xlJN = b => b ? 'ja' : 'nein';
+const xlNum = x => (x === null || x === undefined || x === '' || isNaN(Number(x))) ? null : Number(x);
+function xlRaw(x, s){ if(x && typeof x === 'object') x = x.v; if(XL_DATE(s) && typeof x === 'number') return XLW.serial(x); return x === undefined ? null : x; }
+function xlCell(x, s){
+  if(x === null || x === undefined || x === '') return null;
+  if(typeof x === 'object') return (x.s || !s) ? x : Object.assign({s}, x);
+  if(XL_DATE(s) && typeof x === 'number') return {v: x, t: 'd', s};
+  return s ? {v: x, s} : x;
+}
+
+/* ---------- data table: columns with explanations, rows, formula helpers ---------- */
+function xTable(name, cols, about){
+  const mk = c => ({k: c[0], h: c[1], w: c[2] || 12, s: c[3] || null, d: c[4] || ''});
+  const t = {name, about, cols: cols.map(mk), data: []};
+  let idx = {};
+  const reindex = () => { idx = {}; t.cols.forEach((c, i) => idx[c.k] = i); };
+  reindex();
+  t.push = c => { t.cols.push(mk(c)); reindex(); };
+  t.c = k => { if(!(k in idx)) throw new Error('Spalte „' + k + '“ fehlt im Blatt ' + name); return idx[k]; };
+  t.L = k => XLW.col(t.c(k));
+  t.add = o => { t.data.push(t.cols.map(c => { const x = o[c.k]; return x === undefined || x === '' ? null : x; })); return t.data.length - 1; };
+  t.val = (r, k) => { const i = t.c(k); return xlRaw(t.data[r][i], t.cols[i].s); };
+  t.range = k => { const i = t.c(k); return XLW.abs(name, i, 1, i, Math.max(1, t.data.length)); };
+  t.sheet = tab => ({name, tab, freeze: 1, cols: t.cols.map(c => c.w), heights: {0: 40},
+    filter: 'A1:' + XLW.cell(t.cols.length - 1, Math.max(1, t.data.length)),
+    rows: [t.cols.map(c => ({v: c.h, s: 'head'}))].concat(t.data.map(r => r.map((x, i) => xlCell(x, t.cols[i].s))))});
+  return t;
+}
+/* conditions: [column, value] with value = text (equal, ignoring case), number (equal) or {op, n} (comparison) */
+function xlMatch(x, c){
+  if(c && typeof c === 'object'){ if(typeof x !== 'number') return false; switch(c.op){ case '>=': return x >= c.n; case '>': return x > c.n; case '<=': return x <= c.n; case '<': return x < c.n; } return false; }
+  if(typeof c === 'number') return typeof x === 'number' && x === c;
+  return typeof x === 'string' && x.toLowerCase() === String(c).toLowerCase();
+}
+function xlRows(t, conds){ const out = []; for(let r = 0; r < t.data.length; r++) if(conds.every(([k, c]) => xlMatch(t.val(r, k), c))) out.push(r); return out; }
+const xlLit = s => '"' + String(s).replace(/"/g, '""') + '"';
+const xlCrit = c => typeof c === 'number' ? String(c) : (c && typeof c === 'object') ? xlLit(c.op + c.n) : xlLit(c);
+/* COUNTIFS reads some texts as numbers, dates, wildcards or operators. Such texts are compared with SUMPRODUCT instead. */
+const XL_SAFE = /^[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ .,()·\-–&'_]*$/;
+const xlSafe = conds => conds.every(([k, c]) => typeof c !== 'string' || (XL_SAFE.test(c) && !/^(wahr|falsch|true|false)$/i.test(c) && c.length < 200));
+function xlCnt(t, conds){
+  const v = xlRows(t, conds).length;
+  if(xlSafe(conds)) return {f: 'COUNTIFS(' + conds.map(([k, c]) => t.range(k) + ',' + xlCrit(c)).join(',') + ')', v};
+  const terms = [];
+  conds.forEach(([k, c]) => { const R = t.range(k);
+    if(c && typeof c === 'object') terms.push('ISNUMBER(' + R + ')', '(' + R + c.op + c.n + ')');
+    else terms.push('(' + R + '=' + (typeof c === 'number' ? c : xlLit(c)) + ')'); });
+  return {f: 'SUMPRODUCT(' + terms.join('*') + (terms.length === 1 ? '*1' : '') + ')', v};
+}
+function xlAvg(t, valK, conds){
+  const c2 = conds.concat([[valK, {op: '>=', n: 0}]]);
+  if(!xlSafe(conds)) throw new Error('xlAvg: Bedingung nicht eindeutig');
+  const rows = xlRows(t, c2), v = rows.length ? rows.reduce((s, r) => s + t.val(r, valK), 0) / rows.length : 0;
+  const crit = c2.map(([k, c]) => t.range(k) + ',' + xlCrit(c)).join(',');
+  return {f: 'IF(COUNTIFS(' + crit + ')=0,0,AVERAGEIFS(' + t.range(valK) + ',' + crit + '))', v};
+}
+function xlSumIf(t, valK, conds){
+  const rows = xlRows(t, conds);
+  return {f: 'SUMIFS(' + t.range(valK) + ',' + conds.map(([k, c]) => t.range(k) + ',' + xlCrit(c)).join(',') + ')', v: rows.reduce((s, r) => s + (typeof t.val(r, valK) === 'number' ? t.val(r, valK) : 0), 0)};
+}
+function xlCountA(t, k){ let v = 0; for(let r = 0; r < t.data.length; r++){ const x = t.val(r, k); if(x !== null && x !== '') v++; } return {f: 'COUNTA(' + t.range(k) + ')', v}; }
+function xlSum(t, k){ let v = 0; for(let r = 0; r < t.data.length; r++){ const x = t.val(r, k); if(typeof x === 'number') v += x; } return {f: 'SUM(' + t.range(k) + ')', v}; }
+function xlMedian(t, k){ const a = []; for(let r = 0; r < t.data.length; r++){ const x = t.val(r, k); if(typeof x === 'number') a.push(x); } const m = median(a); return {f: 'IFERROR(MEDIAN(' + t.range(k) + '),"–")', v: m === null ? '–' : m}; }
+const xlShare = (a, b) => ({f: 'IF(' + b.f + '=0,0,' + a.f + '/' + b.f + ')', v: b.v ? a.v / b.v : 0});
+const xlS = (x, s) => Object.assign({}, x, {s});
+function xlGroup(t, k, conds, top){
+  const m = new Map();
+  xlRows(t, conds || []).forEach(r => { const x = t.val(r, k); if(x === null || x === '') return; const key = String(x).toLowerCase(); const o = m.get(key) || {label: String(x), n: 0}; o.n++; m.set(key, o); });
+  return Array.from(m.values()).sort((a, b) => b.n - a.n || a.label.localeCompare(b.label, 'de')).slice(0, top || 1e9);
+}
+/* fixed order first, then everything else that occurs */
+function xlCats(fixed, groups){ const seen = new Set(fixed.map(x => x.toLowerCase())); return fixed.concat(groups.map(g => g.label).filter(l => !seen.has(l.toLowerCase()) && seen.add(l.toLowerCase()))); }
+
+/* ---------- sheet with the tables behind the charts ---------- */
+function xlChartData(){
+  const sh = {name: 'Diagrammdaten', rows: [], merges: [], heights: {}, cols: [42, 16, 16, 16, 16, 16], tab: XL_REF};
+  sh.rows.push([{v: 'Diagrammdaten', s: 'title'}]); sh.heights[0] = 24;
+  sh.rows.push([{v: 'Die Tabellen, aus denen die Diagramme im Dashboard gezeichnet werden. Alle Werte sind Formeln auf die Datenblätter: Änderst du dort etwas, rechnen sich Tabellen und Diagramme neu.', s: 'desc'}]); sh.merges.push('A2:F2'); sh.heights[1] = 28;
+  sh.rows.push([]);
+  sh.table = (title, note, head) => {
+    const r0 = sh.rows.length;
+    sh.rows.push([{v: title, s: 'section'}]); sh.heights[r0] = 20;
+    sh.rows.push([{v: note, s: 'desc'}]); sh.merges.push('A' + (r0 + 2) + ':F' + (r0 + 2)); sh.heights[r0 + 1] = xlLines(note, 125) * 12 + 4;
+    sh.rows.push(head.map(h => ({v: h, s: 'head'}))); sh.heights[r0 + 2] = 28;
+    const t = {title, note, head, hr: r0 + 2, first: r0 + 3, n: 0, cats: [], vals: head.map(() => [])};
+    t.row = (cat, cells) => { const r = sh.rows.length; sh.rows.push([{v: cat}].concat(cells)); t.cats.push(cat); cells.forEach((c, i) => t.vals[i + 1].push(c && typeof c === 'object' ? c.v : c)); t.n++; return r; };
+    t.ref = (ci, i) => XLW.cell(ci, t.first + i);
+    t.done = () => { if(!t.n) t.row('(keine Daten)', head.slice(1).map(() => ({v: 0, s: 'int'}))); sh.rows.push([]); return t; };
+    t.chart = o => Object.assign({src: 'Blatt Diagrammdaten, Tabelle „' + title + '“'}, o, {cats: t.cats.map(String), catRef: XLW.abs(sh.name, 0, t.first, 0, t.first + t.n - 1),
+      series: o.cols.map((ci, k) => ({name: head[ci], nameRef: XLW.abs(sh.name, ci, t.hr), valRef: XLW.abs(sh.name, ci, t.first, ci, t.first + t.n - 1), vals: t.vals[ci], color: (o.colors || XL_PAL)[k]}))});
+    return t;
+  };
+  return sh;
+}
+function xlChartRows(ch){
+  if(ch.type !== 'bar') return ch.wide ? 16 : 15;
+  return Math.min(32, Math.max(14, Math.round(6 + ch.cats.length * (ch.series.length > 1 ? 1.9 : 1.3))));
+}
+
+/* ---------- dashboard ---------- */
+function xlDashboard(meta, kpis, sections){
+  const sh = {name: 'Dashboard', rows: [], merges: [], heights: {}, charts: [], grid: false, tab: XL_PAL[0], fit: 'portrait',
+    cols: [2.5, 10.5, 10.5, 10.5, 10.5, 2.5, 10.5, 10.5, 10.5, 10.5, 2.5, 10.5, 10.5, 10.5, 10.5, 2.5, 10.5, 10.5, 10.5, 10.5]};
+  const put = (r, c, x) => { while(sh.rows.length <= r) sh.rows.push([]); sh.rows[r][c] = x; };
+  const box = (r, c1, c2, x, s) => { put(r, c1, Object.assign(typeof x === 'object' && x !== null ? Object.assign({}, x) : {v: x}, {s})); for(let c = c1 + 1; c <= c2; c++) put(r, c, {v: '', s}); if(c2 > c1) sh.merges.push(XLW.cell(c1, r) + ':' + XLW.cell(c2, r)); };
+  put(0, 1, {v: meta.title, s: 'big'}); sh.heights[0] = 30;
+  box(1, 1, 19, meta.sub, 'desc'); sh.heights[1] = xlLines(meta.sub, 175) * 12 + 4;
+  box(2, 1, 19, meta.how, 'note'); sh.heights[2] = xlLines(meta.how, 175) * 12 + 6;
+  let r = 4;
+  const starts = [1, 6, 11, 16];
+  for(let i = 0; i < kpis.length; i += 4){
+    kpis.slice(i, i + 4).forEach((k, j) => { const c = starts[j];
+      box(r, c, c + 3, k.label, 'kpiLabel'); box(r + 1, c, c + 3, k.cell, k.style); box(r + 2, c, c + 3, k.sub, 'kpiLabel'); });
+    sh.heights[r] = 18; sh.heights[r + 1] = 34; sh.heights[r + 2] = 26;
+    r += 4;
+  }
+  sections.forEach(sec => {
+    if(!sec.charts.length) return;
+    r += 1;
+    put(r, 1, {v: sec.title, s: 'section'}); sh.heights[r] = 22; r++;
+    if(sec.desc){ box(r, 1, 19, sec.desc, 'desc'); sh.heights[r] = xlLines(sec.desc, 175) * 12 + 4; r++; }
+    r++;
+    const list = sec.charts.slice();
+    while(list.length){
+      const a = list.shift(), pair = [a];
+      if(!a.wide && list.length && !list[0].wide) pair.push(list.shift());
+      const h = Math.max.apply(null, pair.map(xlChartRows));
+      const lines = Math.max.apply(null, pair.map(ch => xlLines('Was zeigt das? ' + ch.note, ch.wide ? 170 : 82)));
+      pair.forEach((ch, j) => {
+        const c1 = ch.wide ? 1 : (j ? 11 : 1), c2 = ch.wide ? 20 : (j ? 20 : 10);
+        ch.at = [c1, r, c2, r + h]; sh.charts.push(ch);
+        box(r + h, c1, c2 - 1, 'Was zeigt das? ' + ch.note, 'note');
+      });
+      sh.heights[r + h] = lines * 12.5 + 8;
+      r += h + 2;
+    }
+  });
+  return sh;
+}
+
+/* ---------- explanation of events ---------- */
+const XL_EV_EXPL = {
+  ansicht: 'Eine Seite oder Ansicht der App wurde angezeigt (Details: welche Seite, ggf. Raum und Sprache).',
+  ansicht_ende: 'Eine Seite wurde verlassen. Details: aktive Zeit auf der Seite (ohne Zeit im Hintergrund) und Scrolltiefe in Prozent.',
+  klick: 'Klick auf etwas Bedienbares: Knopf, Link, Kachel. Details: Beschriftung, Aktion und Zeit seit Öffnen der Seite.',
+  leer_klick: 'Klick auf eine Stelle, die nichts tut. Häufig ein Hinweis, dass etwas wie ein Knopf aussieht, aber keiner ist.',
+  frust_klick: 'Drei schnelle Klicks auf dieselbe Stelle: Etwas hat nicht so reagiert, wie die Person erwartet hat.',
+  suche: 'Eingabe in der Raumsuche mit Anzahl der Treffer.',
+  chat_frage: 'Frage an Campi, so wie sie eingetippt wurde. Der in der App eingetragene Name wird vorher entfernt.',
+  chat_antwort: 'Antwort von Campi: Thema, ob eine geprüfte Antwort gefunden wurde, Sprache der Antwort.',
+  aufgabe: 'Beginn oder Ende einer Aufgabe im App-Test, mit Ergebnis und Sekunden.',
+  schritt: 'Technisch: Wechsel zwischen den Schritten des App-Tests.',
+  sprache: 'Die Sprache der App wurde gewechselt (von → nach).',
+  standort_gewechselt: 'Der Campus wurde in der App gewechselt (von → nach).',
+  standort: 'Echter Standort nach freiwilliger Freigabe, gerundet, mit Entfernung zum Ziel und zur Campus-Mitte.',
+  standort_status: 'Ergebnis der Standortfreigabe: erlaubt, abgelehnt, nicht verfügbar, Fehler.',
+  standort_anfrage: 'Technisch: Der Standort wurde beim Gerät angefragt.',
+  standort_erhalten: 'Technisch: Das Gerät hat einen Standort geliefert.',
+  ziel_erreicht: 'Mit eingeschaltetem Standort am Zielgebäude angekommen.',
+  verlassen: 'Die App oder der Tab wurde in den Hintergrund gelegt.',
+  zurueck: 'Zurück in der App, mit der Zeit, die die Person weg war.',
+  app_geoeffnet: 'Die App wurde geöffnet (Pilotphase).',
+  installation: 'Hinweis zur Installation auf dem Home-Bildschirm oder Installation selbst.',
+  karte: 'Bedienung des Lageplans (z. B. vergrößert).',
+  raum_gewaehlt: 'Ein Raum wurde ausgewählt, mit dem Weg dorthin (Suche, Liste, Karte).',
+  einwilligung: 'Einwilligung zur Datenerhebung gegeben.',
+  fragebogen: 'Fragebogen geöffnet oder bearbeitet.',
+  abgeschlossen: 'App-Test abgeschlossen, Fragebogen abgeschickt.',
+  abbruch: 'App-Test abgebrochen.',
+  fehler: 'Technischer Fehler in der App (Meldung in den Details).',
+  fenster: 'Technisch: Die Fenstergröße hat sich geändert.',
+  pilot_beigetreten: 'Gerät ist der Pilotphase beigetreten.',
+  pilot_beendet: 'Teilnahme an der Pilotphase beendet.',
+  live_automatisch: 'Die Live-Karte wurde automatisch geöffnet, weil der Standort freigegeben war.',
+  danach: 'Nach dem App-Test hat sich die Person freiwillig weiter umgesehen.'
+};
+const XL_GEO = {ok: 'erlaubt', denied: 'abgelehnt', na: 'nicht verfügbar', error: 'Fehler', wait: 'angefragt', off: 'ausgeschaltet'};
+function xlDetail(e){
+  if(e.typ === 'standort_status'){ const s = (e.daten || {}).status; return XL_GEO[s] || String(s || ''); }
+  try { return evDetail(e); } catch(x){ return ''; }
+}
+const xlArea = k => { const b = pageBase(k); return b ? (PAGE_LABEL[b] || b) : null; };
+
+/* ================= build the workbook ================= */
+async function xlBuild(v){
+  const d = S.data, now = Date.now();
+  const sessById = {}; d.sitzungen.forEach(s => sessById[s.id] = s);
+  const artOf = sid => { const s = sessById[sid]; return s && isPilot(s) ? 'Pilot' : 'Test'; };
+  const sess = v.sess.slice().sort((a, b) => a._start - b._start);
+  const order = {}; sess.forEach((s, i) => order[s.id] = i);
+
+  /* ----- questions ----- */
+  const h2aMap = new Map(h2aQuestions(v).map(q => [q.id, q]));
+  const qList = [], qById = {}, qByText = {};
+  v.fragen.forEach(q => { const e = {no: qList.length + 1, id: q.id, frage: q.frage, typ: q.typ, opts: (q.optionen || []).map(String), q, aktiv: q.aktiv, key: q.schluessel, smin: q.skala_min, smax: q.skala_max, h2a: h2aMap.get(q.id) || null}; qList.push(e); qById[q.id] = e; });
+  v.ans.forEach(a => { if(a.frage_id && qById[a.frage_id]) return; const k = (a.frage || '') + '|' + (a.typ || ''); if(!qByText[k]){ const e = {no: qList.length + 1, id: null, frage: a.frage || '(ohne Fragetext)', typ: a.typ || 'text', opts: [], q: null, aktiv: false, orphan: true, h2a: null}; qList.push(e); qByText[k] = e; } });
+  const qOf = a => (a.frage_id && qById[a.frage_id]) || qByText[(a.frage || '') + '|' + (a.typ || '')];
+  const optNo = (e, x) => { x = String(x); let i = e.opts.indexOf(x); if(i < 0){ e.opts.push(x); i = e.opts.length - 1; } return i + 1; };
+  const TYP = {einfach: 'Einfachauswahl', mehrfach: 'Mehrfachauswahl', skala: 'Skala 1–5', text: 'Freitext'};
+
+  /* ----- per-session facts from events, results and answers ----- */
+  const fact = {};
+  sess.forEach(s => {
+    const evs = v.evBy[s.id] || [];
+    const has = (nr, ph) => evs.some(e => e.typ === 'aufgabe' && e.daten && +e.daten.nr === nr && e.daten.phase === ph) ? 1 : 0;
+    let last = null; for(let i = evs.length - 1; i >= 0; i--){ if(evs[i].schritt){ last = STEP_LABEL[evs[i].schritt] || evs[i].schritt; break; } }
+    const opened = new Set(evs.filter(e => e.typ === 'ansicht' && e.daten && e.daten.ansicht).map(e => pageBase(e.daten.ansicht)));
+    fact[s.id] = {a1s: has(1, 'start'), a1e: has(1, 'ende'), a2e: has(2, 'ende'), a3e: has(3, 'ende'), last: last || 'Einwilligung', opened,
+      klicks: evs.filter(e => e.typ === 'klick').length, aktiv: evs.filter(e => e.typ === 'ansicht_ende' && e.daten).reduce((x, e) => x + (Number(e.daten.dauer_ms) || 0), 0) / 1000,
+      weg: evs.some(e => e.typ === 'verlassen'), ev: evs.length, ans: {}, h2a: null, ersetzt: null};
+  });
+  const qErs = qList.find(e => e.key === 'ersetzt' && !e.orphan);
+  v.ans.forEach(a => { const f = fact[a.sitzung_id]; if(!f) return; const e = qOf(a); if(!e) return;
+    f.ans[e.no] = Array.isArray(a.wert) ? a.wert.join(', ') : (e.typ === 'skala' ? xlNum(a.wert) : (a.wert === null || a.wert === undefined ? null : String(a.wert)));
+    if(e.h2a && artOf(a.sitzung_id) === 'Test') f.h2a = f.h2a || h2aYes(e.h2a, a.wert);
+    if(qErs && e === qErs && artOf(a.sitzung_id) === 'Test') f.ersetzt = (Array.isArray(a.wert) && a.wert.some(o => !/^(nichts|keine)/i.test(o))) ? 1 : 0;
+  });
+  v.ans.forEach(a => { const f = fact[a.sitzung_id], e = qOf(a); if(f && e && e.h2a && artOf(a.sitzung_id) === 'Test' && f.h2a === null) f.h2a = false; });
+
+  /* ----- sheet Teilnahmen ----- */
+  const AREAS = PAGE_ORDER.concat(['einstellungen']);
+  const T = xTable('Teilnahmen', [
+    ['id', 'Sitzungs-ID', 37, null, 'Zufällige Nummer der Sitzung. Eine Sitzung ist ein Durchlauf des App-Tests oder, in der Pilotphase, ein Öffnen der App.'],
+    ['start', 'Beginn', 16, 'dt', 'Zeitpunkt des ersten Ereignisses auf dem Gerät, in der Uhrzeit dieses Computers.'],
+    ['tag', 'Tag', 11, 'date', 'Kalendertag des Beginns. Grundlage für „Teilnahmen pro Tag“.'],
+    ['art', 'Art', 7, null, '„Test“ = App-Test mit drei Aufgaben und Fragebogen. „Pilot“ = ein Öffnen der App in der Pilotphase.'],
+    ['pilot', 'Pilot-ID', 37, null, 'Zufällige Nummer des Geräts in der Pilotphase, gleich für alle Öffnungen dieses Geräts. Leer im App-Test.'],
+    ['version', 'App-Version', 11, null, 'Version der App, mit der die Sitzung lief.'],
+    ['lang', 'App-Sprache', 11, null, 'Sprache, in der die App zu Beginn angezeigt wurde.'],
+    ['campus', 'Campus', 14, null, 'Gewählter oder angegebener Campus: Stadtmitte, Flandernstraße, Göppingen oder woanders.'],
+    ['geo', 'Standort freigegeben', 10, null, '„ja“, wenn der echte Standort freiwillig freigegeben wurde. Er wird nur gerundet gespeichert.'],
+    ['inst', 'Vom Home-Bildschirm', 10, null, '„ja“, wenn die App installiert vom Home-Bildschirm geöffnet wurde.'],
+    ['gruppe', 'Gruppe (A/B)', 12, null, 'Zufallsgruppe für Aufgabe 2: Die KI-Antwort wurde „mit Quelle“ oder „ohne Quelle“ angezeigt.'],
+    ['geraet', 'Gerät', 10, null, 'Handy, Tablet oder Computer, abgeleitet aus Bildschirm und Browser.'],
+    ['os', 'Betriebssystem', 13, null, 'Betriebssystem des Geräts.'],
+    ['browser', 'Browser', 12, null, 'Verwendeter Browser.'],
+    ['bsprache', 'Browsersprache', 11, null, 'Spracheinstellung des Browsers, z. B. de-DE.'],
+    ['tz', 'Zeitzone', 15, null, 'Zeitzone des Geräts.'],
+    ['screen', 'Bildschirm', 11, null, 'Bildschirmgröße in Pixeln (Breite x Höhe).'],
+    ['win', 'Fenster', 11, null, 'Sichtbare Fläche im Browser in Pixeln.'],
+    ['dpr', 'Pixeldichte', 9, 'dec', 'Verhältnis von Geräte- zu CSS-Pixeln, z. B. 3 bei vielen Handys.'],
+    ['touch', 'Touchscreen', 9, null, '„ja“, wenn das Gerät einen Touchscreen hat.'],
+    ['dark', 'Dunkelmodus', 9, null, '„ja“, wenn das Gerät auf Dunkelmodus eingestellt ist.'],
+    ['motion', 'Weniger Bewegung', 9, null, '„ja“, wenn das Gerät Animationen reduziert (Bedienungshilfe).'],
+    ['net', 'Verbindung', 9, null, 'Art der Internetverbindung, soweit der Browser sie verrät (z. B. 4g, wifi).'],
+    ['quelle', 'Quelle (Link)', 12, null, 'Wert von ?quelle= im geteilten Link, z. B. instagram.'],
+    ['kampagne', 'Kampagne', 12, null, 'Wert von ?kampagne= im Link.'],
+    ['ref', 'Verweisende Website', 16, null, 'Nur die Domain der Website, von der jemand kam.'],
+    ['herkunft', 'Herkunft', 16, null, 'Quelle aus dem Link, sonst die verweisende Website, sonst „direkt“. Grundlage für „Woher kamen die Leute?“.'],
+    ['semester', 'Semester', 18, null, 'Angabe zu Beginn des App-Tests.'],
+    ['raumsuche', 'Letzte Raumsuche', 15, null, 'Wann die Person zuletzt einen Raum gesucht hat (Angabe zu Beginn des App-Tests).'],
+    ['ladezeit', 'Ladezeit (ms)', 9, 'int', 'Millisekunden, bis die App bereit war.'],
+    ['abg', 'Abgeschlossen', 10, null, '„ja“, wenn der Fragebogen am Ende abgeschickt wurde. Nur dann gibt es Ergebnisse der Aufgaben.'],
+    ['a1erg', 'A1 Ergebnis', 11, null, 'Aufgabe 1 (Raum finden): „gefunden“ oder „aufgegeben“.'],
+    ['a1sek', 'A1 Sekunden', 9, 'dec', 'Sekunden, bis der Raum gefunden oder die Aufgabe aufgegeben wurde.'],
+    ['a1tipps', 'A1 Tipps', 8, 'int', 'Wie oft während Aufgabe 1 getippt oder geklickt wurde.'],
+    ['a1weg', 'A1 Wege', 20, null, 'Benutzte Wege in der App, z. B. Suche, Liste, Lageplan. Einzeln im Blatt „Wege und Bereiche“.'],
+    ['a1verst', 'A1 Verständlich (1–5)', 11, 'int', 'Wie verständlich die Wegbeschreibung war: 5 = sehr, 1 = gar nicht.'],
+    ['a1ziel', 'Ziel Raumsuche erreicht', 11, 'int', 'Formel: 1, wenn gefunden UND höchstens 60 Sekunden UND Verständlichkeit 4 oder 5, sonst 0.'],
+    ['a2erg', 'A2 Ergebnis', 11, null, 'Aufgabe 2 (KI-Frage zur Prüfungsanmeldung): „beantwortet“ oder „aufgegeben“.'],
+    ['a2sek', 'A2 Sekunden', 9, 'dec', 'Sekunden bis zur Antwort.'],
+    ['a2fragen', 'A2 Fragen', 8, 'int', 'Wie viele Fragen bis zur richtigen Antwort gestellt wurden.'],
+    ['a2vert', 'A2 Vertrauen (1–5)', 10, 'int', 'Vertrauen in die Antwort: 5 = voll und ganz, 1 = gar nicht.'],
+    ['a2lieber', 'A2 Nächstes Mal', 22, null, 'Was die Person beim nächsten Mal tun würde: Campi fragen, Website der Hochschule durchsuchen oder jemanden fragen.'],
+    ['a2ziel', 'Ziel KI erreicht', 10, 'int', 'Formel: 1, wenn Vertrauen 4 oder 5 UND „Campi fragen“, sonst 0.'],
+    ['a3sek', 'A3 Sekunden', 9, 'dec', 'Aufgabe 3 (frei umsehen): Dauer in Sekunden.'],
+    ['a3ber', 'A3 Bereiche', 26, null, 'Was beim freien Umsehen geöffnet wurde. Einzeln im Blatt „Wege und Bereiche“.'],
+    ['a3n', 'A3 Anzahl Bereiche', 9, 'int', 'Anzahl der Einträge in „A3 Bereiche“.'],
+    ['dauer', 'Dauer gesamt (s)', 10, 'dec', 'Sekunden vom Start bis zum Absenden des Fragebogens.'],
+    ['fbsek', 'Fragebogen (s)', 10, 'dec', 'Sekunden für den Fragebogen.'],
+    ['f_a1s', 'A1 begonnen', 9, 'int', '1, wenn Aufgabe 1 begonnen wurde. Diese vier Spalten sind die Grundlage des Trichters „Wo steigen Testpersonen aus?“.'],
+    ['f_a1e', 'A1 beendet', 9, 'int', '1, wenn Aufgabe 1 beendet wurde.'],
+    ['f_a2e', 'A2 beendet', 9, 'int', '1, wenn Aufgabe 2 beendet wurde.'],
+    ['f_a3e', 'A3 beendet', 9, 'int', '1, wenn Aufgabe 3 beendet wurde.'],
+    ['letzter', 'Letzter Schritt', 13, null, 'Nur bei nicht abgeschlossenen App-Tests: der zuletzt erreichte Schritt. Zeigt, wo abgebrochen wurde.'],
+    ['ev', 'Ereignisse', 9, 'int', 'Anzahl aller aufgezeichneten Ereignisse der Sitzung (Blatt „Ereignisse“).'],
+    ['klicks', 'Klicks', 8, 'int', 'Anzahl der Klicks auf Bedienbares.'],
+    ['aktiv', 'Aktive Zeit (s)', 10, 'dec', 'Summe der Zeit auf allen Seiten, während die App im Vordergrund war.'],
+    ['weg', 'Zwischendurch verlassen', 11, null, '„ja“, wenn während der Sitzung in eine andere App oder einen anderen Tab gewechselt wurde.']
+  ].concat(AREAS.map(k => ['o_' + k, 'Geöffnet: ' + PAGE_LABEL[k], 10, 'int', '1, wenn der Bereich „' + PAGE_LABEL[k] + '“ in der Sitzung mindestens einmal geöffnet wurde.']), [
+    ['h2a_ant', 'H2a beantwortet', 9, 'int', '1, wenn mindestens eine Frage beantwortet wurde, die für H2a zählt (nur App-Test).'],
+    ['h2a_ja', 'H2a Zustimmung', 9, 'int', '1, wenn bei einer H2a-Frage eine Antwort gewählt wurde, die als Zustimmung zählt (würde Campi installieren). 0 = beantwortet, aber keine Zustimmung.'],
+    ['ersetzt', 'Nennt ersetzte App', 9, 'int', '1, wenn bei der Frage mit dem Schlüssel „ersetzt“ mindestens eine App oder Website genannt wurde, 0 bei „Nichts“ oder „Keine“, leer ohne Antwort.']
+  ]), 'Eine Zeile pro Sitzung im Filter: Gerät, Herkunft, Angaben zu Beginn, Ergebnisse der drei Aufgaben, Hilfsspalten (1 oder 0) für Hypothesen und Diagramme und rechts die Antworten des Fragebogens (Spalten F1, F2 …).');
+  qList.forEach(e => T.push(['q' + e.no, 'F' + e.no + ' · ' + xlShort(e.frage, 70), e.typ === 'text' ? 30 : 18, e.typ === 'skala' ? 'int' : null, 'Antwort auf Frage F' + e.no + ' (' + TYP[e.typ] + '): ' + e.frage]));
+  sess.forEach(s => {
+    const r = v.resBy[s.id], f = fact[s.id], rn = T.data.length + 2, art = isPilot(s) ? 'Pilot' : 'Test';
+    const o = {id: s.id, start: s._start, tag: startOfDay(s._start), art, pilot: s.pilot_id, version: s.version, lang: LANG_NAME[s.sprache_app] || s.sprache_app || 'unbekannt',
+      campus: CAMPUS_NAME[s.standort] || s.standort || 'unbekannt', geo: xlJN(s.standort_freigabe), inst: xlJN(s.installiert), gruppe: s.gruppe,
+      geraet: s.geraet || 'unbekannt', os: s.betriebssystem || 'unbekannt', browser: s.browser || 'unbekannt', bsprache: s.sprache, tz: s.zeitzone, screen: s.bildschirm, win: s.fenster,
+      dpr: xlNum(s.pixeldichte), touch: xlJN(s.touch), dark: xlJN(s.dunkelmodus), motion: xlJN(s.weniger_bewegung), net: s.verbindung, quelle: s.quelle, kampagne: s.kampagne, ref: s.referrer,
+      herkunft: xlShort(s.quelle || s.referrer || 'direkt', 100), semester: s.semester, raumsuche: s.letzte_raumsuche, ladezeit: xlNum(s.ladezeit_ms),
+      abg: xlJN(r), f_a1s: f.a1s, f_a1e: f.a1e, f_a2e: f.a2e, f_a3e: f.a3e, letzter: !r && art === 'Test' ? f.last : null,
+      ev: f.ev, klicks: f.klicks, aktiv: Math.round(f.aktiv * 10) / 10, weg: xlJN(f.weg),
+      h2a_ant: f.h2a === null ? null : 1, h2a_ja: f.h2a === null ? null : (f.h2a ? 1 : 0), ersetzt: f.ersetzt};
+    AREAS.forEach(k => o['o_' + k] = f.opened.has(k) ? 1 : 0);
+    if(r){
+      Object.assign(o, {a1erg: r.a1_ergebnis, a1sek: xlNum(r.a1_sekunden), a1tipps: xlNum(r.a1_tipps), a1weg: r.a1_weg, a1verst: xlNum(r.a1_verstaendlich),
+        a2erg: r.a2_ergebnis, a2sek: xlNum(r.a2_sekunden), a2fragen: xlNum(r.a2_fragen), a2vert: xlNum(r.a2_vertrauen), a2lieber: r.a2_lieber,
+        a3sek: xlNum(r.a3_sekunden), a3ber: (r.a3_bereiche || []).join(', '), a3n: (r.a3_bereiche || []).length, dauer: xlNum(r.dauer_sekunden), fbsek: xlNum(r.fragebogen_sekunden)});
+    }
+    const c = k => T.L(k) + rn;
+    const g1 = String(o.a1erg || '').toLowerCase() === 'gefunden' && typeof o.a1sek === 'number' && o.a1sek <= 60 && typeof o.a1verst === 'number' && o.a1verst >= 4;
+    o.a1ziel = {f: 'IF(AND(' + c('a1erg') + '="gefunden",ISNUMBER(' + c('a1sek') + '),' + c('a1sek') + '<=60,ISNUMBER(' + c('a1verst') + '),' + c('a1verst') + '>=4),1,0)', v: g1 ? 1 : 0};
+    const g2 = typeof o.a2vert === 'number' && o.a2vert >= 4 && String(o.a2lieber || '').toLowerCase() === 'campi fragen';
+    o.a2ziel = {f: 'IF(AND(ISNUMBER(' + c('a2vert') + '),' + c('a2vert') + '>=4,' + c('a2lieber') + '="Campi fragen"),1,0)', v: g2 ? 1 : 0};
+    qList.forEach(e => { const x = f.ans[e.no]; if(x !== undefined && x !== null) o['q' + e.no] = x; });
+    T.add(o);
+  });
+
+  /* ----- sheet Antworten (long format) ----- */
+  const A = xTable('Antworten', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung, zu der die Antwort gehört (Blatt „Teilnahmen“).'],
+    ['art', 'Art', 7, null, 'Test oder Pilot.'],
+    ['zeit', 'Zeitpunkt', 16, 'dt', 'Wann die Antwort gespeichert wurde.'],
+    ['no', 'Frage-Nr.', 8, 'int', 'Nummer der Frage, wie im Blatt „Fragebogen“ (F1, F2 …).'],
+    ['frage', 'Frage', 48, null, 'Fragetext zum Zeitpunkt der Antwort.'],
+    ['typ', 'Fragetyp', 14, null, 'Einfachauswahl, Mehrfachauswahl, Skala 1–5 oder Freitext.'],
+    ['antwort', 'Antwort', 40, null, 'Gewählte Antwort, Zahl auf der Skala oder Freitext. Bei Mehrfachauswahl eine Zeile pro gewählter Antwort.'],
+    ['opt', 'Antwort-Nr.', 9, 'int', 'Nummer der Antwortmöglichkeit innerhalb der Frage (bei Skalen der Wert 1 bis 5). Grundlage der Zählung im Blatt „Fragebogen“.'],
+    ['erste', 'Zählt als Person', 9, 'int', '1 in der ersten Zeile jeder Antwort, sonst 0. Die Summe ergibt die Anzahl der Personen, die die Frage beantwortet haben.'],
+    ['h2a', 'Zählt für H2a', 9, null, '„ja“, wenn die Frage im Fragenkatalog der Hypothese H2a zugeordnet ist.'],
+    ['zust', 'H2a-Zustimmung', 10, null, 'Nur bei H2a-Fragen, in der ersten Zeile: „ja“, wenn die Antwort als Zustimmung zählt.']
+  ], 'Alle Antworten des Fragebogens im Langformat: eine Zeile pro gewählter Antwort. Bei Mehrfachauswahl hat eine Person mehrere Zeilen; die Spalte „Zählt als Person“ verhindert, dass sie mehrfach gezählt wird.');
+  v.ans.slice().sort((a, b) => (order[a.sitzung_id] - order[b.sitzung_id]) || (Date.parse(a.erstellt) - Date.parse(b.erstellt))).forEach(a => {
+    const e = qOf(a); if(!e || !(a.sitzung_id in order)) return;
+    const base = {sid: a.sitzung_id, art: artOf(a.sitzung_id), zeit: Date.parse(a.erstellt), no: e.no, frage: a.frage || e.frage, typ: TYP[e.typ] || e.typ, h2a: xlJN(e.h2a)};
+    const zust = e.h2a && base.art === 'Test' ? xlJN(h2aYes(e.h2a, a.wert)) : null;
+    if(e.typ === 'skala'){ const n = xlNum(a.wert); A.add(Object.assign({}, base, {antwort: n, opt: n !== null && n >= 1 && n <= 5 ? n : null, erste: 1, zust})); return; }
+    if(e.typ === 'text'){ A.add(Object.assign({}, base, {antwort: a.wert === null || a.wert === undefined ? null : String(a.wert), erste: 1})); return; }
+    const vals = [].concat(a.wert === null || a.wert === undefined ? [] : a.wert);
+    if(!vals.length){ A.add(Object.assign({}, base, {erste: 1, zust})); return; }
+    vals.forEach((x, j) => A.add(Object.assign({}, base, {antwort: String(x), opt: optNo(e, x), erste: j ? 0 : 1, zust: j ? null : zust})));
+  });
+
+  /* ----- sheet Ereignisse ----- */
+  const E = xTable('Ereignisse', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung, zu der das Ereignis gehört.'],
+    ['art', 'Art', 7, null, 'Test oder Pilot.'],
+    ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitpunkt auf dem Gerät, in der Uhrzeit dieses Computers.'],
+    ['sek', 'Sek. seit Beginn', 10, 'dec', 'Sekunden seit Beginn der Sitzung.'],
+    ['label', 'Ereignis', 18, null, 'Was passiert ist, in Worten. Erklärung aller Ereignis-Typen im Blatt „Erklärung“.'],
+    ['typ', 'Typ', 16, null, 'Technischer Name des Ereignisses.'],
+    ['schritt', 'Schritt im Test', 12, null, 'Schritt des App-Tests, in dem das Ereignis passierte.'],
+    ['seite', 'Seite', 20, null, 'Seite der App, auf der das Ereignis passierte.'],
+    ['details', 'Details', 50, null, 'Die wichtigsten Angaben zum Ereignis in Worten.'],
+    ['daten', 'Rohdaten', 60, null, 'Alle aufgezeichneten Angaben im JSON-Format.']
+  ], 'Alles, was in der App passiert ist, in zeitlicher Reihenfolge: eine Zeile pro Ereignis. Die Ereignis-Typen sind im Blatt „Erklärung“ beschrieben.');
+  const SZ = xTable('Seitenzeiten', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung des Besuchs.'], ['art', 'Art', 7, null, 'Test oder Pilot.'],
+    ['zeit', 'Verlassen um', 16, 'dt', 'Wann die Seite verlassen wurde.'], ['seite', 'Seite', 24, null, 'Genaue Seite, z. B. „Räume · Plan + Lageplan groß“.'],
+    ['bereich', 'Bereich', 14, null, 'Bereich der App: Start, Räume, Frag Campi, Mensa, Studileben, Stadtleben, Einstellungen.'],
+    ['sek', 'Sekunden aktiv', 10, 'dec', 'Wie lange die Seite angezeigt wurde, während die App im Vordergrund war.'],
+    ['scroll', 'Scrolltiefe (%)', 10, 'int', 'Wie weit nach unten gescrollt wurde, in Prozent der Seitenlänge.'],
+    ['grund', 'Grund', 12, null, 'Warum die Seite verlassen wurde, z. B. Wechsel auf eine andere Seite.']
+  ], 'Eine Zeile pro Besuch einer Seite: wie lange sie aktiv angezeigt wurde und wie weit gescrollt wurde.');
+  const K = xTable('Klicks', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung des Klicks.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitpunkt des Klicks.'],
+    ['klickart', 'Klickart', 13, null, '„Klick“ = auf etwas Bedienbares, „Klick ins Leere“ = auf etwas, das nichts tut, „Frust-Klick“ = drei schnelle Klicks auf dieselbe Stelle.'],
+    ['ziel', 'Klick auf', 30, null, 'Beschriftung des angeklickten Elements, sonst seine Aktion oder Art (höchstens 50 Zeichen).'],
+    ['element', 'Element', 12, null, 'Art des Elements, z. B. button, a, div.'], ['aktion', 'Aktion', 16, null, 'Was der Klick in der App auslöst.'],
+    ['seite', 'Seite', 22, null, 'Seite, auf der geklickt wurde.'], ['bereich', 'Bereich', 14, null, 'Bereich der App, in dem geklickt wurde.'],
+    ['msv', 'Sek. auf der Seite davor', 10, 'dec', 'Wie lange die Seite schon offen war, bevor geklickt wurde.']
+  ], 'Alle Klicks, Klicks ins Leere und Frust-Klicks mit Ziel und Seite.');
+  const R = xTable('Raumsuche', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung der Suche.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitpunkt der Suche.'],
+    ['begriff', 'Suchbegriff', 28, null, 'Eingegebener Text, klein geschrieben (höchstens 100 Zeichen).'], ['treffer', 'Treffer', 8, 'int', 'Anzahl der gefundenen Räume oder Orte.'],
+    ['ohne', 'Ohne Treffer', 9, null, '„ja“, wenn die Suche nichts gefunden hat. Solche Begriffe kennt die App noch nicht.']
+  ], 'Alle Eingaben in der Raumsuche mit Anzahl der Treffer.');
+  const C = xTable('KI-Fragen', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung der Frage.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitpunkt der Frage.'],
+    ['frage', 'Frage', 50, null, 'Frage an Campi, wie eingetippt (ohne den in der App eingetragenen Namen).'],
+    ['eingabe', 'Eingabe über', 12, null, 'Wie die Frage gestellt wurde, z. B. eingetippt oder über einen Vorschlag.'],
+    ['thema', 'Thema der Antwort', 20, null, 'Worauf Campi geantwortet hat.'],
+    ['ok', 'Geprüfte Antwort', 9, null, '„ja“, wenn Campi eine geprüfte Antwort hatte, „nein“, wenn nicht.'],
+    ['qz', 'Quelle angezeigt', 9, null, '„ja“, wenn unter der Antwort eine Quelle angezeigt wurde.'],
+    ['sprache', 'Antwortsprache', 12, null, 'In welcher Sprache Campi geantwortet hat (erkannte Sprache der Frage).']
+  ], 'Alle Fragen an Campi mit dem Thema der Antwort.');
+  const evs = v.ev.filter(e => e.sitzung_id in order).sort((a, b) => (order[a.sitzung_id] - order[b.sitzung_id]) || ((Number(a.zeit_ms) || 0) - (Number(b.zeit_ms) || 0)));
+  const lastQ = {};
+  evs.forEach(e => {
+    const s = sessById[e.sitzung_id], x = e.daten || {}, art = artOf(e.sitzung_id), t = evTime(e, s);
+    let raw = ''; try { raw = e.daten ? JSON.stringify(e.daten) : ''; } catch(z){}
+    E.add({sid: e.sitzung_id, art, zeit: t, sek: Math.round((Number(e.zeit_ms) || 0) / 100) / 10, label: EV_LABEL[e.typ] || e.typ, typ: e.typ, schritt: e.schritt ? (STEP_LABEL[e.schritt] || e.schritt) : null,
+      seite: e.ansicht ? pageName(e.ansicht) : null, details: xlDetail(e), daten: xlShort(raw, 3000)});
+    if(e.typ === 'ansicht_ende' && x.ansicht) SZ.add({sid: e.sitzung_id, art, zeit: t, seite: pageName(x.ansicht), bereich: xlArea(x.ansicht), sek: Math.round((Number(x.dauer_ms) || 0) / 100) / 10, scroll: xlNum(x.scrolltiefe), grund: x.grund});
+    if(e.typ === 'klick' || e.typ === 'leer_klick' || e.typ === 'frust_klick')
+      K.add({sid: e.sitzung_id, art, zeit: t, klickart: {klick: 'Klick', leer_klick: 'Klick ins Leere', frust_klick: 'Frust-Klick'}[e.typ], ziel: xlShort(x.text || x.aktion || x.element || '(ohne Text)', 50),
+        element: x.element, aktion: x.aktion, seite: e.ansicht ? pageName(e.ansicht) : null, bereich: e.ansicht ? xlArea(e.ansicht) : null, msv: xlNum(x.ms_in_ansicht) === null ? null : Math.round(Number(x.ms_in_ansicht) / 100) / 10});
+    if(e.typ === 'suche' && x.text){ const n = Number(x.treffer) || 0; R.add({sid: e.sitzung_id, art, zeit: t, begriff: xlShort(String(x.text).toLowerCase().trim(), 100), treffer: n, ohne: xlJN(!n)}); }
+    if(e.typ === 'chat_frage'){ lastQ[e.sitzung_id] = C.add({sid: e.sitzung_id, art, zeit: t, frage: xlShort(x.text, 2000), eingabe: x.quelle}); }
+    if(e.typ === 'chat_antwort' && lastQ[e.sitzung_id] !== undefined){
+      const row = C.data[lastQ[e.sitzung_id]];
+      row[C.c('thema')] = x.thema || null; row[C.c('ok')] = xlJN(x.beantwortet !== false); row[C.c('qz')] = x.quelle_gezeigt === undefined ? null : xlJN(x.quelle_gezeigt);
+      row[C.c('sprache')] = x.sprache ? (LANG_NAME[x.sprache] || x.sprache) : null; delete lastQ[e.sitzung_id];
+    }
+  });
+
+  /* ----- sheet Wege und Bereiche ----- */
+  const WB = xTable('Wege und Bereiche', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung (nur abgeschlossene App-Tests).'],
+    ['was', 'Art', 11, null, '„Weg“ = in Aufgabe 1 benutzter Weg zum Raum. „Angesehen“ = in Aufgabe 3 geöffneter Bereich.'],
+    ['wert', 'Eintrag', 30, null, 'Der Weg bzw. der Bereich.']
+  ], 'Aus den Ergebnissen der Aufgaben: benutzte Wege in Aufgabe 1 und angesehene Bereiche in Aufgabe 3, eine Zeile pro Nennung.');
+  sess.forEach(s => { const r = v.resBy[s.id]; if(!r) return;
+    String(r.a1_weg || '').split(',').map(w => w.trim()).filter(Boolean).forEach(w => WB.add({sid: s.id, was: 'Weg', wert: xlShort(w, 100)}));
+    (r.a3_bereiche || []).forEach(b => WB.add({sid: s.id, was: 'Angesehen', wert: xlShort(b, 100)})); });
+
+  /* ----- sheet Personen ----- */
+  const PE = xTable('Personen', [
+    ['person', 'Person', 22, null, 'App-Test: eine Sitzung. Pilot: alle Öffnungen eines Geräts. Gekürzte Nummer.'], ['art', 'Art', 7, null, 'Test oder Pilot.'],
+    ['first', 'Erste Sitzung', 16, 'dt', 'Beginn der ersten Sitzung.'], ['last', 'Letzte Sitzung', 16, 'dt', 'Beginn der letzten Sitzung.'],
+    ['sitz', 'Sitzungen', 9, 'int', 'Anzahl der Sitzungen.'], ['klicks', 'Klicks', 8, 'int', 'Anzahl der Klicks.'], ['ev', 'Ereignisse', 9, 'int', 'Anzahl aller Ereignisse.'],
+    ['aktiv', 'Aktive Zeit gesamt (s)', 11, 'int', 'Summe der aktiven Zeit auf allen Seiten in Sekunden.']
+  ].concat(AREAS.map(k => ['p_' + k, PAGE_LABEL[k] + ' (s)', 10, 'int', 'Aktive Zeit im Bereich „' + PAGE_LABEL[k] + '“ in Sekunden.'])),
+  'Eine Zeile pro Person mit der aktiven Zeit pro Bereich in Sekunden (ohne Zeit im Hintergrund). Gefiltert wie in der Auswertung.');
+  personList(v).slice().sort((a, b) => a.first - b.first).forEach(p => { const o = {person: (p.pilot ? 'Pilot ' : 'Test ') + p.key.slice(2, 10), art: p.pilot ? 'Pilot' : 'Test', first: p.first, last: p.last,
+    sitz: p.sessions.length, klicks: p.clicks, ev: p.events, aktiv: Math.round(p.active / 1000)}; AREAS.forEach(k => o['p_' + k] = Math.round((p.pages[k] || 0) / 1000)); PE.add(o); });
+
+  /* ----- sheets Pilot and Pilot-Öffnungen (always all pilot data) ----- */
+  const users = pilotUsers(d).slice().sort((a, b) => a.first - b.first);
+  const P = xTable('Pilot', [
+    ['id', 'Pilot-ID', 37, null, 'Zufällige Nummer des Geräts in der Pilotphase.'],
+    ['first', 'Erstes Öffnen', 16, 'dt', 'Erste Öffnung der App über den Pilot-Link.'], ['last', 'Zuletzt', 16, 'dt', 'Letzte Öffnung.'],
+    ['sitz', 'Sitzungen', 9, 'int', 'Anzahl der Sitzungen (jedes Laden der App).'],
+    ['oeff', 'Öffnungen', 9, 'int', 'Anzahl der Öffnungen. Sitzungen mit weniger als 30 Minuten Abstand zählen als eine Öffnung.'],
+    ['w1', 'Öffnungen Woche 1', 10, 'int', 'Öffnungen in Tag 1 bis 7 (ab dem gemeinsamen Pilotstart oder dem ersten Öffnen).'],
+    ['w2', 'Öffnungen Woche 2', 10, 'int', 'Öffnungen in Tag 8 bis 14. Entscheidend für H2b.'],
+    ['w3', 'Öffnungen Woche 3', 10, 'int', 'Öffnungen in Tag 15 bis 21.'],
+    ['w2ge3', 'Woche 2 mind. 3×', 10, 'int', 'Formel: 1, wenn in Woche 2 mindestens 3 Öffnungen, sonst 0.'],
+    ['w2st', 'Status Woche 2', 11, null, '„vorbei“ = Woche 2 ist abgeschlossen und zählt für H2b. „läuft“ = die Person ist gerade in Woche 2. „noch nicht“ = Woche 2 hat noch nicht begonnen.'],
+    ['w2er', 'Woche 2 erreicht', 9, null, '„ja“, wenn Woche 2 schon begonnen hat.'], ['w3er', 'Woche 3 erreicht', 9, null, '„ja“, wenn Woche 3 schon begonnen hat.'],
+    ['zaehlt', 'Zählt für H2b', 9, null, '„ja“, wenn die Person in Woche 1 beigetreten ist (bei gemeinsamem Pilotstart) bzw. immer (ohne gemeinsamen Start).'],
+    ['inst', 'Vom Home-Bildschirm', 10, null, '„ja“, wenn Campi mindestens einmal installiert vom Home-Bildschirm geöffnet wurde.'],
+    ['geo', 'Standort freigegeben', 10, null, '„ja“, wenn der Standort mindestens einmal freigegeben wurde.'],
+    ['geraet', 'Gerät', 10, null, 'Gerät bei der ersten Öffnung.'], ['os', 'Betriebssystem', 13, null, ''], ['browser', 'Browser', 12, null, ''],
+    ['lang', 'App-Sprache', 11, null, 'Sprache bei der ersten Öffnung.'], ['campus', 'Campus', 14, null, 'Campus bei der ersten Öffnung.']
+  ], 'Eine Zeile pro Pilotnutzer (Gerät). Enthält immer alle Pilotdaten, unabhängig vom Filter. Grundlage für H2b.');
+  const PO = xTable('Pilot-Öffnungen', [
+    ['id', 'Pilot-ID', 37, null, 'Gerät, das die App geöffnet hat.'], ['zeit', 'Zeitpunkt', 16, 'dt', 'Zeitpunkt der Öffnung.'],
+    ['tag', 'Tag', 11, 'date', 'Kalendertag der Öffnung. Grundlage für „Öffnungen pro Tag“.'],
+    ['woche', 'Pilotwoche', 12, null, 'Woche 1, 2 oder 3 des Pilots dieser Person, sonst „davor“ oder „danach“.']
+  ], 'Eine Zeile pro Öffnung der App in der Pilotphase (Sitzungen mit weniger als 30 Minuten Abstand zählen als eine).');
+  users.forEach(u => {
+    const rn = P.data.length + 2, m = u.meta;
+    P.add({id: u.id, first: u.first, last: u.last, sitz: u.sessions.length, oeff: u.opens.length, w1: u.week[0], w2: u.week[1], w3: u.week[2],
+      w2ge3: {f: 'IF(' + P.L('w2') + rn + '>=3,1,0)', v: u.week[1] >= 3 ? 1 : 0}, w2st: u.w2done ? 'vorbei' : (u.inW2 ? 'läuft' : 'noch nicht'),
+      w2er: xlJN(now >= u.base + 7 * DAY), w3er: xlJN(now >= u.base + 14 * DAY), zaehlt: xlJN(u.eligible), inst: xlJN(u.installed), geo: xlJN(u.geo),
+      geraet: m.geraet || 'unbekannt', os: m.betriebssystem || 'unbekannt', browser: m.browser || 'unbekannt', lang: LANG_NAME[m.sprache_app] || m.sprache_app || 'unbekannt', campus: CAMPUS_NAME[m.standort] || m.standort || 'unbekannt'});
+    u.opens.forEach(t => { const w = Math.floor((t - u.base) / (7 * DAY)); PO.add({id: u.id, zeit: t, tag: startOfDay(t), woche: w < 0 ? 'davor' : w > 2 ? 'danach' : 'Woche ' + (w + 1)}); });
+  });
+
+  /* ================= Hypothesen ================= */
+  const H = {name: 'Hypothesen', rows: [], merges: ['A2:J2'], heights: {0: 24, 1: 40, 2: 30}, cols: [18, 42, 62, 8, 8, 10, 8, 12, 18, 46], tab: XL_PAL[1], freeze: 3, fit: 'landscape'};
+  H.rows.push([{v: 'Hypothesen und Test-Ziele', s: 'title'}]);
+  H.rows.push([{v: 'Ergebnis = Ja ÷ n. Status: „Zu wenig Daten“, solange n unter „Mindestens n“ liegt, sonst „Bestätigt“ bzw. „Ziel erreicht“, wenn das Ergebnis mindestens das Ziel erreicht. H2a und die Test-Ziele nutzen die gefilterten App-Test-Daten, H2b immer alle Pilotdaten. Alle Zahlen sind Formeln auf die Datenblätter.', s: 'desc'}]);
+  H.rows.push(['Kurzname', 'Hypothese', 'Kriterium', 'Ja', 'n', 'Ergebnis', 'Ziel', 'Mindestens n', 'Status', 'Datenquelle'].map(h => ({v: h, s: 'head'})));
+  const testN = xlCnt(T, [['art', 'Test']]), testDone = xlCnt(T, [['art', 'Test'], ['abg', 'ja']]);
+  const elig = xlCnt(P, [['zaehlt', 'ja']]), h2bN = xlCnt(P, [['zaehlt', 'ja'], ['w2st', 'vorbei']]);
+  const q2a = qList.filter(e => e.h2a);
+  const ersQ = qErs;
+  const hyps = [
+    {kurz: 'H2a Installieren', text: 'Studierende würden die App herunterladen', krit: 'Mindestens 30 % der Studierenden im App-Test geben an, dass sie Campi installieren würden' + (q2a.length ? ' (Fragen ' + q2a.map(e => 'F' + e.no).join(', ') + '; welche Antworten als Zustimmung zählen, steht im Blatt „Fragebogen“, Spalte D).' : '.'),
+      ja: xlCnt(T, [['art', 'Test'], ['h2a_ja', 1]]), n: xlCnt(T, [['art', 'Test'], ['h2a_ant', 1]]), ziel: HYP.h2a.t / 100, min: 10, good: 'Bestätigt', bad: 'Nicht bestätigt', missing: !q2a.length && 'Frage fehlt',
+      src: 'Teilnahmen: Spalten „H2a beantwortet“ und „H2a Zustimmung“ (nur Art = Test)'},
+    {kurz: 'H2b Woche 2', text: 'Pilotnutzer öffnen die App in Woche 2 mindestens 3-mal', krit: 'Mindestens 30 % der Pilotnutzer öffnen die App in der zweiten Woche des 3-wöchigen Pilots noch mindestens 3-mal. Gezählt werden Personen, deren Woche 2 vorbei ist.',
+      ja: xlCnt(P, [['zaehlt', 'ja'], ['w2st', 'vorbei'], ['w2ge3', 1]]), n: h2bN, ziel: HYP.h2b.t / 100, min: 5, good: 'Bestätigt', bad: 'Nicht bestätigt', running: {f: '(' + elig.f + '-' + h2bN.f + ')', v: elig.v - h2bN.v},
+      src: 'Pilot: Spalten „Zählt für H2b“, „Status Woche 2“, „Woche 2 mind. 3×“ (alle Pilotdaten)'},
+    {kurz: 'Raum ≤ 60 s', text: 'Test-Ziel Raumsuche: Raum schnell gefunden und Weg verständlich', krit: 'Mindestens 80 % der abgeschlossenen App-Tests: Raum in höchstens 60 Sekunden gefunden und Wegbeschreibung mit 4 oder 5 bewertet.',
+      ja: xlCnt(T, [['art', 'Test'], ['a1ziel', 1]]), n: testDone, ziel: 0.8, min: 5, good: 'Ziel erreicht', bad: 'Noch nicht erreicht', src: 'Teilnahmen: Spalte „Ziel Raumsuche erreicht“'},
+    {kurz: 'KI-Vertrauen', text: 'Test-Ziel KI-Assistent: vertraut der Antwort und würde wieder Campi fragen', krit: 'Mindestens 70 % der abgeschlossenen App-Tests: Vertrauen 4 oder 5 und beim nächsten Mal „Campi fragen“.',
+      ja: xlCnt(T, [['art', 'Test'], ['a2ziel', 1]]), n: testDone, ziel: 0.7, min: 5, good: 'Ziel erreicht', bad: 'Noch nicht erreicht', src: 'Teilnahmen: Spalte „Ziel KI erreicht“'},
+    {kurz: 'Ersetzt Apps', text: 'Campi würde andere Apps oder Websites ersetzen', krit: 'Mindestens 40 % der Befragten nennen mindestens eine App oder Website, die Campi ersetzen würde' + (ersQ ? ' (Frage F' + ersQ.no + ').' : '. Die Frage mit dem Schlüssel „ersetzt“ fehlt im Fragenkatalog.'),
+      ja: xlCnt(T, [['art', 'Test'], ['ersetzt', 1]]), n: xlCnt(T, [['art', 'Test'], ['ersetzt', {op: '>=', n: 0}]]), ziel: 0.4, min: 5, good: 'Ziel erreicht', bad: 'Noch nicht erreicht', missing: !ersQ && 'Frage fehlt', src: 'Teilnahmen: Spalte „Nennt ersetzte App“'}
+  ];
+  hyps.forEach(h => {
+    const rn = H.rows.length + 1;
+    h.row = rn;
+    h.val = h.n.v ? h.ja.v / h.n.v : '';
+    const res = {f: 'IF(E' + rn + '=0,"",D' + rn + '/E' + rn + ')', v: h.val, s: 'pct'};
+    const ok = 'IF(F' + rn + '>=G' + rn + ',' + xlLit(h.good) + ',' + xlLit(h.bad) + ')';
+    const okV = h.n.v >= h.min ? (h.val >= h.ziel ? h.good : h.bad) : null;
+    let st;
+    if(h.missing) st = {v: h.missing};
+    else if(h.running) st = {f: 'IF(E' + rn + '<H' + rn + ',IF(' + h.running.f + '>0,"Pilot läuft","Zu wenig Daten"),' + ok + ')', v: okV || (h.running.v > 0 ? 'Pilot läuft' : 'Zu wenig Daten')};
+    else st = {f: 'IF(E' + rn + '<H' + rn + ',"Zu wenig Daten",' + ok + ')', v: okV || 'Zu wenig Daten'};
+    h.status = st.v;
+    H.rows.push([{v: h.kurz, s: 'bold'}, {v: h.text, s: 'wrap'}, {v: h.krit, s: 'wrap'}, xlS(h.ja, 'int'), xlS(h.n, 'int'), res, {v: h.ziel, s: 'pct'}, {v: h.min, s: 'int'}, Object.assign(st, {s: 'bold'}), {v: h.src, s: 'wrap'}]);
+    H.heights[rn - 1] = Math.max(xlLines(h.krit, 62), xlLines(h.src, 46), xlLines(h.text, 42)) * 12.6 + 4;
+  });
+  const hRef = (h, col) => ({f: 'Hypothesen!' + col + h.row, v: col === 'F' ? h.val : col === 'I' ? h.status : null});
+
+  /* ================= Diagrammdaten ================= */
+  const DD = xlChartData();
+  const CH = {hyp: [], test: [], survey: [], beh: [], who: [], pilot: []};
+  const kpiRows = {};
+  {
+    const t = DD.table('Kennzahlen', 'Die Zahlen oben im Dashboard und weitere Kennzahlen. Spalte C erklärt, wie gezählt wird.', ['Kennzahl', 'Wert', 'So wird gezählt']);
+    const add = (key, label, cell, style, expl) => { const r = t.row(label, [xlS(cell, style), {v: expl, s: 'note'}]); kpiRows[key] = {f: 'Diagrammdaten!B' + (r + 1), v: cell.v, label, expl}; };
+    add('n', 'Teilnahmen App-Test', testN, 'int', 'Zeilen mit Art = Test im Blatt Teilnahmen (jede Person mit Einwilligung).');
+    add('done', 'Abgeschlossene App-Tests', testDone, 'int', 'Art = Test und Abgeschlossen = ja.');
+    add('quote', 'Abschlussquote', xlShare(testDone, testN), 'pct', 'Abgeschlossene ÷ alle App-Test-Teilnahmen.');
+    add('dauer', 'Dauer des Tests (Median, s)', xlMedian(T, 'dauer'), 'sec', 'Median der Spalte „Dauer gesamt (s)“: die Hälfte war schneller, die Hälfte langsamer.');
+    add('ev', 'Ereignisse', xlCountA(E, 'typ'), 'int', 'Alle Zeilen im Blatt Ereignisse (App-Test und Pilot im Filter).');
+    add('pilotn', 'Pilotnutzer', xlCountA(P, 'id'), 'int', 'Geräte mit Einwilligung über den Pilot-Link (immer alle).');
+    add('oeff', 'Öffnungen im Pilot', xlSum(P, 'oeff'), 'int', 'Summe der Spalte „Öffnungen“ im Blatt Pilot.');
+    add('klick', 'Klicks', xlCnt(K, [['klickart', 'Klick']]), 'int', 'Klicks auf Bedienbares (Blatt Klicks, Klickart = Klick).');
+    add('frust', 'Frust-Klicks', xlCnt(K, [['klickart', 'Frust-Klick']]), 'int', 'Drei schnelle Klicks auf dieselbe Stelle.');
+    add('leer', 'Klicks ins Leere', xlCnt(K, [['klickart', 'Klick ins Leere']]), 'int', 'Klicks auf Stellen, die nichts tun.');
+    add('chat', 'Fragen an Campi', xlCountA(C, 'sid'), 'int', 'Alle Zeilen im Blatt KI-Fragen.');
+    add('chatok', 'Fragen mit geprüfter Antwort', xlShare(xlCnt(C, [['ok', 'ja']]), xlCountA(C, 'sid')), 'pct', 'Anteil der Fragen, auf die Campi eine geprüfte Antwort hatte.');
+    add('such', 'Raumsuchen', xlCountA(R, 'sid'), 'int', 'Alle Zeilen im Blatt Raumsuche.');
+    add('suchleer', 'Raumsuchen ohne Treffer', xlShare(xlCnt(R, [['ohne', 'ja']]), xlCountA(R, 'sid')), 'pct', 'Anteil der Suchen, die nichts gefunden haben.');
+    add('weg', 'Zwischendurch verlassen (App-Test)', xlShare(xlCnt(T, [['art', 'Test'], ['weg', 'ja']]), testN), 'pct', 'Anteil der App-Tests, in denen zwischendurch in eine andere App oder einen Tab gewechselt wurde.');
+    add('geo', 'Standort freigegeben (alle Sitzungen)', xlShare(xlCnt(T, [['geo', 'ja']]), xlCountA(T, 'id')), 'pct', 'Anteil aller Sitzungen im Filter mit freiwilliger Standortfreigabe.');
+    add('fehler', 'Technische Fehler', xlCnt(E, [['typ', 'fehler']]), 'int', 'Ereignisse vom Typ „fehler“.');
+    add('h2a', 'H2a: würden installieren', hRef(hyps[0], 'F'), 'pct', 'Aus dem Blatt Hypothesen, Zeile H2a.');
+    add('h2b', 'H2b: Woche 2 mind. 3×', hRef(hyps[1], 'F'), 'pct', 'Aus dem Blatt Hypothesen, Zeile H2b.');
+    t.done();
+  }
+  { const t = DD.table('Hypothesen und Ziele', 'Ergebnis und Ziel jeder Hypothese aus dem Blatt Hypothesen.', ['Hypothese', 'Ergebnis', 'Ziel']);
+    hyps.forEach(h => t.row(h.kurz, [xlS(hRef(h, 'F'), 'pct'), xlS({f: 'Hypothesen!G' + h.row, v: h.ziel}, 'pct')])); t.done();
+    CH.hyp.push(t.chart({title: 'Hypothesen: Ergebnis gegen Ziel', type: 'bar', pct: true, cols: [1, 2], colors: [XL_PAL[0], XL_REF],
+      note: 'Ergebnis jeder Hypothese (blau) neben ihrem Zielwert (grau). Liegt Blau mindestens auf Grau, ist das Ziel erreicht, sofern genug Daten da sind (Status im Blatt „Hypothesen“). Ein fehlender blauer Balken heißt: noch keine Daten.'})); }
+  { const t = DD.table('Trichter App-Test', 'Wie viele App-Test-Teilnahmen jeden Schritt erreicht haben.', ['Schritt', 'Teilnahmen', 'Anteil']);
+    const steps = [['Einwilligung gegeben', testN], ['Aufgabe 1 begonnen', xlCnt(T, [['art', 'Test'], ['f_a1s', 1]])], ['Aufgabe 1 beendet', xlCnt(T, [['art', 'Test'], ['f_a1e', 1]])],
+      ['Aufgabe 2 beendet', xlCnt(T, [['art', 'Test'], ['f_a2e', 1]])], ['Aufgabe 3 beendet', xlCnt(T, [['art', 'Test'], ['f_a3e', 1]])], ['Fragebogen abgeschickt', testDone]];
+    steps.forEach(([l, c], i) => { const r = DD.rows.length + 1; t.row(l, [xlS(c, 'int'), {f: 'IF($B$' + (t.first + 1) + '=0,0,B' + r + '/$B$' + (t.first + 1) + ')', v: testN.v ? c.v / testN.v : 0, s: 'pct'}]); }); t.done();
+    CH.hyp.push(t.chart({title: 'Wo steigen Testpersonen aus?', type: 'bar', cols: [1],
+      note: 'Anzahl der App-Test-Teilnahmen, die jeden Schritt erreicht haben, von der Einwilligung bis zum abgeschickten Fragebogen. Ein großer Sprung zwischen zwei Balken zeigt, wo die meisten aufhören.'})); }
+  { const t = DD.table('Teilnahmen pro Tag', 'Neue App-Test-Teilnahmen je Kalendertag, höchstens die letzten 60 Tage bis heute.', ['Tag', 'Datum', 'App-Test-Teilnahmen']);
+    const days = T.data.map((x, i) => i).filter(i => T.val(i, 'art') === 'Test').map(i => sess[i]._start);
+    const end = startOfDay(now); let start = days.length ? startOfDay(Math.min.apply(null, days)) : end;
+    start = Math.max(start, end - 59 * DAY);
+    for(let day = start; day <= end + 3600e3; day = startOfDay(day + DAY + 3 * 3600e3)){ const dd = new Date(day);
+      t.row(dd.toLocaleDateString('de-DE', {weekday: 'short', day: '2-digit', month: '2-digit'}), [{v: day, t: 'd', s: 'date'}, xlS(xlCnt(T, [['art', 'Test'], ['tag', XLW.serial(day)]]), 'int')]); }
+    t.done();
+    CH.test.push(t.chart({title: 'App-Test-Teilnahmen pro Tag', type: 'col', cols: [2], wide: true, labels: t.n <= 31,
+      note: 'Neue App-Test-Teilnahmen je Tag (höchstens die letzten 60 Tage). Zeigt, wann geteilte Links oder Aushänge gewirkt haben.'})); }
+  { const t = DD.table('Aufgabe 1: Zeit bis gefunden', 'Nur App-Tests, in denen der Raum gefunden wurde, nach Sekunden gruppiert.', ['Zeit', 'Personen', 'Anteil']);
+    const base = [['art', 'Test'], ['a1erg', 'gefunden']], all = xlCnt(T, base.concat([['a1sek', {op: '>=', n: 0}]]));
+    [['bis 15 s', 0, 15], ['15 bis 30 s', 15, 30], ['30 bis 60 s', 30, 60], ['1 bis 2 Min.', 60, 120], ['über 2 Min.', 120, null]].forEach(([l, lo, hi]) => {
+      const c = xlCnt(T, base.concat([['a1sek', {op: lo ? '>' : '>=', n: lo}]], hi === null ? [] : [['a1sek', {op: '<=', n: hi}]])); t.row(l, [xlS(c, 'int'), xlS(xlShare(c, all), 'pct')]); }); t.done();
+    CH.test.push(t.chart({title: 'Aufgabe 1: Zeit bis der Raum gefunden war', type: 'col', cols: [1],
+      note: 'Wie lange die Personen gebraucht haben, die den Raum gefunden haben. Für das Test-Ziel zählen die ersten drei Balken (höchstens 60 Sekunden).'})); }
+  { const t = DD.table('Aufgabe 1: Verständlichkeit', 'Bewertung der Wegbeschreibung, nur abgeschlossene App-Tests.', ['Bewertung', 'Antworten']);
+    [5, 4, 3, 2, 1].forEach(k => t.row(k + (k === 5 ? ' (sehr)' : k === 1 ? ' (gar nicht)' : ''), [xlS(xlCnt(T, [['art', 'Test'], ['a1verst', k]]), 'int')])); t.done();
+    CH.test.push(t.chart({title: 'Aufgabe 1: Wie verständlich war der Weg?', type: 'col', cols: [1],
+      note: 'Bewertung der Wegbeschreibung von 5 (sehr verständlich) bis 1 (gar nicht). Für das Test-Ziel zählen 4 und 5.'})); }
+  { const t = DD.table('Aufgabe 1: benutzte Wege', 'Welche Wege in der App beim Suchen des Raums benutzt wurden (Mehrfachnennung), Anteil der abgeschlossenen App-Tests.', ['Weg', 'Anteil', 'Nennungen']);
+    xlGroup(WB, 'wert', [['was', 'Weg']], 10).forEach(g => { const c = xlCnt(WB, [['was', 'Weg'], ['wert', g.label]]); t.row(g.label, [xlS(xlShare(c, testDone), 'pct'), xlS(c, 'int')]); }); t.done();
+    CH.test.push(t.chart({title: 'Aufgabe 1: Welche Wege wurden benutzt?', type: 'bar', pct: true, cols: [1],
+      note: 'Welche Wege die Testpersonen beim Suchen des Raums benutzt haben (Mehrfachnennung möglich, daher über 100 % in Summe). Zeigt, welcher Einstieg am natürlichsten ist.'})); }
+  { const t = DD.table('Aufgabe 2: Vertrauen nach Gruppe', 'Anteil je Bewertung innerhalb der Zufallsgruppe. Anteile statt Anzahlen, damit unterschiedlich große Gruppen vergleichbar sind.', ['Vertrauen', 'mit Quelle', 'ohne Quelle', 'Anzahl mit Quelle', 'Anzahl ohne Quelle']);
+    const gn = g => xlCnt(T, [['gruppe', g], ['a2vert', {op: '>=', n: 1}]]);
+    const nm = gn('mit Quelle'), no = gn('ohne Quelle');
+    [5, 4, 3, 2, 1].forEach(k => { const a = xlCnt(T, [['gruppe', 'mit Quelle'], ['a2vert', k]]), b = xlCnt(T, [['gruppe', 'ohne Quelle'], ['a2vert', k]]);
+      t.row(k + (k === 5 ? ' (voll und ganz)' : k === 1 ? ' (gar nicht)' : ''), [xlS(xlShare(a, nm), 'pct'), xlS(xlShare(b, no), 'pct'), xlS(a, 'int'), xlS(b, 'int')]); }); t.done();
+    CH.test.push(t.chart({title: 'Aufgabe 2: Vertrauen mit und ohne Quellenangabe', type: 'col', pct: true, cols: [1, 2],
+      note: 'Vertrauen in die KI-Antwort, getrennt nach Zufallsgruppe: Antwort mit Quellenangabe (blau) und ohne (orange). Liegen bei „mit Quelle“ mehr Antworten bei 4 und 5, stärkt die Quelle das Vertrauen.'})); }
+  { const t = DD.table('Aufgabe 2: beim nächsten Mal', 'Was die Personen nach Aufgabe 2 beim nächsten Mal tun würden, Anteil der Antworten.', ['Antwort', 'Anteil', 'Personen']);
+    const all = xlCnt(T, [['art', 'Test'], ['abg', 'ja']]);
+    const known = ['Campi fragen', 'Website der Hochschule durchsuchen', 'Jemanden fragen'];
+    const gl = xlGroup(T, 'a2lieber', [['art', 'Test']]); const answered = {f: '(' + gl.map(g => xlCnt(T, [['art', 'Test'], ['a2lieber', g.label]]).f).join('+') + ')', v: gl.reduce((s, g) => s + g.n, 0)};
+    xlCats(known, gl).forEach(l => { const c = xlCnt(T, [['art', 'Test'], ['a2lieber', l]]); t.row(l, [xlS(xlShare(c, gl.length ? answered : all), 'pct'), xlS(c, 'int')]); }); t.done();
+    CH.test.push(t.chart({title: 'Aufgabe 2: Was beim nächsten Mal?', type: 'bar', pct: true, cols: [1],
+      note: 'Was die Testpersonen nach Aufgabe 2 beim nächsten Mal tun würden. „Campi fragen“ zählt für das Test-Ziel KI-Assistent.'})); }
+  { const t = DD.table('Aufgabe 2: Fragen bis zur Antwort', 'Nur App-Tests mit Ergebnis „beantwortet“.', ['Fragen', 'Personen']);
+    [['1 Frage', 1, 1], ['2 Fragen', 2, 2], ['3 oder mehr', 3, null]].forEach(([l, lo, hi]) => t.row(l, [xlS(xlCnt(T, [['art', 'Test'], ['a2erg', 'beantwortet'], ['a2fragen', {op: '>=', n: lo}]].concat(hi === null ? [] : [['a2fragen', {op: '<=', n: hi}]])), 'int')])); t.done();
+    CH.test.push(t.chart({title: 'Aufgabe 2: Fragen bis zur Antwort', type: 'col', cols: [1],
+      note: 'Wie viele Fragen an Campi nötig waren, bis die richtige Antwort kam. Viele „3 oder mehr“ heißen: Campi versteht die Frage oft nicht beim ersten Mal.'})); }
+  { const t = DD.table('Aufgabe 3: angesehen', 'Was beim freien Umsehen geöffnet wurde, Anteil der abgeschlossenen App-Tests.', ['Bereich', 'Anteil', 'Nennungen']);
+    xlGroup(WB, 'wert', [['was', 'Angesehen']], 12).forEach(g => { const c = xlCnt(WB, [['was', 'Angesehen'], ['wert', g.label]]); t.row(g.label, [xlS(xlShare(c, testDone), 'pct'), xlS(c, 'int')]); }); t.done();
+    CH.test.push(t.chart({title: 'Aufgabe 3: Was wurde beim Umsehen angesehen?', type: 'bar', pct: true, cols: [1],
+      note: 'Was die Testpersonen beim freien Umsehen geöffnet haben (Mehrfachnennung). Zeigt, was neugierig macht.'})); }
+  { const t = DD.table('Abbruch', 'Nicht abgeschlossene App-Tests nach dem zuletzt erreichten Schritt.', ['Letzter Schritt', 'Teilnahmen']);
+    xlCats(['Einwilligung', 'Aufgabe 1', 'Aufgabe 2', 'Aufgabe 3', 'Fragebogen', 'Speichern'], xlGroup(T, 'letzter', [['art', 'Test']])).forEach(l => t.row(l, [xlS(xlCnt(T, [['art', 'Test'], ['letzter', l]]), 'int')])); t.done();
+    CH.test.push(t.chart({title: 'Wo wurde abgebrochen?', type: 'bar', cols: [1],
+      note: 'Für App-Tests ohne abgeschickten Fragebogen: der letzte erreichte Schritt. Zeigt, an welcher Stelle die meisten aufgehört haben.'})); }
+
+  /* questionnaire: own sheet with counts per answer, charts on the dashboard */
+  const FB = {name: 'Fragebogen', rows: [], merges: [], heights: {0: 24, 1: 40}, cols: [54, 11, 11, 26], tab: XL_PAL[3]};
+  FB.rows.push([{v: 'Fragebogen', s: 'title'}]);
+  FB.rows.push([{v: 'Jede Frage mit Anzahl und Anteil je Antwort. Anteil = Personen mit dieser Antwort ÷ Personen, die die Frage beantwortet haben. Bei Mehrfachauswahl kann die Summe über 100 % liegen. Gezählt wird mit Formeln aus dem Blatt „Antworten“.', s: 'desc'}]); FB.merges.push('A2:D2');
+  FB.rows.push([]);
+  qList.forEach(e => {
+    const r0 = FB.rows.length;
+    FB.rows.push([{v: 'F' + e.no + ' · ' + e.frage, s: 'section'}]); FB.merges.push('A' + (r0 + 1) + ':D' + (r0 + 1)); FB.heights[r0] = xlLines(e.frage, 75) * 16 + 4;
+    const meta = [TYP[e.typ] || e.typ, e.orphan ? 'nicht mehr im Fragenkatalog' : (e.aktiv ? 'aktiv' : 'zurzeit nicht aktiv'), e.key ? 'Schlüssel: ' + e.key : '', e.h2a ? 'zählt für H2a' : ''].filter(Boolean).join(' · ');
+    FB.rows.push([{v: meta, s: 'desc'}]); FB.merges.push('A' + (r0 + 2) + ':D' + (r0 + 2));
+    const n = xlCnt(A, [['no', e.no], ['erste', 1]]), nRow = FB.rows.length + 1;
+    FB.rows.push([{v: 'Personen mit Antwort', s: 'bold'}, xlS(n, 'int'), xlS(xlShare(n, testDone), 'pct'), {v: 'der abgeschlossenen App-Tests', s: 'note'}]);
+    if(e.typ === 'text'){ FB.rows.push([{v: 'Freitext: Die Antworten stehen im Blatt „Antworten“ (Frage-Nr. ' + e.no + ').', s: 'note'}]); FB.rows.push([]); return; }
+    const hr = FB.rows.length; FB.rows.push(['Antwort', 'Anzahl', 'Anteil', 'Zählt als Zustimmung (H2a)'].map(h => ({v: h, s: 'head'}))); FB.heights[hr] = 28;
+    const ja = e.h2a ? new Set(((e.h2a.wertung || {}).ja || []).map(String)) : null, ab = e.h2a ? Number((e.h2a.wertung || {}).ab || 4) : 4;
+    const opts = e.typ === 'skala' ? [5, 4, 3, 2, 1].map(k => ({label: k + (k === 5 && e.smax ? ' (' + e.smax + ')' : k === 1 && e.smin ? ' (' + e.smin + ')' : ''), no: k, yes: e.h2a ? k >= ab : null}))
+      : e.opts.map((o, i) => ({label: o, no: i + 1, yes: e.h2a ? ja.has(o) : null}));
+    const first = FB.rows.length, vals = [];
+    opts.forEach(o => { const rr = FB.rows.length + 1, c = xlCnt(A, [['no', e.no], ['opt', o.no]]), sh = {f: 'IF($B$' + nRow + '=0,0,B' + rr + '/$B$' + nRow + ')', v: n.v ? c.v / n.v : 0, s: 'pct'};
+      FB.rows.push([{v: o.label, s: 'wrap'}, xlS(c, 'int'), sh, o.yes === null ? null : xlJN(o.yes)]); vals.push(sh.v); });
+    if(e.typ === 'skala') FB.rows.push([{v: 'Durchschnitt (1–5)', s: 'bold'}, xlS(xlAvg(A, 'antwort', [['no', e.no]]), 'dec')]);
+    if(opts.length) CH.survey.push({title: 'F' + e.no + ': ' + xlShort(e.frage, 80), type: 'bar', pct: true, cats: opts.map(o => o.label), catRef: XLW.abs('Fragebogen', 0, first, 0, first + opts.length - 1),
+      series: [{name: 'Anteil', nameRef: XLW.abs('Fragebogen', 2, hr), valRef: XLW.abs('Fragebogen', 2, first, 2, first + opts.length - 1), vals, color: XL_PAL[0]}],
+      src: 'Blatt Fragebogen, Frage F' + e.no, note: 'Anteil der Befragten je Antwort auf „' + xlShort(e.frage, 120) + '“.' + (e.typ === 'mehrfach' ? ' Mehrfachauswahl: Eine Person kann mehrere Antworten wählen, die Summe kann über 100 % liegen.' : '') +
+        (e.h2a ? ' Zählt für H2a: Welche Antworten als Zustimmung gelten, steht im Blatt „Fragebogen“, Spalte D.' : '')});
+    FB.rows.push([]);
+  });
+  if(!qList.length) FB.rows.push([{v: 'Noch keine Fragen im Fragenkatalog.', s: 'note'}]);
+
+  { const t = DD.table('Zeit pro Bereich', 'Durchschnittliche aktive Sekunden pro Besuch eines Bereichs (Blatt Seitenzeiten).', ['Bereich', 'Ø Sekunden pro Besuch', 'Besuche', 'Sekunden gesamt']);
+    xlCats(AREAS.map(k => PAGE_LABEL[k]), xlGroup(SZ, 'bereich')).forEach(l => { if(!xlSafe([['bereich', l]])) return;
+      t.row(l, [xlS(xlAvg(SZ, 'sek', [['bereich', l]]), 'dec'), xlS(xlCnt(SZ, [['bereich', l]]), 'int'), xlS(xlSumIf(SZ, 'sek', [['bereich', l]]), 'dec')]); }); t.done();
+    CH.beh.push(t.chart({title: 'Zeit pro Bereich (Ø Sekunden pro Besuch)', type: 'bar', fmt: '0.0', cols: [1],
+      note: 'Durchschnittliche aktive Zeit pro Besuch eines Bereichs in Sekunden (nur Zeit im Vordergrund). Lange Zeiten können Interesse bedeuten oder langes Suchen; zusammen mit den Frust-Klicks lesen.'})); }
+  { const t = DD.table('Geöffnete Bereiche', 'Anteil der Sitzungen im Filter (App-Test und Pilot), in denen der Bereich mindestens einmal geöffnet wurde.', ['Bereich', 'Anteil der Sitzungen', 'Sitzungen']);
+    const all = xlCountA(T, 'id');
+    AREAS.forEach(k => { const c = xlCnt(T, [['o_' + k, 1]]); t.row(PAGE_LABEL[k], [xlS(xlShare(c, all), 'pct'), xlS(c, 'int')]); }); t.done();
+    CH.beh.push(t.chart({title: 'Welche Bereiche wurden geöffnet?', type: 'bar', pct: true, cols: [1],
+      note: 'Anteil der Sitzungen, in denen der Bereich mindestens einmal geöffnet wurde (App-Test und Pilot im Filter). Bereiche mit wenig Anteil werden übersehen oder nicht gebraucht.'})); }
+  { const t = DD.table('Häufigste Klicks', 'Die zehn häufigsten Klickziele (Blatt Klicks, Klickart = Klick).', ['Klick auf', 'Klicks']);
+    xlGroup(K, 'ziel', [['klickart', 'Klick']], 10).forEach(g => t.row(g.label, [xlS(xlCnt(K, [['klickart', 'Klick'], ['ziel', g.label]]), 'int')])); t.done();
+    CH.beh.push(t.chart({title: 'Häufigste Klicks', type: 'bar', cols: [1], note: 'Die zehn häufigsten Klickziele, nach der Beschriftung des Knopfs oder Links. Zeigt, was am meisten benutzt wird.'})); }
+  { const t = DD.table('Frust-Klicks und Klicks ins Leere', 'Je Bereich der App (Blatt Klicks).', ['Bereich', 'Frust-Klicks', 'Klicks ins Leere']);
+    xlCats(AREAS.map(k => PAGE_LABEL[k]), xlGroup(K, 'bereich')).forEach(l => { if(!xlSafe([['bereich', l]])) return; t.row(l, [xlS(xlCnt(K, [['klickart', 'Frust-Klick'], ['bereich', l]]), 'int'), xlS(xlCnt(K, [['klickart', 'Klick ins Leere'], ['bereich', l]]), 'int')]); }); t.done();
+    CH.beh.push(t.chart({title: 'Frust-Klicks und Klicks ins Leere je Bereich', type: 'bar', cols: [1, 2],
+      note: 'Frust-Klicks (blau: drei schnelle Klicks auf dieselbe Stelle) und Klicks ins Leere (orange: Klick auf etwas, das nichts tut), je Bereich. Hohe Werte zeigen Stellen, die anders funktionieren als erwartet. Welche Stelle genau, steht im Blatt „Klicks“.'})); }
+  { const t = DD.table('Themen der Antworten von Campi', 'Die häufigsten Themen (Blatt KI-Fragen).', ['Thema', 'Antworten']);
+    xlGroup(C, 'thema', [], 12).forEach(g => t.row(g.label, [xlS(xlCnt(C, [['thema', g.label]]), 'int')])); t.done();
+    CH.beh.push(t.chart({title: 'Frag Campi: Themen der Antworten', type: 'bar', cols: [1], note: 'Zu welchen Themen Campi geantwortet hat (häufigste zwölf). Fragen ohne geprüfte Antwort zeigen Wissenslücken; sie stehen im Blatt „KI-Fragen“ mit „nein“ in „Geprüfte Antwort“.'})); }
+  { const t = DD.table('Sprache der Chat-Fragen', 'In welcher Sprache Campi geantwortet hat (Blatt KI-Fragen).', ['Sprache', 'Antworten']);
+    xlGroup(C, 'sprache').forEach(g => t.row(g.label, [xlS(xlCnt(C, [['sprache', g.label]]), 'int')])); t.done();
+    CH.beh.push(t.chart({title: 'Frag Campi: Sprache der Fragen', type: 'bar', cols: [1], note: 'In welcher Sprache Campi geantwortet hat, also welche Sprache in den Fragen erkannt wurde. Zeigt, wie wichtig die Mehrsprachigkeit ist.'})); }
+  { const t = DD.table('Suchbegriffe in der Raumsuche', 'Die zehn häufigsten Suchbegriffe (Blatt Raumsuche).', ['Suchbegriff', 'Suchen', 'davon ohne Treffer']);
+    xlGroup(R, 'begriff', [], 10).forEach(g => t.row(g.label, [xlS(xlCnt(R, [['begriff', g.label]]), 'int'), xlS(xlCnt(R, [['begriff', g.label], ['ohne', 'ja']]), 'int')])); t.done();
+    CH.beh.push(t.chart({title: 'Raumsuche: häufigste Suchbegriffe', type: 'bar', cols: [1, 2], note: 'Die häufigsten Suchbegriffe (blau) und wie oft sie ohne Treffer blieben (orange). Begriffe ohne Treffer kennt die App noch nicht und sollten ergänzt werden.'})); }
+  { const t = DD.table('Standortfreigabe', 'Ergebnisse der Standortabfragen (Blatt Ereignisse, Typ standort_status).', ['Ergebnis', 'Abfragen']);
+    xlCats(['erlaubt', 'abgelehnt', 'nicht verfügbar', 'Fehler'], xlGroup(E, 'details', [['typ', 'standort_status']])).forEach(l => t.row(l, [xlS(xlCnt(E, [['typ', 'standort_status'], ['details', l]]), 'int')])); t.done();
+    CH.beh.push(t.chart({title: 'Standortfreigabe', type: 'bar', cols: [1], note: 'Was bei den Standortabfragen herauskam: erlaubt, abgelehnt, nicht verfügbar. Der Standort wird nur nach freiwilliger Freigabe und gerundet erfasst.'})); }
+
+  /* who took part: App-Test sessions and pilot users side by side */
+  const two = (title, tk, pk, fixed, note, top) => {
+    const t = DD.table(title, 'App-Test-Teilnahmen (Blatt Teilnahmen, Art = Test) und Pilotnutzer (Blatt Pilot).', [title, 'App-Test', 'Pilotnutzer']);
+    const gt = xlGroup(T, tk, [['art', 'Test']]), gp = pk ? xlGroup(P, pk, []) : [];
+    const tot = new Map(); gt.concat(gp).forEach(g => { const k = g.label.toLowerCase(); const o = tot.get(k) || {label: g.label, n: 0}; o.n += g.n; tot.set(k, o); });
+    xlCats(fixed || [], Array.from(tot.values()).sort((a, b) => b.n - a.n)).slice(0, top || 10).forEach(l => t.row(l, [xlS(xlCnt(T, [['art', 'Test'], [tk, l]]), 'int'), pk ? xlS(xlCnt(P, [[pk, l]]), 'int') : {v: 0, s: 'int'}])); t.done();
+    CH.who.push(t.chart({title, type: 'bar', cols: pk ? [1, 2] : [1], note}));
+  };
+  two('Sprache der App', 'lang', 'lang', null, 'In welcher Sprache die App genutzt wurde: App-Test-Teilnahmen (blau) und Pilotnutzer (orange).');
+  two('Campus', 'campus', 'campus', null, 'Welcher Campus angegeben oder gewählt wurde: App-Test-Teilnahmen (blau) und Pilotnutzer (orange).');
+  two('Geräte', 'geraet', 'geraet', null, 'Mit welchem Gerät teilgenommen wurde: App-Test-Teilnahmen (blau) und Pilotnutzer (orange).');
+  two('Betriebssysteme', 'os', 'os', null, 'Betriebssysteme der Geräte: App-Test-Teilnahmen (blau) und Pilotnutzer (orange).');
+  two('Browser', 'browser', 'browser', null, 'Verwendete Browser: App-Test-Teilnahmen (blau) und Pilotnutzer (orange). Wichtig, um die App auf den häufigsten Browsern zu testen.');
+  { const t = DD.table('Herkunft', 'Woher die Testpersonen kamen (Blatt Teilnahmen, Spalte Herkunft, Art = Test).', ['Herkunft', 'App-Test']);
+    xlGroup(T, 'herkunft', [['art', 'Test']], 10).forEach(g => t.row(g.label, [xlS(xlCnt(T, [['art', 'Test'], ['herkunft', g.label]]), 'int')])); t.done();
+    CH.who.push(t.chart({title: 'Woher kamen die Testpersonen?', type: 'bar', cols: [1], note: 'Wert von ?quelle= im geteilten Link, sonst die verweisende Website, sonst „direkt“. Zeigt, welcher geteilte Link funktioniert hat.'})); }
+  { const t = DD.table('Semester', 'Angabe zu Beginn des App-Tests.', ['Semester', 'App-Test']);
+    xlCats(['1. Semester', '2. bis 3. Semester', '4. Semester oder höher', 'Ich studiere nicht'], xlGroup(T, 'semester', [['art', 'Test']])).forEach(l => t.row(l, [xlS(xlCnt(T, [['art', 'Test'], ['semester', l]]), 'int')])); t.done();
+    CH.who.push(t.chart({title: 'Semester der Testpersonen', type: 'bar', cols: [1], note: 'Studienfortschritt der Testpersonen. Erstsemester brauchen Orientierung am meisten.'})); }
+  { const t = DD.table('Letzte Raumsuche', 'Angabe zu Beginn des App-Tests.', ['Zuletzt einen Raum gesucht', 'App-Test']);
+    xlCats(['Diese Woche', 'In diesem Monat', 'Länger her', 'Noch nie'], xlGroup(T, 'raumsuche', [['art', 'Test']])).forEach(l => t.row(l, [xlS(xlCnt(T, [['art', 'Test'], ['raumsuche', l]]), 'int')])); t.done();
+    CH.who.push(t.chart({title: 'Ist das Problem real? Letzte Raumsuche', type: 'bar', cols: [1], note: 'Wann die Testpersonen zuletzt einen Raum gesucht haben. Viele „Diese Woche“ oder „In diesem Monat“ zeigen: Raumsuche ist ein echtes, häufiges Problem.'})); }
+  { const t = DD.table('Geräteeinstellungen', 'Anteil der App-Test-Teilnahmen.', ['Einstellung', 'Anteil', 'Teilnahmen']);
+    [['Dunkelmodus', 'dark'], ['Weniger Bewegung', 'motion'], ['Touchscreen', 'touch'], ['Standort freigegeben', 'geo'], ['Vom Home-Bildschirm', 'inst']].forEach(([l, k]) => { const c = xlCnt(T, [['art', 'Test'], [k, 'ja']]); t.row(l, [xlS(xlShare(c, testN), 'pct'), xlS(c, 'int')]); }); t.done();
+    CH.who.push(t.chart({title: 'Geräteeinstellungen der Testpersonen', type: 'bar', pct: true, cols: [1], note: 'Anteil der App-Test-Teilnahmen mit Dunkelmodus, reduzierter Bewegung (Bedienungshilfe), Touchscreen, Standortfreigabe und Start vom Home-Bildschirm. Wichtig für Design und Barrierefreiheit.'})); }
+
+  /* pilot */
+  { const t = DD.table('Pilot: Öffnungen pro Tag', 'Öffnungen aller Pilotnutzer je Kalendertag (Blatt Pilot-Öffnungen), höchstens die letzten 60 Tage bis heute.', ['Tag', 'Datum', 'Öffnungen']);
+    const firstOpen = users.length ? Math.min.apply(null, users.map(u => u.opens[0] || u.first)) : null;
+    const end = startOfDay(now); let start = firstOpen ? startOfDay(firstOpen) : end; start = Math.max(start, end - 59 * DAY);
+    for(let day = start; day <= end + 3600e3; day = startOfDay(day + DAY + 3 * 3600e3)){ const dd = new Date(day);
+      t.row(dd.toLocaleDateString('de-DE', {weekday: 'short', day: '2-digit', month: '2-digit'}), [{v: day, t: 'd', s: 'date'}, xlS(xlCnt(PO, [['tag', XLW.serial(day)]]), 'int')]); }
+    t.done();
+    CH.pilot.push(t.chart({title: 'Pilot: Öffnungen pro Tag', type: 'col', cols: [2], wide: true, labels: t.n <= 31, note: 'Wie oft alle Pilotnutzer zusammen die App je Tag geöffnet haben (Öffnungen mit weniger als 30 Minuten Abstand zählen als eine). Zeigt, ob die Nutzung über die Wochen hält.'})); }
+  { const t = DD.table('Pilot: Öffnungen in Woche 2', 'Verteilung der Öffnungen in Woche 2, nur Personen, die für H2b zählen.', ['Öffnungen in Woche 2', 'Woche 2 vorbei', 'gerade in Woche 2']);
+    [['0 Öffnungen', 0, 0], ['1 Öffnung', 1, 1], ['2 Öffnungen', 2, 2], ['3 Öffnungen', 3, 3], ['4 Öffnungen', 4, 4], ['5 oder mehr', 5, null]].forEach(([l, lo, hi]) => { const cond = hi === null ? [['w2', {op: '>=', n: lo}]] : [['w2', lo]];
+      t.row(l, [xlS(xlCnt(P, [['zaehlt', 'ja'], ['w2st', 'vorbei']].concat(cond)), 'int'), xlS(xlCnt(P, [['zaehlt', 'ja'], ['w2st', 'läuft']].concat(cond)), 'int')]); }); t.done();
+    CH.pilot.push(t.chart({title: 'Pilot: Öffnungen in Woche 2 (H2b)', type: 'col', cols: [1, 2], note: 'Wie oft Pilotnutzer die App in ihrer zweiten Woche geöffnet haben. Blau: Woche 2 ist vorbei, zählt für H2b. Orange: Woche 2 läuft gerade, vorläufig. H2b ist bestätigt, wenn mindestens 30 % der blauen Personen bei 3 oder mehr liegen.'})); }
+  { const t = DD.table('Pilot: aktiv pro Woche', 'Anteil der Pilotnutzer, die die App in der Woche mindestens einmal geöffnet haben, unter denen, die diese Woche schon erreicht haben.', ['Pilotwoche', 'Anteil aktiv', 'Aktiv', 'Woche erreicht']);
+    [['Woche 1', 'w1', null], ['Woche 2', 'w2', 'w2er'], ['Woche 3', 'w3', 'w3er']].forEach(([l, wk, er]) => { const base = [['zaehlt', 'ja']].concat(er ? [[er, 'ja']] : []);
+      const b = xlCnt(P, base), a = xlCnt(P, base.concat([[wk, {op: '>=', n: 1}]])); t.row(l, [xlS(xlShare(a, b), 'pct'), xlS(a, 'int'), xlS(b, 'int')]); }); t.done();
+    CH.pilot.push(t.chart({title: 'Pilot: aktiv pro Woche', type: 'col', pct: true, cols: [1], note: 'Anteil der Pilotnutzer, die die App in der jeweiligen Woche mindestens einmal geöffnet haben (nur Personen, die diese Woche schon erreicht haben). Sinkt der Wert stark, verliert die App an Interesse.'})); }
+
+  /* ================= Dashboard ================= */
+  const f = S.filter;
+  const FL = {zeit: {alle: 'gesamter Zeitraum', heute: 'heute', '7': 'letzte 7 Tage', '30': 'letzte 30 Tage'}, modus: {alle: 'App-Test und Pilot', test: 'nur App-Test', pilot: 'nur Pilot'}};
+  const filterTxt = [FL.zeit[f.zeit] || f.zeit, FL.modus[f.modus] || f.modus, f.geraet === 'alle' ? 'alle Geräte' : 'nur ' + f.geraet, f.gruppe === 'alle' ? 'beide Gruppen' : 'Gruppe ' + f.gruppe, f.fertig ? 'nur abgeschlossene' : ''].filter(Boolean).join(', ');
+  const stamp = new Date(now).toLocaleString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'});
+  const k = (key, style, sub) => ({label: kpiRows[key].label, cell: {f: kpiRows[key].f, v: kpiRows[key].v}, style, sub});
+  const kpis = [k('n', 'kpi', 'mit Einwilligung'), k('quote', 'kpiPct', 'haben den Fragebogen abgeschickt'), k('dauer', 'kpiSec', 'Median vom Start bis zum Absenden'), k('ev', 'kpi', 'Klicks, Seiten, Suchen … im Filter'),
+    k('h2a', 'kpiPct', {f: 'Hypothesen!I' + hyps[0].row + '&" · Ziel 30 %"', v: hyps[0].status + ' · Ziel 30 %'}), k('h2b', 'kpiPct', {f: 'Hypothesen!I' + hyps[1].row + '&" · Ziel 30 %"', v: hyps[1].status + ' · Ziel 30 %'}),
+    k('pilotn', 'kpi', 'Geräte über den Pilot-Link (alle)'), k('oeff', 'kpi', 'Öffnungen mit 30 Min. Abstand'),
+    k('klick', 'kpi', 'auf Knöpfe, Links und Kacheln'), k('frust', 'kpi', 'drei schnelle Klicks auf dieselbe Stelle'), k('chat', 'kpi', 'im Chat gestellt'), k('suchleer', 'kpiPct', 'Raumsuchen ohne Treffer')];
+  const sections = [
+    {title: 'Hypothesen', desc: 'H2a und H2b sind die Geschäftshypothesen, dazu kommen die Ziele des App-Tests. Definitionen, Zahlen und Status stehen im Blatt „Hypothesen“.', charts: CH.hyp},
+    {title: 'App-Test: Aufgaben', desc: 'Ergebnisse der drei Aufgaben. Nur App-Test-Teilnahmen im Filter.', charts: CH.test},
+    {title: 'Fragebogen', desc: 'Eine Grafik pro Auswahl- oder Skalenfrage. Freitexte stehen im Blatt „Antworten“.', charts: CH.survey},
+    {title: 'Verhalten in der App', desc: 'Aus den aufgezeichneten Ereignissen aller Sitzungen im Filter (App-Test und Pilot): Seiten, Klicks, Chat, Raumsuche, Standort.', charts: CH.beh},
+    {title: 'Wer hat teilgenommen?', desc: 'Geräte, Sprachen, Campus und Herkunft. Blau = App-Test-Teilnahmen, orange = Pilotnutzer.', charts: CH.who},
+    {title: 'Pilotphase', desc: 'Immer alle Pilotnutzer, unabhängig vom Filter. Grundlage für H2b.', charts: CH.pilot}];
+  const DB = xlDashboard({title: 'Campi · Auswertung', sub: 'Export vom ' + stamp + ' · Filter: ' + filterTxt + ' · Pilotdaten: immer alle · ' + T.data.length + ' Sitzungen, ' + E.data.length + ' Ereignisse, ' + users.length + ' Pilotnutzer',
+    how: 'So liest du das: Unter jedem Diagramm steht, was es zeigt. Alle Zahlen sind Formeln auf die Datenblätter und rechnen sich neu, wenn du dort etwas änderst. Was jede Spalte und jede Kennzahl bedeutet, steht im Blatt „Erklärung“. Inoffizieller Prototyp, Daten nur aus der App (App-Test und Pilotphase).'}, kpis, sections);
+
+  /* ================= Erklärung ================= */
+  const EX = {name: 'Erklärung', rows: [], merges: [], heights: {0: 24}, cols: [20, 34, 110, 10], tab: XL_PAL[2], freeze: 3, fit: 'landscape'};
+  EX.rows.push([{v: 'Erklärung: Was steht wo, und was bedeutet es?', s: 'title'}]);
+  EX.rows.push([{v: 'Jedes Blatt, jede Spalte, jede Kennzahl und jedes Diagramm dieser Datei, kurz erklärt.', s: 'desc'}]); EX.merges.push('A2:D2');
+  EX.rows.push(['Blatt', 'Spalte / Element', 'Erklärung', 'Anzahl'].map(h => ({v: h, s: 'head'})));
+  const ex = (a, b, c, dd) => { const r = EX.rows.length; EX.rows.push([a ? {v: a, s: 'bold'} : null, b ? {v: b, s: 'wrap'} : null, {v: c, s: 'wrap'}].concat(dd ? [dd] : [])); EX.heights[r] = Math.max(xlLines(c, 118), xlLines(b, 32)) * 12.6 + 3; };
+  const exSec = t => { EX.rows.push([]); EX.rows.push([{v: t, s: 'section'}]); EX.heights[EX.rows.length - 1] = 20; };
+  exSec('Allgemein');
+  ex('Diese Datei', '', 'Alle Daten, die Campi in der App erhebt (App-Test und Pilotphase), mit fertigem Dashboard. Erstellt am ' + stamp + ' aus der Auswertungsseite.');
+  ex('Filter', '', 'Die Datei enthält die Daten so, wie sie beim Export auf der Auswertungsseite gefiltert waren: ' + filterTxt + '. Die Blätter „Pilot“ und „Pilot-Öffnungen“ und die Hypothese H2b enthalten immer alle Pilotdaten.');
+  ex('Formeln', '', 'Kennzahlen, Hypothesen, Fragebogen und Diagrammdaten sind Formeln (ZÄHLENWENNS, MITTELWERTWENNS, SUMMENPRODUKT …) auf die Datenblätter. Änderst oder löschst du dort Zeilen, ändern sich die Ergebnisse mit. Die Diagramme im Dashboard lesen aus dem Blatt „Diagrammdaten“.');
+  ex('Uhrzeiten', '', 'Alle Zeitpunkte sind in der Uhrzeit des Computers angegeben, auf dem exportiert wurde. „Beginn“ ist das erste Ereignis auf dem Gerät.');
+  ex('Ja / nein, 1 / 0', '', 'Textspalten mit „ja“ oder „nein“ beschreiben Eigenschaften. Hilfsspalten mit 1 oder 0 sind zum Zählen gedacht: Ihre Summe ist die Anzahl der Fälle.');
+  ex('Datenschutz', '', 'Die Datei enthält keine Namen: Den Namen, den man in der App eintragen kann, entfernt die App aus allen Aufzeichnungen. Der Standort ist nur nach freiwilliger Freigabe und gerundet enthalten. Freitexte und Chat-Fragen stehen so da, wie sie eingetippt wurden. Gib die Datei nur an Personen weiter, die die Auswertung sehen dürfen.');
+  exSec('Dashboard: Kennzahlen');
+  kpis.forEach(x => ex('Dashboard', x.label, kpiRows[Object.keys(kpiRows).find(kk => kpiRows[kk].label === x.label)].expl));
+  exSec('Dashboard: Diagramme');
+  sections.forEach(sec => sec.charts.forEach(ch => ex(sec.title, ch.title, ch.note + ' Daten: ' + ch.src + '.')));
+  exSec('Hypothesen');
+  ex('Hypothesen', 'Ja', 'Anzahl der Fälle, die das Kriterium erfüllen.');
+  ex('Hypothesen', 'n', 'Anzahl der Fälle, die gezählt werden (Grundgesamtheit).');
+  ex('Hypothesen', 'Ergebnis', 'Ja ÷ n als Prozent. Leer, solange n = 0.');
+  ex('Hypothesen', 'Ziel', 'Mindestwert, ab dem die Hypothese als bestätigt bzw. das Test-Ziel als erreicht gilt.');
+  ex('Hypothesen', 'Mindestens n', 'Unter dieser Anzahl ist das Ergebnis zu unsicher; der Status lautet dann „Zu wenig Daten“ (bei H2b „Pilot läuft“, solange noch Personen im Pilot sind).');
+  hyps.forEach(h => ex('Hypothesen', h.kurz + ': ' + h.text, h.krit + ' Daten: ' + h.src + '.'));
+  [[T, 'Teilnahmen'], [FB, 'Fragebogen'], [A, 'Antworten'], [E, 'Ereignisse'], [SZ, 'Seitenzeiten'], [K, 'Klicks'], [R, 'Raumsuche'], [C, 'KI-Fragen'], [WB, 'Wege und Bereiche'], [PE, 'Personen'], [P, 'Pilot'], [PO, 'Pilot-Öffnungen']].forEach(([t, nm]) => {
+    exSec('Blatt ' + nm);
+    if(t === FB){ ex(nm, '', 'Jede Frage des Fragenkatalogs mit Anzahl und Anteil je Antwort, gezählt mit Formeln aus dem Blatt „Antworten“. Spalte D zeigt bei H2a-Fragen, welche Antworten als Zustimmung zählen. Bei Skalen steht zusätzlich der Durchschnitt.');
+      qList.forEach(e => ex(nm, 'F' + e.no, e.frage + ' (' + (TYP[e.typ] || e.typ) + (e.orphan ? ', nicht mehr im Fragenkatalog' : '') + ')')); return; }
+    ex(nm, '', t.about);
+    t.cols.forEach(c => { if(c.d) ex(nm, c.h, c.d); });
+  });
+  exSec('Ereignis-Typen (Blatt Ereignisse, Spalte Typ)');
+  const types = Object.keys(EV_LABEL).concat(Array.from(new Set(E.data.map((x, i) => E.val(i, 'typ')))).filter(x => x && !(x in EV_LABEL)));
+  types.forEach(ty => ex(ty, EV_LABEL[ty] || ty, XL_EV_EXPL[ty] || 'Weiteres Ereignis der App.', xlS(xlCnt(E, [['typ', ty]]), 'int')));
+  exSec('Diagrammdaten');
+  ex('Diagrammdaten', '', 'Die Tabellen hinter den Diagrammen. Jede Tabelle hat eine kurze Beschreibung. Du kannst sie für eigene Diagramme verwenden.');
+
+  const sheets = [DB, EX, H, T.sheet(XL_PAL[0]), FB, A.sheet(XL_PAL[3]), E.sheet(XL_PAL[4]), SZ.sheet(XL_PAL[4]), K.sheet(XL_PAL[4]), R.sheet(XL_PAL[4]), C.sheet(XL_PAL[4]), WB.sheet(XL_PAL[0]), PE.sheet(XL_PAL[4]), P.sheet(XL_PAL[6]), PO.sheet(XL_PAL[6]), DD];
+  return XLW.build(sheets, {title: 'Campi Auswertung ' + stamp});
+}
+async function exportXlsx(){
+  if(S.xlBusy) return;
+  S.xlBusy = true; S.error = ''; S.notice = 'Die Excel-Datei wird erstellt …'; render();
+  try {
+    const blob = await xlBuild(view());
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'campi-auswertung-' + new Date().toISOString().slice(0, 10) + '.xlsx';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
+    S.notice = 'Die Excel-Datei ist fertig: Dashboard mit Diagrammen, Erklärungen und alle Daten.';
+  } catch(e){ S.notice = ''; S.error = 'Die Excel-Datei konnte nicht erstellt werden: ' + e.message; }
+  S.xlBusy = false; render();
+}
 
 /* ================= Darstellung ================= */
 function render(){
@@ -1453,7 +2458,7 @@ function render(){
       '<button class="btn" type="submit" style="margin-top:18px;width:100%"' + (S.loginBusy ? ' disabled' : '') + '>' + (S.loginBusy ? 'Anmelden …' : 'Anmelden') + '</button></form></div>';
     return;
   }
-  const right = '<span>' + esc(S.auth.email) + '</span><a class="btn-link" href="index.html" target="_blank" rel="noopener">Zur Testseite</a><button class="btn-link" type="button" data-a="logout">Abmelden</button>';
+  const right = (S.data && S.admin ? '<button class="btn btn-2 btn-sm" type="button" data-a="xlsx-all"' + (S.xlBusy ? ' disabled' : '') + ' title="Dashboard mit Diagrammen, Erklärungen und alle Daten">' + icon('down2') + 'Excel</button>' : '') + '<span>' + esc(S.auth.email) + '</span><a class="btn-link" href="index.html" target="_blank" rel="noopener">Zur Testseite</a><button class="btn-link" type="button" data-a="logout">Abmelden</button>';
   if(S.admin === null){ app.innerHTML = '<div class="wrap">' + top(right) + '<p class="note">Einen Moment …</p></div>'; return; }
   if(S.admin === false){
     app.innerHTML = '<div class="wrap">' + top(right) + '<div class="alert err"><b>Kein Admin-Zugang</b>' + (S.error ? esc(S.error) + '<br>' : '') +
