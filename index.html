@@ -3612,11 +3612,11 @@ function geoAvailable(){ return 'geolocation' in navigator && window.isSecureCon
 function studyOverlayHTML(){
   switch(ST.step){
     case 'intro': {
-      const where = t(REMOTE ? 'st_where_remote' : 'st_where_local');
+      const where = "";
       return stScreen(stLangRow() + '<p class="st-kicker">' + esc(CFG.projekt) + '</p><h1 id="st-h">' + esc(t('st_title')) + '</h1>' +
         '<p>' + esc(t('st_text')) + '</p>' +
         '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('st_box1')) + '</p>' +
-        '<p>' + esc(t('st_box2')) + ' ' + esc(where) + ' ' + esc(t('st_map_note')) + '</p>' +
+        '<p>' + esc(t('st_box2')) + ' ' + esc(where) + '</p>' +
         (CFG.kontakt ? '<p>' + esc(t('st_contact', {c: CFG.kontakt})) + '</p>' : '') + '</div>' +
         stForm('intro',
           stQ(esc(t('q_semester')), stRadio('semester', [{v:'1. Semester', l:t('o_sem1')}, {v:'2. bis 3. Semester', l:t('o_sem2')}, {v:'4. Semester oder höher', l:t('o_sem4')}, {v:'Ich studiere nicht', l:t('o_semx')}])) +
@@ -3628,7 +3628,7 @@ function studyOverlayHTML(){
         '<button class="st-link" type="button" data-st="skip">' + esc(t('st_skip')) + '</button>');
     }
     case 'pilot-intro': {
-      const where = t(REMOTE ? 'st_where_remote' : 'st_where_local');
+      const where = "";
       return stScreen(stLangRow() + '<p class="st-kicker">' + esc(CFG.projekt) + '</p><h1 id="st-h">' + esc(t('pi_title')) + '</h1>' +
         '<p>' + esc(t('pi_text')) + '</p>' +
         '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('pi_box1')) + '</p><p>' + esc(t('st_box2')) + ' ' + esc(where) + '</p>' +
