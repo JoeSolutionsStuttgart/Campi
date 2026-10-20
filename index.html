@@ -503,20 +503,20 @@ a{color:inherit}
 .ask-home:focus-within .ask-caret,.ask-home:has(input:not(:placeholder-shown)) .ask-caret{display:none}
 @keyframes ask-blink{50%{opacity:0}}
 @media (prefers-reduced-motion: reduce){ .st-bar-task .st-ico,.ask-caret{animation:none} }
-/* task pill "Aufgabe x von 3": very conspicuous pink, blinking */
-.st-bar .st-txt b,.st-kicker-task,.st-fly b{display:inline-flex;align-items:center;gap:7px;font-size:13px!important;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.2;padding:5px 12px 5px 10px;border-radius:999px;border:2px solid #D6006F;background:#D6006F;color:#FFFFFF}
-.st-bar .st-txt b::before,.st-kicker-task::before,.st-fly b::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+/* task pill "Aufgabe x von 3": very conspicuous pink (no blinking) */
+.st-bar .st-txt b,.st-kicker-task{display:inline-flex;align-items:center;gap:7px;font-size:13px!important;font-weight:900;letter-spacing:.08em;text-transform:uppercase;line-height:1.2;padding:5px 12px 5px 10px;border-radius:999px;border:2px solid #D6006F;background:#D6006F;color:#FFFFFF}
+.st-bar .st-txt b::before,.st-kicker-task::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
 .st-kicker-task{align-self:flex-start}
-.st-bar-task .st-txt b,.st-kicker-task{animation:st-blink 1.1s ease-in-out infinite}
-@keyframes st-blink{0%,100%{background:#D6006F;color:#FFFFFF;box-shadow:0 0 0 0 rgba(255,40,150,0)}50%{background:#FFFFFF;color:#D6006F;box-shadow:0 0 0 5px rgba(255,40,150,.55)}}
+.st-bar-task .st-txt b{box-shadow:0 0 0 3px rgba(255,64,160,.35)}
 .st-bar-task{border-bottom-color:#D6006F}
 .st-bar-task .st-ico{background:#D6006F;color:#FFFFFF;animation:st-pulse-pink 1.4s ease-out 3}
 @keyframes st-pulse-pink{0%{box-shadow:0 0 0 0 rgba(255,40,150,.75)}100%{box-shadow:0 0 0 14px rgba(255,40,150,0)}}
-.st-bar-ok .st-txt b{background:#0CA30C;border-color:#0CA30C;color:#FFFFFF;animation:none}
-/* the task card flies up into the bar */
-.st-ghost{pointer-events:none;z-index:33;overflow:hidden!important}
-.st-fly{position:absolute;z-index:34;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:6px;padding:10px 16px;overflow:hidden;pointer-events:none;box-shadow:0 18px 40px -16px rgba(0,0,0,.55);border-left:4px solid #D6006F;font-weight:800;font-size:16px;line-height:1.3}
-.st-fly span{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.st-bar-ok .st-txt b{background:#0CA30C;border-color:#0CA30C;color:#FFFFFF;box-shadow:none}
+/* the task card glides up and becomes the bar (transform and opacity only) */
+.st-leaving{pointer-events:none;will-change:opacity,transform}
+.st-plate{position:absolute;z-index:31;pointer-events:none;transform-origin:50% 50%;will-change:transform;margin:0}
+.st-fly-text{position:absolute;z-index:33;margin:0;pointer-events:none;background:transparent!important;border-color:transparent!important;box-shadow:none!important;will-change:transform,opacity;overflow:hidden}
+.st-bar-morph{z-index:32!important;background:transparent!important;border-bottom-color:transparent!important;box-shadow:none!important;will-change:opacity}
 /* home-screen guide (pilot) */
 .guide-intro{font-size:15px;line-height:1.5}
 .guide-direct{margin-top:12px}
@@ -543,7 +543,7 @@ a{color:inherit}
 .guide-link span{flex:1;min-width:0}
 .guide-link > .ic:first-child{width:38px;height:38px;padding:8px;border-radius:11px;background:var(--a-accent-soft);color:var(--a-accent-on-soft)}
 .guide-link > .ic:last-child{color:var(--a-muted)}
-@media (prefers-reduced-motion: reduce){ .st-bar-task .st-txt b,.st-kicker-task,.st-bar-task .st-ico{animation:none} }
+@media (prefers-reduced-motion: reduce){ .st-bar-task .st-ico{animation:none} }
 </style>
 </head>
 <body>
@@ -3781,43 +3781,67 @@ function renderStudy(){
   }
 }
 
-/* after "Start task": the task card moves up into the bar at the top and the app appears below it */
+/* after "Start task": the task card glides up and turns into the bar at the top; the app appears below it.
+   Only transform and opacity are animated (no layout during the motion), so it stays smooth on phones. */
 function reducedMotion(){ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
-function snapBrief(){
+function takeBrief(){
   const ov = $('st-layer'), card = ov && ov.querySelector('.st-task');
   if(!ov || !card || reducedMotion() || typeof ov.animate !== 'function') return null;
-  const k = ov.querySelector('.st-kicker');
-  return {ghost: ov.cloneNode(true), rect: card.getBoundingClientRect(), scroll: ov.scrollTop, kicker: k ? k.textContent : '', text: card.textContent};
+  const rect = card.getBoundingClientRect();
+  ov.removeAttribute('id'); ov.removeAttribute('role'); ov.removeAttribute('aria-modal'); ov.setAttribute('aria-hidden', 'true');
+  ov.inert = true; ov.classList.add('st-leaving');
+  ov.querySelectorAll('[id]').forEach(x => x.removeAttribute('id'));
+  return {ov, card, rect};
 }
-function flyToBar(s){
+function briefToBar(s){
+  if(!s) return;
   const app = $('app'), bar = $('st-bar');
-  if(!s || !app || !bar) return;
-  const ar = app.getBoundingClientRect(), br = bar.getBoundingClientRect(), cr = s.rect;
-  if(!br.height || !cr.height) return;
-  const g = s.ghost;
-  g.removeAttribute('id'); g.removeAttribute('role'); g.removeAttribute('aria-modal'); g.setAttribute('aria-hidden', 'true'); g.classList.add('st-ghost');
-  g.querySelectorAll('[id]').forEach(x => x.removeAttribute('id'));
-  g.querySelectorAll('.st-task').forEach(x => { x.style.visibility = 'hidden'; });
-  app.appendChild(g); g.scrollTop = s.scroll;
-  const f = document.createElement('div');
-  f.className = 'st-fly'; f.setAttribute('aria-hidden', 'true');
-  f.innerHTML = '<b>' + esc(s.kicker) + '</b><span>' + esc(s.text) + '</span>';
-  const cs = getComputedStyle(app), v = n => cs.getPropertyValue(n).trim();
-  const x0 = cr.left - ar.left, y0 = cr.top - ar.top, x1 = br.left - ar.left, y1 = br.top - ar.top;
-  Object.assign(f.style, {left: x0 + 'px', top: y0 + 'px', width: cr.width + 'px', height: cr.height + 'px'});
-  app.appendChild(f);
-  const D = 720, ease = 'cubic-bezier(.65,0,.35,1)', lift = Math.max(0, ar.height - (br.bottom - ar.top));
-  g.animate([{transform: 'translateY(0)', opacity: 1}, {transform: 'translateY(' + (-lift * 0.55) + 'px)', opacity: 0.95, offset: 0.5}, {transform: 'translateY(' + (-lift) + 'px)', opacity: 0}],
-    {duration: D, easing: ease, fill: 'forwards'});
-  const box = (x, y, w, h) => ({left: x + 'px', top: y + 'px', width: w + 'px', height: h + 'px'});
-  const a = f.animate([
-    Object.assign(box(x0, y0, cr.width, cr.height), {backgroundColor: v('--a-surface') || '#fff', color: v('--a-fg') || '#111', borderRadius: '14px', opacity: 1}),
-    Object.assign(box(x1, y1, br.width, br.height), {backgroundColor: v('--a-primary') || '#14213D', color: v('--a-on-primary') || '#fff', borderRadius: '0px', opacity: 1, offset: 0.82}),
-    Object.assign(box(x1, y1, br.width, br.height), {backgroundColor: v('--a-primary') || '#14213D', color: v('--a-on-primary') || '#fff', borderRadius: '0px', opacity: 0})],
-    {duration: D + 160, easing: ease, fill: 'forwards'});
-  let gone = false;
-  const done = () => { if(gone) return; gone = true; g.remove(); f.remove(); bar.classList.add('st-bar-landed'); };
-  a.onfinish = done; a.oncancel = done; setTimeout(done, D + 700);
+  if(!app || !bar){ s.ov.remove(); return; }
+  bar.classList.add('st-bar-morph');
+  requestAnimationFrame(() => {
+    const ar = app.getBoundingClientRect(), br = bar.getBoundingClientRect(), cr = s.rect;
+    if(!br.height || !cr.height){ s.ov.remove(); bar.classList.remove('st-bar-morph'); return; }
+    const cs = getComputedStyle(app), v = (n, d) => cs.getPropertyValue(n).trim() || d;
+    const surf = v('--a-surface', '#FFFFFF'), prim = v('--a-primary', '#14213D'), accent = v('--a-accent', '#E8572A'), line = v('--a-line', '#E2DED6');
+    const place = (el, r) => { Object.assign(el.style, {left: (r.left - ar.left) + 'px', top: (r.top - ar.top) + 'px', width: r.width + 'px', height: r.height + 'px'}); app.appendChild(el); return el; };
+    /* the card's background becomes the bar's background */
+    const plate = place(document.createElement('div'), br); plate.className = 'st-plate'; plate.setAttribute('aria-hidden', 'true');
+    /* the card's text travels along and fades out, the bar's text fades in */
+    const ccs = getComputedStyle(s.card), txt = s.card.cloneNode(true);
+    ['fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 'letterSpacing', 'color', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderStyle', 'textAlign']
+      .forEach(k => { txt.style[k] = ccs[k]; });
+    txt.style.boxSizing = 'border-box'; place(txt, cr); txt.classList.add('st-fly-text'); txt.setAttribute('aria-hidden', 'true');
+    s.card.style.visibility = 'hidden';
+    const dx = (cr.left + cr.width / 2) - (br.left + br.width / 2), dy = (cr.top + cr.height / 2) - (br.top + br.height / 2);
+    const D = 900, E = 'cubic-bezier(.45,0,.2,1)';
+    const inner = s.ov.querySelector('.st-inner');
+    const anims = [
+      /* movement: one even, eased glide from the card to the bar */
+      plate.animate([
+        {transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + (cr.width / br.width) + ',' + (cr.height / br.height) + ')'},
+        {transform: 'translate(0px,0px) scale(1,1)'}], {duration: D, easing: E, fill: 'both'}),
+      /* look: stays a card for the first third, then turns into the bar */
+      plate.animate([
+        {backgroundColor: surf, borderRadius: '14px', boxShadow: 'inset 4px 0 0 0 ' + accent + ', inset 0 0 0 1px ' + line, offset: 0},
+        {backgroundColor: surf, borderRadius: '14px', boxShadow: 'inset 4px 0 0 0 ' + accent + ', inset 0 0 0 1px ' + line, offset: 0.3},
+        {backgroundColor: prim, borderRadius: '0px', boxShadow: 'inset 0 -4px 0 0 #D6006F, inset 0 0 0 0 ' + line, offset: 0.8},
+        {backgroundColor: prim, borderRadius: '0px', boxShadow: 'inset 0 -4px 0 0 #D6006F, inset 0 0 0 0 ' + line, offset: 1}], {duration: D, easing: 'linear', fill: 'both'}),
+      /* the card's text rides along, then gives way to the bar's text */
+      txt.animate([{transform: 'translate(0px,0px)'}, {transform: 'translate(' + (-dx) + 'px,' + (-dy) + 'px)'}], {duration: D, easing: E, fill: 'both'}),
+      txt.animate([{opacity: 1}, {opacity: 1, offset: 0.3}, {opacity: 0, offset: 0.58}, {opacity: 0}], {duration: D, easing: 'linear', fill: 'both'}),
+      bar.animate([{opacity: 0}, {opacity: 0, offset: 0.5}, {opacity: 1, offset: 0.85}, {opacity: 1}], {duration: D, easing: 'linear', fill: 'both'}),
+      /* the rest of the task page: first its text fades, then its background, so nothing shows through twice */
+      inner ? inner.animate([{opacity: 1, transform: 'translateY(0px)'}, {opacity: 0, transform: 'translateY(-24px)'}], {duration: D * 0.3, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards'}) : null,
+      s.ov.animate([{opacity: 1}, {opacity: 1, offset: 0.25}, {opacity: 0}], {duration: D * 0.62, easing: 'cubic-bezier(.4,0,.6,1)', fill: 'forwards'})
+    ].filter(Boolean);
+    let gone = false;
+    const done = () => {
+      if(gone) return; gone = true;
+      bar.classList.remove('st-bar-morph'); anims.forEach(a => { try { a.cancel(); } catch(e){} });
+      plate.remove(); txt.remove(); s.ov.remove();
+    };
+    anims[0].onfinish = done; setTimeout(done, D + 3500);
+  });
 }
 
 /* forms and buttons */
@@ -3962,7 +3986,7 @@ document.addEventListener('click', e => {
     case 'pilot-skip': ST.active = false; ST.step = ''; ST.mode = ''; renderStudy(); break;
     case 'close': track('danach', {}); endStudy(); break;
     case 'restart': startStudy(ST.preview); break;
-    case 'begin': { const next = {'t1-brief':'t1', 't2-brief':'t2', 't3-brief':'t3'}[ST.step]; if(next){ const snap = snapBrief(); setStep(next); flyToBar(snap); } break; }
+    case 'begin': { const next = {'t1-brief':'t1', 't2-brief':'t2', 't3-brief':'t3'}[ST.step]; if(next){ const snap = takeBrief(); setStep(next); briefToBar(snap); } break; }
     case 'guide-ok': if(ST.step === 'pilot-install') closeGuideOverlay(); break;
     case 'next': if(ST.step === 't1-done') setStep('t1-q'); else if(ST.step === 't2-done') setStep('t2-q'); break;
     case 'giveup1': if(ST.step === 't1') finishTask1(false); break;
