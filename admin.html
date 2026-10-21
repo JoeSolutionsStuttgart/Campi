@@ -414,7 +414,7 @@ async function reloadQuestions(){ S.data.fragen = await api('fragen?select=*&ord
 
 /* ================= Auswertung ================= */
 const STEP_LABEL = {intro:'Einwilligung', 't1-brief':'Aufgabe 1', t1:'Aufgabe 1', 't1-done':'Aufgabe 1', 't1-q':'Aufgabe 1', 't2-brief':'Aufgabe 2', t2:'Aufgabe 2', 't2-done':'Aufgabe 2', 't2-q':'Aufgabe 2', 't3-brief':'Aufgabe 3', t3:'Aufgabe 3', laden:'Fragebogen', fragen:'Fragebogen', sending:'Speichern', thanks:'Fertig', danach:'Fertig'};
-const AREA_LABEL = {start:'Start', raeume:'Räume', 'raeume+karte':'Lageplan groß', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', einstellungen:'Einstellungen'};
+const AREA_LABEL = {start:'Start', raeume:'Räume', 'raeume+karte':'Lageplan groß', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', hilfe:'Hilfe & Tipps', einstellungen:'Einstellungen'};
 const areaName = k => pageName(k);
 function view(){
   const d = S.data; if(!d) return null;
@@ -768,17 +768,17 @@ function sessionStarts(d){
 function evTime(e, s){ return e.zeitpunkt ? Date.parse(e.zeitpunkt) : (s ? s._start + (Number(e.zeit_ms) || 0) : Date.parse(e.erstellt)); }
 
 /* page names */
-const PAGE_BASE = {start:'Start', 'raeume-plan':'Räume · Plan', 'raeume-live':'Räume · Live-Karte', raeume:'Räume', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', einstellungen:'Einstellungen'};
-const PAGE_SUFFIX = {karte:'Lageplan groß', sprache:'Sprachwahl', standort:'Standortwahl'};
+const PAGE_BASE = {start:'Start', 'raeume-plan':'Räume · Plan', 'raeume-live':'Räume · Live-Karte', raeume:'Räume', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', hilfe:'Hilfe & Tipps', einstellungen:'Einstellungen'};
+const PAGE_SUFFIX = {karte:'Lageplan groß', sprache:'Sprachwahl', standort:'Standortwahl', name:'Namen eintragen', 'app-anleitung':'Anleitung Home-Bildschirm'};
 function pageName(k){
   if(!k) return '–';
   const [base, ...suf] = String(k).split('+');
   return (PAGE_BASE[base] || base) + suf.map(x => ' + ' + (PAGE_SUFFIX[x] || x)).join('');
 }
 function pageBase(k){ const b = String(k || '').split('+')[0]; return b.startsWith('raeume') ? 'raeume' : b; }
-const PAGE_COLOR = {start:'#2a78d6', raeume:'#eb6834', chat:'#8a5cd1', mensa:'#1f9e6e', 'entdecken-studi':'#c99a06', 'entdecken-stadt':'#d6487e', einstellungen:'#898781'};
-const PAGE_ORDER = ['start', 'raeume', 'chat', 'mensa', 'entdecken-studi', 'entdecken-stadt'];
-const PAGE_LABEL = {start:'Start', raeume:'Räume', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', einstellungen:'Einstellungen'};
+const PAGE_COLOR = {start:'#2a78d6', raeume:'#eb6834', chat:'#8a5cd1', mensa:'#1f9e6e', 'entdecken-studi':'#c99a06', 'entdecken-stadt':'#d6487e', hilfe:'#008300', einstellungen:'#898781'};
+const PAGE_ORDER = ['start', 'raeume', 'chat', 'mensa', 'entdecken-studi', 'entdecken-stadt', 'hilfe'];
+const PAGE_LABEL = {start:'Start', raeume:'Räume', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', hilfe:'Hilfe', einstellungen:'Einstellungen'};
 
 /* ---------- hypotheses ---------- */
 function pilotStart(){ const v = lsGet(PILOT_START_KEY); const t = v ? Date.parse(v + 'T00:00:00') : NaN; return isNaN(t) ? null : t; }
@@ -2029,7 +2029,7 @@ async function xlBuild(v){
   const SZ = xTable('Seitenzeiten', [
     ['sid', 'Sitzungs-ID', 37, null, 'Sitzung des Besuchs.'], ['art', 'Art', 7, null, 'Test oder Pilot.'],
     ['zeit', 'Verlassen um', 16, 'dt', 'Wann die Seite verlassen wurde.'], ['seite', 'Seite', 24, null, 'Genaue Seite, z. B. „Räume · Plan + Lageplan groß“.'],
-    ['bereich', 'Bereich', 14, null, 'Bereich der App: Start, Räume, Frag Campi, Mensa, Studileben, Stadtleben, Einstellungen.'],
+    ['bereich', 'Bereich', 14, null, 'Bereich der App: Start, Räume, Frag Campi, Mensa, Studileben, Stadtleben, Hilfe, Einstellungen.'],
     ['sek', 'Sekunden aktiv', 10, 'dec', 'Wie lange die Seite angezeigt wurde, während die App im Vordergrund war.'],
     ['scroll', 'Scrolltiefe (%)', 10, 'int', 'Wie weit nach unten gescrollt wurde, in Prozent der Seitenlänge.'],
     ['grund', 'Grund', 12, null, 'Warum die Seite verlassen wurde, z. B. Wechsel auf eine andere Seite.']
