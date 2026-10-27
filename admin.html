@@ -397,7 +397,8 @@ async function loadData(){
       fetchAll('ergebnisse?select=*&order=sitzung_id.asc'),
       fetchAll('antworten?select=*&order=erstellt.asc,id.asc'),
       api('fragen?select=*&order=position.asc,erstellt.asc'),
-      fetchAll('ereignisse?select=sitzung_id,erstellt,zeitpunkt,zeit_ms,typ,schritt,ansicht,daten&order=sitzung_id.asc,zeit_ms.asc,id.asc')
+      fetchAll('ereignisse?select=sitzung_id,erstellt,zeitpunkt,zeit_ms,typ,schritt,ansicht,daten,ip&order=sitzung_id.asc,zeit_ms.asc,id.asc')
+        .catch(() => fetchAll('ereignisse?select=sitzung_id,erstellt,zeitpunkt,zeit_ms,typ,schritt,ansicht,daten&order=sitzung_id.asc,zeit_ms.asc,id.asc'))
         .catch(() => fetchAll('ereignisse?select=sitzung_id,erstellt,zeit_ms,typ,schritt,ansicht,daten&order=sitzung_id.asc,zeit_ms.asc,id.asc')),
       opt(api('interviews?select=id')),   /* nur noch, um alte Interviews (Version 2) löschen zu können */
       opt(api('orte?select=*'))
@@ -688,16 +689,17 @@ function editorHTML(){
 }
 function viewData(v){
   const rows = v.sess.slice(0, 300);
-  let html = card('Export', 'Alles in einer Excel-Datei: Dashboard mit Diagrammen, Erklärung jeder Spalte und alle Daten (Teilnahmen, Antworten, Verhalten, Pilot). Gefiltert wie oben; die Pilotdaten sind immer vollständig.',
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="btn" type="button" data-a="xlsx-all"' + (S.xlBusy ? ' disabled' : '') + '>' + icon('down2') + (S.xlBusy ? 'Excel-Datei wird erstellt …' : 'Alles als Excel (mit Dashboard)') + '</button></div>' +
+  let html = card('Export', 'Zwei Excel-Dateien, beide mit Dashboard, Diagrammen und Erklärung jeder Spalte, gefiltert wie oben (die Pilotdaten sind immer vollständig). Standard: alle Datenarten bis Version 8 (Teilnahmen, Antworten, Seiten, Klicks, Suchen, Chat, Pilot). Erweitert: zusätzlich IP-Adressen, Tipp-Positionen mit Heatmaps, Scrollen, Eingabeverhalten und Technik (Ladezeiten, Netz, Akku, Fehler).',
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button class="btn" type="button" data-a="xlsx-all"' + (S.xlBusy ? ' disabled' : '') + '>' + icon('down2') + (S.xlBusy ? 'Excel-Datei wird erstellt …' : 'Excel: Standard') + '</button>' +
+    '<button class="btn" type="button" data-a="xlsx-ext"' + (S.xlBusy ? ' disabled' : '') + '>' + icon('down2') + (S.xlBusy ? 'Excel-Datei wird erstellt …' : 'Excel: erweitert (mit IP und mehr)') + '</button></div>' +
     '<p class="note" style="margin-bottom:8px">Einzelne CSV-Dateien, mit Semikolon getrennt:</p>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-2" type="button" data-a="csv-sess">' + icon('down2') + 'Teilnahmen mit Ergebnissen und Antworten</button>' +
     '<button class="btn btn-2" type="button" data-a="csv-ev">' + icon('down2') + 'Alle Ereignisse</button><button class="btn btn-2" type="button" data-a="csv-ans">' + icon('down2') + 'Alle Antworten</button></div>');
   html += viewDelete();
   html += '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Teilnahmen</h2><p class="sub">' + v.sess.length + ' Teilnahmen' + (v.sess.length > 300 ? ', die neuesten 300' : '') + '. Einzelne Teilnahmen (z. B. eigene Probeläufe) löschst du hier, mit dem Lösch-Kennwort.</p></div></div>' +
-    (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Zeit</th><th>Art</th><th>Gerät</th><th>System · Browser</th><th>Sprache</th><th>Gruppe</th><th>Semester</th><th>Fertig</th><th class="num">Dauer</th><th class="num">A1</th><th class="num">Vertrauen</th><th class="num">Ereignisse</th><th></th></tr></thead><tbody>' +
+    (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Zeit</th><th>Art</th><th>IP-Adresse</th><th>Gerät</th><th>System · Browser</th><th>Sprache</th><th>Gruppe</th><th>Semester</th><th>Fertig</th><th class="num">Dauer</th><th class="num">A1</th><th class="num">Vertrauen</th><th class="num">Ereignisse</th><th></th></tr></thead><tbody>' +
       rows.map(s => { const r = v.resBy[s.id]; const evn = (v.evBy[s.id] || []).length;
-        return '<tr><td>' + esc(dt(new Date(s._start).toISOString())) + '</td><td>' + (isPilot(s) ? 'Pilot' : 'Test') + '</td><td>' + esc(s.geraet || '') + '</td><td>' + esc((s.betriebssystem || '') + ' · ' + (s.browser || '')) + '</td><td>' + esc((s.sprache_app || '').toUpperCase()) + '</td><td>' + esc(s.gruppe || '') + '</td><td>' + esc(s.semester || '') + '</td>' +
+        return '<tr><td>' + esc(dt(new Date(s._start).toISOString())) + '</td><td>' + (isPilot(s) ? 'Pilot' : 'Test') + '</td><td><span class="code">' + esc(s.ip || '–') + '</span></td><td>' + esc(s.geraet || '') + '</td><td>' + esc((s.betriebssystem || '') + ' · ' + (s.browser || '')) + '</td><td>' + esc((s.sprache_app || '').toUpperCase()) + '</td><td>' + esc(s.gruppe || '') + '</td><td>' + esc(s.semester || '') + '</td>' +
           '<td>' + (r ? 'ja' : 'nein') + '</td><td class="num">' + (r ? dur(Number(r.dauer_sekunden)) : '–') + '</td><td class="num">' + (r ? (r.a1_ergebnis === 'gefunden' ? nf(Number(r.a1_sekunden)) + ' s' : 'aufgegeben') : '–') + '</td><td class="num">' + (r && r.a2_vertrauen !== null ? r.a2_vertrauen : '–') + '</td><td class="num">' + evn + '</td>' +
           '<td><div style="display:flex;gap:6px"><button class="btn btn-2 btn-sm" type="button" data-a="person" data-id="' + (isPilot(s) && s.pilot_id ? 'P:' + s.pilot_id : 'S:' + s.id) + '">Zeitleiste</button><button class="btn-danger" type="button" data-a="s-del" data-id="' + s.id + '">Löschen</button></div></td></tr>'; }).join('') +
       '</tbody></table></div>' : empty()) + '</section>';
@@ -736,7 +738,7 @@ function exportSessions(v){
   v.fragen.forEach(q => { qkey[q.id] = q.frage; qcols.push(q.frage); });
   v.ans.forEach(a => { const k = a.frage_id && qkey[a.frage_id] ? qkey[a.frage_id] : a.frage; if(!qcols.includes(k)) qcols.push(k); });
   const ans = {}; v.ans.forEach(a => { const k = a.frage_id && qkey[a.frage_id] ? qkey[a.frage_id] : a.frage; (ans[a.sitzung_id] = ans[a.sitzung_id] || {})[k] = a.wert; });
-  const scols = ['id','erstellt','version','modus','pilot_id','sprache_app','standort','standort_freigabe','installiert','gruppe','geraet','betriebssystem','browser','sprache','zeitzone','bildschirm','fenster','pixeldichte','touch','dunkelmodus','weniger_bewegung','verbindung','quelle','kampagne','referrer','semester','letzte_raumsuche','ladezeit_ms'];
+  const scols = ['id','erstellt','ip','version','modus','pilot_id','sprache_app','standort','standort_freigabe','installiert','gruppe','geraet','betriebssystem','browser','sprache','zeitzone','bildschirm','fenster','pixeldichte','touch','dunkelmodus','weniger_bewegung','verbindung','quelle','kampagne','referrer','semester','letzte_raumsuche','ladezeit_ms'];
   const rcols = ['abgeschlossen','a1_ergebnis','a1_sekunden','a1_tipps','a1_weg','a1_verstaendlich','a2_ergebnis','a2_sekunden','a2_fragen','a2_vertrauen','a2_lieber','a3_sekunden','a3_bereiche','dauer_sekunden','fragebogen_sekunden','ereignisse'];
   const rows = v.sess.map(s => { const r = v.resBy[s.id] || {}; const o = Object.assign({}, s, r, {abgeschlossen: v.resBy[s.id] ? 'ja' : 'nein', ereignisse: (v.evBy[s.id] || []).length}); qcols.forEach(q => o[q] = (ans[s.id] || {})[q]); return o; });
   download('campi-teilnahmen-' + new Date().toISOString().slice(0, 10) + '.csv', csv(rows, scols.concat(rcols, qcols)));
@@ -955,7 +957,13 @@ function exportPilot(){
 const EV_LABEL = {ansicht:'Seite geöffnet', ansicht_ende:'Seite verlassen', klick:'Klick', leer_klick:'Klick ins Leere', frust_klick:'Frust-Klick', suche:'Suche', chat_frage:'Frage an Campi', chat_antwort:'Antwort von Campi',
   aufgabe:'Aufgabe', schritt:'Schritt', sprache:'Sprache gewechselt', standort_gewechselt:'Campus gewechselt', standort:'Echter Standort', standort_status:'Standortfreigabe', standort_anfrage:'Standort angefragt', standort_erhalten:'Standort erhalten',
   ziel_erreicht:'Ziel erreicht', verlassen:'App verlassen', zurueck:'Zurück in der App', app_geoeffnet:'App geöffnet', installation:'Installation', karte:'Karte', raum_gewaehlt:'Raum gewählt', einwilligung:'Einwilligung',
-  fragebogen:'Fragebogen', abgeschlossen:'Test abgeschlossen', abbruch:'Abbruch', fehler:'Fehler', fenster:'Fenstergröße', pilot_beigetreten:'Pilot beigetreten', pilot_beendet:'Pilot beendet', live_automatisch:'Live-Karte automatisch', danach:'Danach frei umgesehen'};
+  fragebogen:'Fragebogen', abgeschlossen:'Test abgeschlossen', abbruch:'Abbruch', fehler:'Fehler', fenster:'Fenstergröße', pilot_beigetreten:'Pilot beigetreten', pilot_beendet:'Pilot beendet', live_automatisch:'Live-Karte automatisch', danach:'Danach frei umgesehen',
+  scrollen:'Gescrollt', eingabe:'Eingabe', technik:'Technik des Geräts', akku:'Akku', netz:'Netzverbindung', ausrichtung:'Bildschirm gedreht'};
+/* neu in Version 9 (erweiterte Erhebung): nur im erweiterten Excel-Export ausgewertet */
+const EV_EXT = new Set(['scrollen', 'eingabe', 'technik', 'akku', 'netz', 'ausrichtung']);
+const EV_EXT_KEYS = ['x_px', 'y_px', 'app_b', 'app_h', 'zeiger', 'druck_ms', 'scroll_y', 'scroll_px', 'scroll_anzahl', 'erstes_scrollen_ms', 'richtungswechsel', 'art'];
+const INPUT_FIELD = {frage_start: 'Frage auf der Startseite', frage_chat: 'Frage im Chat', raumsuche: 'Raumsuche', fragebogen: 'Freitext im Fragebogen', vorschlag: 'Vorschlag angetippt'};
+const INPUT_RES = {abgeschickt: 'abgeschickt', abgebrochen: 'abgebrochen', geleert: 'wieder gelöscht', verlassen: 'Feld verlassen', leer: 'leer'};
 function evDetail(e){
   const x = e.daten || {};
   switch(e.typ){
@@ -973,6 +981,12 @@ function evDetail(e){
     case 'raum_gewaehlt': return (ESS.rooms[x.raum] || x.raum) + ' über ' + (x.ueber || '');
     case 'schritt': return (STEP_LABEL[x.von] || x.von) + ' → ' + (STEP_LABEL[x.nach] || x.nach);
     case 'zurueck': return 'nach ' + secTxt(x.weg_ms);
+    case 'scrollen': return (x.richtung === 'hoch' ? 'nach oben' : 'nach unten') + ' · ' + (x.strecke_px || 0) + ' px in ' + secTxt(x.dauer_ms) + ' · Tiefe ' + (x.tiefe_prozent ?? '–') + ' %';
+    case 'eingabe': return (INPUT_FIELD[x.feld] || x.feld || '') + ' · ' + (INPUT_RES[x.ergebnis] || x.ergebnis || '') + ' · ' + (x.tasten || 0) + ' Tasten, ' + (x.loeschungen || 0) + ' Korrekturen' + (x.eingefuegt ? ', ' + x.eingefuegt + '× eingefügt' : '') + (x.dauer_ms !== undefined ? ' · ' + secTxt(x.dauer_ms) : '') + (x.text ? ' · „' + x.text + '“' : '');
+    case 'technik': return [x.erstes_bild_ms !== undefined ? 'erstes Bild nach ' + x.erstes_bild_ms + ' ms' : '', x.netz ? 'Netz ' + x.netz : '', x.downlink_mbit ? x.downlink_mbit + ' Mbit/s' : '', x.speicher_gb ? x.speicher_gb + ' GB RAM' : '', x.kerne ? x.kerne + ' Kerne' : '', x.ausrichtung || ''].filter(Boolean).join(' · ');
+    case 'akku': return (x.stand_prozent ?? '–') + ' %' + (x.laedt ? ' · lädt' : '');
+    case 'netz': return (x.online === false ? 'offline' : 'online') + (x.netz ? ' · ' + x.netz : '');
+    case 'ausrichtung': return /landscape/.test(x.typ || '') ? 'Querformat' : 'Hochformat';
   }
   return Object.keys(x).map(k => k + ': ' + (typeof x[k] === 'object' ? JSON.stringify(x[k]) : x[k])).join(' · ');
 }
@@ -1014,12 +1028,13 @@ function viewPersons(v){
   const m = p.meta;
   const pageRows = PAGE_ORDER.concat(Object.keys(p.pages).filter(k => !PAGE_ORDER.includes(k))).filter(k => p.pages[k]).map(k => ({label: PAGE_LABEL[k] || k, value: p.pages[k] / 1000}));
   let html = '<section class="card"><div class="card-head"><div style="flex:1;min-width:240px">' + sel + '</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-2 btn-sm" type="button" data-a="csv-person">' + icon('down2') + 'Ereignisse dieser Person als CSV</button><button class="btn-danger" type="button" data-a="p-del" data-id="' + esc(p.key) + '">' + (p.pilot ? 'Alle Daten dieser Person löschen' : 'Diese Teilnahme löschen') + '</button></div></div>' +
-    '<div class="mini"><div><b>' + (p.pilot ? 'Pilot' : 'App-Test') + '</b><span>' + esc(p.key.slice(2, 10)) + '</span></div><div><b>' + p.sessions.length + '</b><span>' + (p.pilot ? 'Öffnungen (Sitzungen)' : 'Sitzung') + '</span></div><div><b>' + secTxt(p.active) + '</b><span>aktive Zeit in der App</span></div><div><b>' + p.clicks + '</b><span>Klicks</span></div><div><b>' + esc((m.geraet || '–') + ' · ' + (m.betriebssystem || '')) + '</b><span>' + esc((m.browser || '') + ' · ' + (LANG_NAME[m.sprache_app] || m.sprache || '')) + '</span></div><div><b>' + esc(CAMPUS_NAME[m.standort] || '–') + '</b><span>Campus' + (m.standort_freigabe ? ' · Standort freigegeben' : '') + '</span></div></div>' +
+    '<div class="mini"><div><b>' + (p.pilot ? 'Pilot' : 'App-Test') + '</b><span>' + esc(p.key.slice(2, 10)) + '</span></div><div><b>' + p.sessions.length + '</b><span>' + (p.pilot ? 'Öffnungen (Sitzungen)' : 'Sitzung') + '</span></div><div><b>' + secTxt(p.active) + '</b><span>aktive Zeit in der App</span></div><div><b>' + p.clicks + '</b><span>Klicks</span></div><div><b>' + esc((m.geraet || '–') + ' · ' + (m.betriebssystem || '')) + '</b><span>' + esc((m.browser || '') + ' · ' + (LANG_NAME[m.sprache_app] || m.sprache || '')) + '</span></div><div><b>' + esc(CAMPUS_NAME[m.standort] || '–') + '</b><span>Campus' + (m.standort_freigabe ? ' · Standort freigegeben' : '') + '</span></div>' +
+    (() => { const ips = Array.from(new Set(p.sessions.map(s => s.ip).filter(Boolean))); return '<div><b class="code">' + esc(ips[0] || '–') + '</b><span>' + (ips.length > 1 ? 'IP-Adresse, dazu ' + (ips.length - 1) + ' weitere' : 'IP-Adresse') + '</span></div>'; })() + '</div>' +
     '<div class="grid g2"><div><h3>Zeit pro Seite</h3>' + bars(pageRows, {fmt: x => secTxt(x * 1000), empty:'Keine Seitenzeiten.'}) + '</div><div><h3>Ablauf der Seiten je Sitzung</h3>' + legendPages() +
     p.sessions.map((s, i) => '<div class="strip-row"><span>' + esc(dShort(s._start) + ' ' + hms(s._start).slice(0, 5)) + '</span>' + stripHTML(s, v.evBy[s.id] || []) + '</div>').join('') + '</div></div></section>';
   html += '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Zeitleiste: was wann angeklickt wurde</h2><p class="sub">Uhrzeit auf dem Gerät · Zeit seit Beginn der Sitzung · Ereignis · Details</p></div>' +
     '<label class="check"><input type="checkbox" data-a-change="tl-all"' + (S.tlAll ? ' checked' : '') + '>Auch technische Ereignisse zeigen</label></div>';
-  const hide = new Set(['fenster', 'standort_anfrage', 'standort_erhalten', 'schritt']);
+  const hide = new Set(['fenster', 'standort_anfrage', 'standort_erhalten', 'schritt', 'scrollen', 'technik', 'akku', 'netz', 'ausrichtung']);
   p.sessions.forEach((s, i) => {
     const evs = (v.evBy[s.id] || []).filter(e => S.tlAll || !hide.has(e.typ));
     html += '<h3 class="tl-head">' + (p.pilot ? 'Öffnung ' + (i + 1) : 'Sitzung') + ' · ' + esc(new Date(s._start).toLocaleString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'})) + (s.installiert ? ' · vom Home-Bildschirm' : '') + '</h3>' +
@@ -1406,7 +1421,8 @@ function extClick(a, b){
     case 'csv-person': exportPerson(view()); return true;
     case 'csv-matrix': exportMatrix(view()); return true;
     case 'csv-pilot': exportPilot(); return true;
-    case 'xlsx-all': exportXlsx(); return true;
+    case 'xlsx-all': exportXlsx(false); return true;
+    case 'xlsx-ext': exportXlsx(true); return true;
     case 'copy': try { navigator.clipboard.writeText(b.dataset.text); S.notice = 'Link kopiert.'; } catch(x){ S.notice = 'Bitte den Link markieren und kopieren.'; } render(); return true;
     case 'orte-campus': MAPZ.campus = id; MAPZ.center = ESS.campus[id].center.slice(); MAPZ.z = 17; MAPZ.pan = [0, 0]; render(); return true;
     case 'am-zoom': MAPZ.z = Math.max(14, Math.min(19, MAPZ.z + Number(id))); { const v = $('am-view'); if(v) v.innerHTML = amapInner(); } return true;
@@ -1532,6 +1548,8 @@ const XLW = (() => {
     out.push('</sheetData>');
     if(sh.filter) out.push('<autoFilter ref="' + sh.filter + '"/>');
     if(sh.merges && sh.merges.length) out.push('<mergeCells count="' + sh.merges.length + '">' + sh.merges.map(m => '<mergeCell ref="' + m + '"/>').join('') + '</mergeCells>');
+    /* heat maps: color scale from light (few) to blue (many) */
+    (sh.scales || []).forEach((ref, i) => out.push('<conditionalFormatting sqref="' + ref + '"><cfRule type="colorScale" priority="' + (i + 1) + '"><colorScale><cfvo type="num" val="0"/><cfvo type="max"/><color rgb="FFF4F6FA"/><color rgb="FF2A78D6"/></colorScale></cfRule></conditionalFormatting>'));
     out.push('<pageMargins left="0.5" right="0.5" top="0.6" bottom="0.6" header="0.3" footer="0.3"/>');
     if(sh.fit) out.push('<pageSetup paperSize="9" orientation="' + (sh.fit === 'portrait' ? 'portrait' : 'landscape') + '" fitToWidth="1" fitToHeight="0"/>');
     if(sh.charts && sh.charts.length) out.push('<drawing r:id="rId1"/>');
@@ -1852,7 +1870,13 @@ const XL_EV_EXPL = {
   pilot_beigetreten: 'Gerät ist der Pilotphase beigetreten.',
   pilot_beendet: 'Teilnahme an der Pilotphase beendet.',
   live_automatisch: 'Die Live-Karte wurde automatisch geöffnet, weil der Standort freigegeben war.',
-  danach: 'Nach dem App-Test hat sich die Person freiwillig weiter umgesehen.'
+  danach: 'Nach dem App-Test hat sich die Person freiwillig weiter umgesehen.',
+  scrollen: 'Nur erweiterter Export: eine Scroll-Bewegung mit Start- und Endposition, Strecke, Richtung, Dauer und erreichter Tiefe.',
+  eingabe: 'Nur erweiterter Export: Tippverhalten in einem Eingabefeld vom Antippen bis zum Absenden oder Verlassen: Dauer, Tasten, Korrekturen, Einfügen, Ergebnis; bei abgebrochenen Fragen der Text.',
+  technik: 'Nur erweiterter Export: technische Angaben einmal pro Sitzung (Ladezeiten, Netz, Speicher, Prozessorkerne, Ausrichtung, Sprachen).',
+  akku: 'Nur erweiterter Export: Akkustand und ob geladen wird (nur Browser, die es verraten, z. B. Chrome auf Android).',
+  netz: 'Nur erweiterter Export: Die Internetverbindung ist weggefallen, zurückgekommen oder hat sich geändert.',
+  ausrichtung: 'Nur erweiterter Export: Das Gerät wurde zwischen Hoch- und Querformat gedreht.'
 };
 const XL_GEO = {ok: 'erlaubt', denied: 'abgelehnt', na: 'nicht verfügbar', error: 'Fehler', wait: 'angefragt', off: 'ausgeschaltet'};
 function xlDetail(e){
@@ -1862,7 +1886,8 @@ function xlDetail(e){
 const xlArea = k => { const b = pageBase(k); return b ? (PAGE_LABEL[b] || b) : null; };
 
 /* ================= build the workbook ================= */
-async function xlBuild(v){
+async function xlBuild(v, ext){
+  ext = !!ext;
   const d = S.data, now = Date.now();
   const sessById = {}; d.sitzungen.forEach(s => sessById[s.id] = s);
   const artOf = sid => { const s = sessById[sid]; return s && isPilot(s) ? 'Pilot' : 'Test'; };
@@ -1887,7 +1912,12 @@ async function xlBuild(v){
     const opened = new Set(evs.filter(e => e.typ === 'ansicht' && e.daten && e.daten.ansicht).map(e => pageBase(e.daten.ansicht)));
     fact[s.id] = {a1s: has(1, 'start'), a1e: has(1, 'ende'), a2e: has(2, 'ende'), a3e: has(3, 'ende'), last: last || 'Einwilligung', opened,
       klicks: evs.filter(e => e.typ === 'klick').length, aktiv: evs.filter(e => e.typ === 'ansicht_ende' && e.daten).reduce((x, e) => x + (Number(e.daten.dauer_ms) || 0), 0) / 1000,
-      weg: evs.some(e => e.typ === 'verlassen'), ev: evs.length, ans: {}, h2a: null, ersetzt: null};
+      weg: evs.some(e => e.typ === 'verlassen'), ev: (ext ? evs : evs.filter(e => !EV_EXT.has(e.typ))).length, ans: {}, h2a: null, ersetzt: null};
+    if(ext){ const F = fact[s.id], tech = evs.find(e => e.typ === 'technik'), akku = evs.find(e => e.typ === 'akku'), inp = evs.filter(e => e.typ === 'eingabe' && e.daten && e.daten.feld !== 'vorschlag');
+      Object.assign(F, {tech: (tech && tech.daten) || {}, akku: akku && akku.daten, scrollN: evs.filter(e => e.typ === 'scrollen').length,
+        scrollPx: evs.filter(e => e.typ === 'scrollen' && e.daten).reduce((x, e) => x + (Number(e.daten.strecke_px) || 0), 0),
+        inpN: inp.length, inpAb: inp.filter(e => e.daten.ergebnis === 'abgebrochen' || e.daten.ergebnis === 'geleert').length, korr: inp.reduce((x, e) => x + (Number(e.daten.loeschungen) || 0), 0),
+        fehler: evs.filter(e => e.typ === 'fehler').length, drehen: evs.filter(e => e.typ === 'ausrichtung').length, offline: evs.filter(e => e.typ === 'netz' && e.daten && e.daten.online === false).length}); }
   });
   const qErs = qList.find(e => e.key === 'ersetzt' && !e.orphan);
   v.ans.forEach(a => { const f = fact[a.sitzung_id]; if(!f) return; const e = qOf(a); if(!e) return;
@@ -1962,6 +1992,31 @@ async function xlBuild(v){
     ['h2a_ja', 'H2a Zustimmung', 9, 'int', '1, wenn bei einer H2a-Frage eine Antwort gewählt wurde, die als Zustimmung zählt (würde Campi installieren). 0 = beantwortet, aber keine Zustimmung.'],
     ['ersetzt', 'Nennt ersetzte App', 9, 'int', '1, wenn bei der Frage mit dem Schlüssel „ersetzt“ mindestens eine App oder Website genannt wurde, 0 bei „Nichts“ oder „Keine“, leer ohne Antwort.']
   ]), 'Eine Zeile pro Sitzung im Filter: Gerät, Herkunft, Angaben zu Beginn, Ergebnisse der drei Aufgaben, Hilfsspalten (1 oder 0) für Hypothesen und Diagramme und rechts die Antworten des Fragebogens (Spalten F1, F2 …).');
+  if(ext) [
+    ['ip', 'IP-Adresse', 16, null, 'IP-Adresse, von der die Sitzung an die Datenbank gesendet wurde. Setzt die Datenbank selbst. Leer bei Sitzungen von vor Version 9.'],
+    ['x_ttfb', 'Server-Antwort (ms)', 10, 'int', 'Millisekunden, bis die erste Antwort des Servers ankam (Time to First Byte).'],
+    ['x_fcp', 'Erstes Bild (ms)', 10, 'int', 'Millisekunden, bis der Browser zum ersten Mal etwas gezeichnet hat (First Contentful Paint).'],
+    ['x_dom', 'Seite bereit (ms)', 10, 'int', 'Millisekunden, bis die Seite fertig geladen war (DOMContentLoaded).'],
+    ['x_kb', 'Übertragen (KB)', 9, 'int', 'Übertragene Datenmenge beim Laden in Kilobyte. 0 = aus dem Zwischenspeicher.'],
+    ['x_netz', 'Netz (Qualität)', 9, null, 'Vom Browser geschätzte Netzqualität: slow-2g, 2g, 3g oder 4g (4g = schnell, auch bei WLAN).'],
+    ['x_down', 'Downlink (Mbit/s)', 9, 'dec', 'Vom Browser geschätzte Bandbreite.'],
+    ['x_rtt', 'Latenz (ms)', 9, 'int', 'Vom Browser geschätzte Antwortzeit des Netzes.'],
+    ['x_spar', 'Datensparmodus', 9, null, '„ja“, wenn der Datensparmodus eingeschaltet ist.'],
+    ['x_ram', 'Arbeitsspeicher (GB)', 9, 'dec', 'Ungefährer Arbeitsspeicher des Geräts (nur manche Browser, höchstens 8).'],
+    ['x_kerne', 'Prozessorkerne', 9, 'int', 'Anzahl der Prozessorkerne.'],
+    ['x_ausr', 'Ausrichtung', 11, null, 'Hoch- oder Querformat zu Beginn.'],
+    ['x_spr', 'Browsersprachen', 16, null, 'Alle eingestellten Sprachen des Browsers in ihrer Reihenfolge.'],
+    ['x_akku', 'Akku (%)', 8, 'int', 'Akkustand zu Beginn der Sitzung (nur Browser, die es verraten).'],
+    ['x_laedt', 'Lädt', 7, null, '„ja“, wenn das Gerät zu Beginn geladen wurde.'],
+    ['x_scrollN', 'Scroll-Bewegungen', 9, 'int', 'Anzahl der Scroll-Bewegungen in der Sitzung.'],
+    ['x_scrollPx', 'Scrollstrecke (px)', 10, 'int', 'Gesamte gescrollte Strecke in Pixeln.'],
+    ['x_inpN', 'Eingaben', 8, 'int', 'Anzahl der Eingaben in Textfelder (Chat, Raumsuche, Fragebogen).'],
+    ['x_inpAb', 'Abgebrochene Eingaben', 10, 'int', 'Eingaben, die angefangen, aber nicht abgeschickt oder wieder gelöscht wurden.'],
+    ['x_korr', 'Korrekturen', 9, 'int', 'Summe der Lösch-Tasten in allen Eingaben.'],
+    ['x_fehler', 'Technische Fehler', 9, 'int', 'Anzahl der Fehler-Ereignisse in der Sitzung.'],
+    ['x_offline', 'Offline-Momente', 9, 'int', 'Wie oft die Internetverbindung während der Sitzung weg war.'],
+    ['x_dreh', 'Gedreht', 8, 'int', 'Wie oft das Gerät zwischen Hoch- und Querformat gedreht wurde.']
+  ].forEach(c => T.push(c));
   qList.forEach(e => T.push(['q' + e.no, 'F' + e.no + ' · ' + xlShort(e.frage, 70), e.typ === 'text' ? 30 : 18, e.typ === 'skala' ? 'int' : null, 'Antwort auf Frage F' + e.no + ' (' + TYP[e.typ] + '): ' + e.frage]));
   sess.forEach(s => {
     const r = v.resBy[s.id], f = fact[s.id], rn = T.data.length + 2, art = isPilot(s) ? 'Pilot' : 'Test';
@@ -1973,6 +2028,12 @@ async function xlBuild(v){
       abg: xlJN(r), f_a1s: f.a1s, f_a1e: f.a1e, f_a2e: f.a2e, f_a3e: f.a3e, letzter: !r && art === 'Test' ? f.last : null,
       ev: f.ev, klicks: f.klicks, aktiv: Math.round(f.aktiv * 10) / 10, weg: xlJN(f.weg),
       h2a_ant: f.h2a === null ? null : 1, h2a_ja: f.h2a === null ? null : (f.h2a ? 1 : 0), ersetzt: f.ersetzt};
+    if(ext){ const x = f.tech || {};
+      Object.assign(o, {ip: s.ip || null, x_ttfb: xlNum(x.ttfb_ms), x_fcp: xlNum(x.erstes_bild_ms), x_dom: xlNum(x.dom_fertig_ms), x_kb: xlNum(x.uebertragen_kb), x_netz: x.netz || null,
+        x_down: xlNum(x.downlink_mbit), x_rtt: xlNum(x.rtt_ms), x_spar: x.datensparen === undefined || x.datensparen === null ? null : xlJN(x.datensparen), x_ram: xlNum(x.speicher_gb), x_kerne: xlNum(x.kerne),
+        x_ausr: x.ausrichtung ? (/landscape/.test(x.ausrichtung) ? 'Querformat' : 'Hochformat') : null, x_spr: x.sprachen || null,
+        x_akku: f.akku ? xlNum(f.akku.stand_prozent) : null, x_laedt: f.akku ? xlJN(f.akku.laedt) : null,
+        x_scrollN: f.scrollN, x_scrollPx: Math.round(f.scrollPx), x_inpN: f.inpN, x_inpAb: f.inpAb, x_korr: f.korr, x_fehler: f.fehler, x_offline: f.offline, x_dreh: f.drehen}); }
     AREAS.forEach(k => o['o_' + k] = f.opened.has(k) ? 1 : 0);
     if(r){
       Object.assign(o, {a1erg: r.a1_ergebnis, a1sek: xlNum(r.a1_sekunden), a1tipps: xlNum(r.a1_tipps), a1weg: r.a1_weg, a1verst: xlNum(r.a1_verstaendlich),
@@ -2026,6 +2087,7 @@ async function xlBuild(v){
     ['details', 'Details', 50, null, 'Die wichtigsten Angaben zum Ereignis in Worten.'],
     ['daten', 'Rohdaten', 60, null, 'Alle aufgezeichneten Angaben im JSON-Format.']
   ], 'Alles, was in der App passiert ist, in zeitlicher Reihenfolge: eine Zeile pro Ereignis. Die Ereignis-Typen sind im Blatt „Erklärung“ beschrieben.');
+  if(ext) E.push(['ip', 'IP-Adresse', 16, null, 'IP-Adresse, von der das Ereignis gesendet wurde (Ereignisse werden in Paketen gesendet; alle eines Pakets haben dieselbe).']);
   const SZ = xTable('Seitenzeiten', [
     ['sid', 'Sitzungs-ID', 37, null, 'Sitzung des Besuchs.'], ['art', 'Art', 7, null, 'Test oder Pilot.'],
     ['zeit', 'Verlassen um', 16, 'dt', 'Wann die Seite verlassen wurde.'], ['seite', 'Seite', 24, null, 'Genaue Seite, z. B. „Räume · Plan + Lageplan groß“.'],
@@ -2034,6 +2096,8 @@ async function xlBuild(v){
     ['scroll', 'Scrolltiefe (%)', 10, 'int', 'Wie weit nach unten gescrollt wurde, in Prozent der Seitenlänge.'],
     ['grund', 'Grund', 12, null, 'Warum die Seite verlassen wurde, z. B. Wechsel auf eine andere Seite.']
   ], 'Eine Zeile pro Besuch einer Seite: wie lange sie aktiv angezeigt wurde und wie weit gescrollt wurde.');
+  if(ext) [['spx', 'Scrollstrecke (px)', 10, 'int', 'Gesamte gescrollte Strecke auf der Seite in Pixeln (hoch und runter).'], ['sn', 'Scroll-Bewegungen', 9, 'int', 'Anzahl der Scroll-Bewegungen auf der Seite.'],
+    ['sfirst', 'Erstes Scrollen nach (s)', 10, 'dec', 'Sekunden vom Öffnen der Seite bis zum ersten Scrollen. Leer = nicht gescrollt.'], ['sturn', 'Richtungswechsel', 9, 'int', 'Wie oft zwischen hoch und runter gewechselt wurde. Viele Wechsel können Suchen bedeuten.']].forEach(c => SZ.push(c));
   const K = xTable('Klicks', [
     ['sid', 'Sitzungs-ID', 37, null, 'Sitzung des Klicks.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitpunkt des Klicks.'],
     ['klickart', 'Klickart', 13, null, '„Klick“ = auf etwas Bedienbares, „Klick ins Leere“ = auf etwas, das nichts tut, „Frust-Klick“ = drei schnelle Klicks auf dieselbe Stelle.'],
@@ -2042,6 +2106,11 @@ async function xlBuild(v){
     ['seite', 'Seite', 22, null, 'Seite, auf der geklickt wurde.'], ['bereich', 'Bereich', 14, null, 'Bereich der App, in dem geklickt wurde.'],
     ['msv', 'Sek. auf der Seite davor', 10, 'dec', 'Wie lange die Seite schon offen war, bevor geklickt wurde.']
   ], 'Alle Klicks, Klicks ins Leere und Frust-Klicks mit Ziel und Seite.');
+  if(ext){ [['x', 'Position x (%)', 9, 'int', 'Waagerechte Position des Tipps in Prozent der App-Breite (0 = links, 100 = rechts).'], ['y', 'Position y (%)', 9, 'int', 'Senkrechte Position in Prozent der sichtbaren App-Höhe (0 = oben, 100 = unten).'],
+    ['xpx', 'x (px)', 8, 'int', 'Waagerechte Position in Pixeln ab dem linken Rand der App.'], ['ypx', 'y (px)', 8, 'int', 'Senkrechte Position in Pixeln ab dem oberen Rand der App.'],
+    ['ab', 'App-Breite (px)', 9, 'int', 'Breite der App auf dem Bildschirm.'], ['ah', 'App-Höhe (px)', 9, 'int', 'Höhe der App auf dem Bildschirm.'],
+    ['zeiger', 'Eingabeart', 10, null, 'Womit getippt wurde: Finger (touch), Maus (mouse) oder Stift (pen).'], ['druck', 'Druckdauer (ms)', 9, 'int', 'Millisekunden zwischen Aufsetzen und Loslassen.'],
+    ['sy', 'Gescrollt (px)', 9, 'int', 'Wie weit die Seite beim Tippen schon nach unten gescrollt war.'], ['zx', 'Zelle x', 7, 'int', 'Für die Heatmap: Spalte 1 bis 10 (je 10 % der Breite).'], ['zy', 'Zelle y', 7, 'int', 'Für die Heatmap: Zeile 1 bis 10 (je 10 % der Höhe).']].forEach(c => K.push(c)); }
   const R = xTable('Raumsuche', [
     ['sid', 'Sitzungs-ID', 37, null, 'Sitzung der Suche.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitpunkt der Suche.'],
     ['begriff', 'Suchbegriff', 28, null, 'Eingegebener Text, klein geschrieben (höchstens 100 Zeichen).'], ['treffer', 'Treffer', 8, 'int', 'Anzahl der gefundenen Räume oder Orte.'],
@@ -2056,17 +2125,53 @@ async function xlBuild(v){
     ['qz', 'Quelle angezeigt', 9, null, '„ja“, wenn unter der Antwort eine Quelle angezeigt wurde.'],
     ['sprache', 'Antwortsprache', 12, null, 'In welcher Sprache Campi geantwortet hat (erkannte Sprache der Frage).']
   ], 'Alle Fragen an Campi mit dem Thema der Antwort.');
-  const evs = v.ev.filter(e => e.sitzung_id in order).sort((a, b) => (order[a.sitzung_id] - order[b.sitzung_id]) || ((Number(a.zeit_ms) || 0) - (Number(b.zeit_ms) || 0)));
+  const SC = xTable('Scrollen', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Ende der Scroll-Bewegung.'],
+    ['seite', 'Seite', 22, null, 'Seite, auf der gescrollt wurde.'], ['bereich', 'Bereich', 14, null, 'Bereich der App.'], ['richtung', 'Richtung', 9, null, '„runter“ oder „hoch“ (überwiegende Richtung der Bewegung).'],
+    ['von', 'Von (px)', 8, 'int', 'Scrollposition zu Beginn in Pixeln ab oben.'], ['bis', 'Bis (px)', 8, 'int', 'Scrollposition am Ende.'], ['strecke', 'Strecke (px)', 9, 'int', 'Gescrollte Strecke in Pixeln (hoch und runter zusammen).'],
+    ['dauer', 'Dauer (ms)', 9, 'int', 'Dauer der Bewegung in Millisekunden.'], ['tiefe', 'Tiefe (%)', 8, 'int', 'Wie weit die Seite danach sichtbar war, in Prozent ihrer Länge (100 = bis ganz unten).'], ['nr', 'Nr. auf der Seite', 8, 'int', 'Die wievielte Scroll-Bewegung auf dieser Seite.']
+  ], 'Nur erweiterter Export: eine Zeile pro Scroll-Bewegung (höchstens 80 pro Seitenbesuch).');
+  const EG = xTable('Eingaben', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Ende der Eingabe (abgeschickt oder Feld verlassen).'],
+    ['feld', 'Feld', 20, null, 'Frage auf der Startseite, Frage im Chat, Raumsuche, Freitext im Fragebogen oder angetippter Vorschlag.'],
+    ['ergebnis', 'Ergebnis', 13, null, '„abgeschickt“, „abgebrochen“ (Text stehen gelassen, nicht abgeschickt), „wieder gelöscht“, „Feld verlassen“ (Raumsuche, Fragebogen).'],
+    ['sek', 'Dauer (s)', 8, 'dec', 'Sekunden vom Antippen des Felds bis zum Absenden oder Verlassen.'], ['erste', 'Bis zur ersten Taste (s)', 10, 'dec', 'Sekunden vom Antippen bis zur ersten Taste: Zeit zum Nachdenken.'],
+    ['tasten', 'Tasten', 7, 'int', 'Anzahl der getippten Zeichen und Lösch-Tasten (welche Tasten, wird nicht gespeichert).'], ['korr', 'Korrekturen', 9, 'int', 'Anzahl der Lösch-Tasten.'],
+    ['paste', 'Eingefügt', 8, 'int', 'Wie oft Text eingefügt wurde.'], ['laenge', 'Länge am Ende', 9, 'int', 'Zeichen im Feld am Ende.'], ['maxl', 'Längste Länge', 9, 'int', 'Größte Zeichenzahl während der Eingabe.'],
+    ['pausen', 'Pausen über 2 s', 9, 'int', 'Wie oft beim Tippen länger als 2 Sekunden pausiert wurde.'], ['tpm', 'Tasten pro Minute', 9, 'int', 'Tippgeschwindigkeit ab der ersten Taste.'],
+    ['text', 'Abgebrochener Text', 40, null, 'Nur bei abgebrochenen Fragen: der Text, der stehen blieb (ohne den in der App eingetragenen Namen). Abgeschickte Fragen stehen im Blatt „KI-Fragen“.'],
+    ['seite', 'Seite', 20, null, 'Seite der Eingabe.']
+  ], 'Nur erweiterter Export: eine Zeile pro Eingabe in ein Textfeld, vom Antippen bis zum Absenden oder Verlassen.');
+  const TE = xTable('Technik', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitpunkt.'],
+    ['was', 'Was', 18, null, 'Technik des Geräts (einmal pro Sitzung), Akku, Netzverbindung, Bildschirm gedreht oder Fehler.'], ['details', 'Details', 50, null, 'Die Angaben in Worten.'],
+    ['akku', 'Akku (%)', 8, 'int', 'Akkustand.'], ['online', 'Online', 7, null, '„nein“, wenn die Verbindung weg war.'], ['netz', 'Netz', 8, null, 'Netzqualität laut Browser.'],
+    ['fcp', 'Erstes Bild (ms)', 9, 'int', 'Bei „Technik des Geräts“: Millisekunden bis zum ersten gezeichneten Bild.'], ['meldung', 'Fehlermeldung', 40, null, 'Bei Fehlern: die Meldung des Browsers.'],
+    ['ip', 'IP-Adresse', 16, null, 'IP-Adresse beim Senden.']
+  ], 'Nur erweiterter Export: technische Angaben und Ereignisse (Ladezeiten, Netz, Akku, Ausrichtung, Fehler).');
+  const evs = v.ev.filter(e => e.sitzung_id in order && (ext || !EV_EXT.has(e.typ))).sort((a, b) => (order[a.sitzung_id] - order[b.sitzung_id]) || ((Number(a.zeit_ms) || 0) - (Number(b.zeit_ms) || 0)));
   const lastQ = {};
   evs.forEach(e => {
     const s = sessById[e.sitzung_id], x = e.daten || {}, art = artOf(e.sitzung_id), t = evTime(e, s);
-    let raw = ''; try { raw = e.daten ? JSON.stringify(e.daten) : ''; } catch(z){}
+    let raw = ''; try { const dd = e.daten && !ext ? Object.fromEntries(Object.entries(e.daten).filter(([kk]) => !EV_EXT_KEYS.includes(kk))) : e.daten; raw = dd ? JSON.stringify(dd) : ''; } catch(z){}
     E.add({sid: e.sitzung_id, art, zeit: t, sek: Math.round((Number(e.zeit_ms) || 0) / 100) / 10, label: EV_LABEL[e.typ] || e.typ, typ: e.typ, schritt: e.schritt ? (STEP_LABEL[e.schritt] || e.schritt) : null,
-      seite: e.ansicht ? pageName(e.ansicht) : null, details: xlDetail(e), daten: xlShort(raw, 3000)});
-    if(e.typ === 'ansicht_ende' && x.ansicht) SZ.add({sid: e.sitzung_id, art, zeit: t, seite: pageName(x.ansicht), bereich: xlArea(x.ansicht), sek: Math.round((Number(x.dauer_ms) || 0) / 100) / 10, scroll: xlNum(x.scrolltiefe), grund: x.grund});
+      seite: e.ansicht ? pageName(e.ansicht) : null, details: xlDetail(e), daten: xlShort(raw, 3000), ip: ext ? (e.ip || null) : undefined});
+    if(e.typ === 'ansicht_ende' && x.ansicht) SZ.add({sid: e.sitzung_id, art, zeit: t, seite: pageName(x.ansicht), bereich: xlArea(x.ansicht), sek: Math.round((Number(x.dauer_ms) || 0) / 100) / 10, scroll: xlNum(x.scrolltiefe), grund: x.grund,
+      spx: ext ? xlNum(x.scroll_px) : null, sn: ext ? xlNum(x.scroll_anzahl) : null, sfirst: ext && xlNum(x.erstes_scrollen_ms) !== null ? Math.round(x.erstes_scrollen_ms / 100) / 10 : null, sturn: ext ? xlNum(x.richtungswechsel) : null});
     if(e.typ === 'klick' || e.typ === 'leer_klick' || e.typ === 'frust_klick')
       K.add({sid: e.sitzung_id, art, zeit: t, klickart: {klick: 'Klick', leer_klick: 'Klick ins Leere', frust_klick: 'Frust-Klick'}[e.typ], ziel: xlShort(x.text || x.aktion || x.element || '(ohne Text)', 50),
-        element: x.element, aktion: x.aktion, seite: e.ansicht ? pageName(e.ansicht) : null, bereich: e.ansicht ? xlArea(e.ansicht) : null, msv: xlNum(x.ms_in_ansicht) === null ? null : Math.round(Number(x.ms_in_ansicht) / 100) / 10});
+        element: x.element, aktion: x.aktion, seite: e.ansicht ? pageName(e.ansicht) : null, bereich: e.ansicht ? xlArea(e.ansicht) : null, msv: xlNum(x.ms_in_ansicht) === null ? null : Math.round(Number(x.ms_in_ansicht) / 100) / 10,
+        x: ext ? xlNum(x.x) : null, y: ext ? xlNum(x.y) : null, xpx: ext ? xlNum(x.x_px) : null, ypx: ext ? xlNum(x.y_px) : null, ab: ext ? xlNum(x.app_b) : null, ah: ext ? xlNum(x.app_h) : null,
+        zeiger: ext ? ({touch: 'Finger', mouse: 'Maus', pen: 'Stift'}[x.zeiger] || x.zeiger || null) : null, druck: ext ? xlNum(x.druck_ms) : null, sy: ext ? xlNum(x.scroll_y) : null,
+        zx: ext && xlNum(x.x) !== null ? Math.min(10, Math.max(1, Math.floor(Number(x.x) / 10) + 1)) : null, zy: ext && xlNum(x.y) !== null ? Math.min(10, Math.max(1, Math.floor(Number(x.y) / 10) + 1)) : null});
+    if(ext && e.typ === 'scrollen') SC.add({sid: e.sitzung_id, art, zeit: t, seite: e.ansicht ? pageName(e.ansicht) : null, bereich: e.ansicht ? xlArea(e.ansicht) : null, richtung: x.richtung === 'hoch' ? 'hoch' : 'runter',
+      von: xlNum(x.von_px), bis: xlNum(x.bis_px), strecke: xlNum(x.strecke_px), dauer: xlNum(x.dauer_ms), tiefe: xlNum(x.tiefe_prozent), nr: xlNum(x.nr)});
+    if(ext && e.typ === 'eingabe') EG.add({sid: e.sitzung_id, art, zeit: t, feld: INPUT_FIELD[x.feld] || x.feld || null, ergebnis: INPUT_RES[x.ergebnis] || x.ergebnis || null, sek: xlNum(x.dauer_ms) === null ? null : Math.round(x.dauer_ms / 100) / 10,
+      erste: xlNum(x.bis_erste_taste_ms) === null ? null : Math.round(x.bis_erste_taste_ms / 100) / 10, tasten: xlNum(x.tasten), korr: xlNum(x.loeschungen), paste: xlNum(x.eingefuegt), laenge: xlNum(x.laenge), maxl: xlNum(x.max_laenge),
+      pausen: xlNum(x.pausen_ueber_2s), tpm: xlNum(x.tasten_pro_min), text: x.text ? xlShort(x.text, 300) : null, seite: e.ansicht ? pageName(e.ansicht) : null});
+    if(ext && (e.typ === 'technik' || e.typ === 'akku' || e.typ === 'netz' || e.typ === 'ausrichtung' || e.typ === 'fehler'))
+      TE.add({sid: e.sitzung_id, art, zeit: t, was: EV_LABEL[e.typ] || e.typ, details: xlShort(xlDetail(e) || x.meldung || '', 300), akku: e.typ === 'akku' ? xlNum(x.stand_prozent) : null, online: e.typ === 'netz' || e.typ === 'technik' ? (x.online === false ? 'nein' : 'ja') : null,
+        netz: x.netz || null, fcp: e.typ === 'technik' ? xlNum(x.erstes_bild_ms) : null, meldung: e.typ === 'fehler' ? xlShort(x.meldung || '', 200) : null, ip: e.ip || null});
     if(e.typ === 'suche' && x.text){ const n = Number(x.treffer) || 0; R.add({sid: e.sitzung_id, art, zeit: t, begriff: xlShort(String(x.text).toLowerCase().trim(), 100), treffer: n, ohne: xlJN(!n)}); }
     if(e.typ === 'chat_frage'){ lastQ[e.sitzung_id] = C.add({sid: e.sitzung_id, art, zeit: t, frage: xlShort(x.text, 2000), eingabe: x.quelle}); }
     if(e.typ === 'chat_antwort' && lastQ[e.sitzung_id] !== undefined){
@@ -2129,6 +2234,45 @@ async function xlBuild(v){
       geraet: m.geraet || 'unbekannt', os: m.betriebssystem || 'unbekannt', browser: m.browser || 'unbekannt', lang: LANG_NAME[m.sprache_app] || m.sprache_app || 'unbekannt', campus: CAMPUS_NAME[m.standort] || m.standort || 'unbekannt'});
     u.opens.forEach(t => { const w = Math.floor((t - u.base) / (7 * DAY)); PO.add({id: u.id, zeit: t, tag: startOfDay(t), woche: w < 0 ? 'davor' : w > 2 ? 'danach' : 'Woche ' + (w + 1)}); });
   });
+
+  /* ----- extended: IP addresses and tap heat maps ----- */
+  const IPS = xTable('IP-Adressen', [
+    ['ip', 'IP-Adresse', 18, null, 'IP-Adresse, von der gesendet wurde.'], ['sitz', 'Sitzungen', 9, 'int', 'Sitzungen mit dieser IP-Adresse (Formel auf das Blatt Teilnahmen).'],
+    ['test', 'davon App-Test', 9, 'int', 'Sitzungen im App-Test.'], ['pilot', 'davon Pilot', 9, 'int', 'Sitzungen in der Pilotphase.'],
+    ['geraete', 'Pilot-Geräte', 9, 'int', 'Verschiedene Pilot-Nummern mit dieser IP-Adresse. Mehrere Geräte hinter einer Adresse sind z. B. ein gemeinsames WLAN (Hochschule, Wohnheim).'],
+    ['first', 'Erste Sitzung', 16, 'dt', 'Beginn der ersten Sitzung.'], ['last', 'Letzte Sitzung', 16, 'dt', 'Beginn der letzten Sitzung.'],
+    ['ver', 'IP-Version', 8, null, 'IPv4 (z. B. 141.87.1.2) oder IPv6 (mit Doppelpunkten).']
+  ], 'Nur erweiterter Export: eine Zeile pro IP-Adresse mit der Zahl der Sitzungen. Die IP-Adresse setzt die Datenbank beim Speichern, nicht die App.');
+  let HM = null;
+  if(ext){
+    const byIp = new Map();
+    sess.forEach(s2 => { if(!s2.ip) return; const o = byIp.get(s2.ip) || {ip: s2.ip, list: []}; o.list.push(s2); byIp.set(s2.ip, o); });
+    Array.from(byIp.values()).sort((a, b) => b.list.length - a.list.length || a.ip.localeCompare(b.ip)).forEach(o => {
+      IPS.add({ip: o.ip, sitz: xlCnt(T, [['ip', o.ip]]), test: xlCnt(T, [['ip', o.ip], ['art', 'Test']]), pilot: xlCnt(T, [['ip', o.ip], ['art', 'Pilot']]),
+        geraete: new Set(o.list.map(x => x.pilot_id).filter(Boolean)).size, first: Math.min.apply(null, o.list.map(x => x._start)), last: Math.max.apply(null, o.list.map(x => x._start)), ver: o.ip.includes(':') ? 'IPv6' : 'IPv4'});
+    });
+    /* heat maps: where on the screen people tap, 10 x 10 cells, counted with formulas from the sheet Klicks */
+    HM = {name: 'Tipp-Heatmap', rows: [], merges: [], heights: {0: 24}, cols: [17].concat(Array(10).fill(7.5), [3, 30]), tab: XL_PAL[4], scales: [], grid: false};
+    HM.rows.push([{v: 'Tipp-Heatmap: Wohin wird getippt?', s: 'title'}]);
+    HM.rows.push([{v: 'Jede Karte ist die App, in 10 × 10 Felder geteilt (je 10 % der Breite und der sichtbaren Höhe). Die Zahl ist die Anzahl der Tipps in diesem Feld, je dunkler, desto mehr. Gezählt werden Klicks, Klicks ins Leere und Frust-Klicks aus dem Blatt „Klicks“ (Spalten „Zelle x“ und „Zelle y“). Viele Tipps ins Leere an einer Stelle zeigen Elemente, die wie Knöpfe aussehen.', s: 'desc'}]);
+    HM.merges.push('A2:M2'); HM.heights[1] = 56;
+    const maps = [['Alle Seiten', []], ['Klicks ins Leere (alle Seiten)', [['klickart', 'Klick ins Leere']]]].concat(['Start', 'Räume', 'Frag Campi', 'Mensa', 'Studileben', 'Stadtleben'].map(b => [b, [['bereich', b]]]));
+    maps.forEach(([title, cond]) => {
+      if(!xlSafe(cond)) return;
+      HM.rows.push([]);
+      const r0 = HM.rows.length; HM.rows.push([{v: title, s: 'section'}]); HM.heights[r0] = 20;
+      HM.rows.push([{v: 'Höhe ↓ · Breite → (%)', s: 'head'}].concat(Array.from({length: 10}, (_, i) => ({v: (i * 10) + '–' + (i * 10 + 10), s: 'head'}))));
+      HM.heights[r0 + 1] = 26;
+      const first = HM.rows.length;
+      for(let zy = 1; zy <= 10; zy++){
+        const row = [{v: ((zy - 1) * 10) + '–' + (zy * 10) + ' % ' + (zy === 1 ? '(oben)' : zy === 10 ? '(unten)' : ''), s: 'bold'}];
+        for(let zx = 1; zx <= 10; zx++) row.push(xlS(xlCnt(K, cond.concat([['zx', zx], ['zy', zy]])), 'int'));
+        if(zy === 1) row.push(null, xlS(xlCnt(K, cond.concat([['zx', {op: '>=', n: 1}]])), 'int')); if(zy === 2) row.push(null, {v: 'Tipps mit Position', s: 'note'});
+        HM.rows.push(row); HM.heights[HM.rows.length - 1] = 18;
+      }
+      HM.scales.push('B' + (first + 1) + ':K' + (first + 10));
+    });
+  }
 
   /* ================= Hypothesen ================= */
   const H = {name: 'Hypothesen', rows: [], merges: ['A2:J2'], heights: {0: 24, 1: 40, 2: 30}, cols: [18, 42, 62, 8, 8, 10, 8, 12, 18, 46], tab: XL_PAL[1], freeze: 3, fit: 'landscape'};
@@ -2360,6 +2504,53 @@ async function xlBuild(v){
       const b = xlCnt(P, base), a = xlCnt(P, base.concat([[wk, {op: '>=', n: 1}]])); t.row(l, [xlS(xlShare(a, b), 'pct'), xlS(a, 'int'), xlS(b, 'int')]); }); t.done();
     CH.pilot.push(t.chart({title: 'Pilot: aktiv pro Woche', type: 'col', pct: true, cols: [1], note: 'Anteil der Pilotnutzer, die die App in der jeweiligen Woche mindestens einmal geöffnet haben (nur Personen, die diese Woche schon erreicht haben). Sinkt der Wert stark, verliert die App an Interesse.'})); }
 
+  /* extended data */
+  CH.ext = [];
+  if(ext){
+    { const t = DD.table('Tipps nach Bildschirmbereich', 'Anteil der Tipps im oberen, mittleren und unteren Drittel der App, je links, Mitte, rechts (Blatt Klicks).', ['Bereich', 'links', 'Mitte', 'rechts']);
+      const all = xlCnt(K, [['zx', {op: '>=', n: 1}]]);
+      [['oben', 1, 3], ['Mitte', 4, 7], ['unten', 8, 10]].forEach(([l, y1, y2]) => t.row(l, [[1, 3], [4, 7], [8, 10]].map(([x1, x2]) => xlS(xlShare(xlCnt(K, [['zx', {op: '>=', n: x1}], ['zx', {op: '<=', n: x2}], ['zy', {op: '>=', n: y1}], ['zy', {op: '<=', n: y2}]]), all), 'pct'))));
+      t.done();
+      CH.ext.push(t.chart({title: 'Wohin wird getippt? (Drittel der App)', type: 'col', pct: true, cols: [1, 2, 3], note: 'Anteil aller Tipps je Drittel der App: oben, Mitte, unten, jeweils links (blau), Mitte (orange) und rechts (grün). Auf dem Handy sind unten und Mitte mit dem Daumen am leichtesten erreichbar. Die genaue Verteilung zeigt das Blatt „Tipp-Heatmap“.'})); }
+    { const t = DD.table('Eingabeart', 'Womit getippt wurde (Blatt Klicks).', ['Eingabeart', 'Tipps']);
+      xlCats(['Finger', 'Maus', 'Stift'], xlGroup(K, 'zeiger')).forEach(l => { if(xlSafe([['zeiger', l]])) t.row(l, [xlS(xlCnt(K, [['zeiger', l]]), 'int')]); }); t.done();
+      CH.ext.push(t.chart({title: 'Finger, Maus oder Stift?', type: 'bar', cols: [1], note: 'Womit die Tipps gemacht wurden. Zeigt, ob die App vor allem am Handy (Finger) oder am Computer (Maus) benutzt wird.'})); }
+    { const t = DD.table('Scrolltiefe', 'Wie weit Seiten nach unten gescrollt wurden (Blatt Seitenzeiten), Anteil der Seitenbesuche.', ['Scrolltiefe', 'Anteil', 'Besuche']);
+      const all = xlCnt(SZ, [['scroll', {op: '>=', n: 0}]]);
+      [['unter 50 %', 0, 49], ['50 bis 74 %', 50, 74], ['75 bis 99 %', 75, 99], ['100 % (bis unten)', 100, 100]].forEach(([l, lo, hi]) => { const c = xlCnt(SZ, [['scroll', {op: '>=', n: lo}], ['scroll', {op: '<=', n: hi}]]); t.row(l, [xlS(xlShare(c, all), 'pct'), xlS(c, 'int')]); }); t.done();
+      CH.ext.push(t.chart({title: 'Wie weit wird gescrollt?', type: 'col', pct: true, cols: [1], note: 'Wie weit die Seiten nach unten gescrollt wurden, Anteil aller Seitenbesuche. Kurze Seiten zählen als 100 %. Viele Besuche unter 50 % heißen: Was weiter unten steht, wird oft nicht gesehen.'})); }
+    { const t = DD.table('Scrollen pro Bereich', 'Durchschnittliche Scrollstrecke und Scroll-Bewegungen pro Seitenbesuch (Blatt Seitenzeiten).', ['Bereich', 'Ø Strecke (px)', 'Ø Bewegungen', 'Ø Richtungswechsel']);
+      xlCats(AREAS.map(k => PAGE_LABEL[k]), xlGroup(SZ, 'bereich')).forEach(l => { if(!xlSafe([['bereich', l]])) return;
+        t.row(l, [xlS(xlAvg(SZ, 'spx', [['bereich', l]]), 'int'), xlS(xlAvg(SZ, 'sn', [['bereich', l]]), 'dec'), xlS(xlAvg(SZ, 'sturn', [['bereich', l]]), 'dec')]); }); t.done();
+      CH.ext.push(t.chart({title: 'Scrollstrecke pro Bereich (Ø Pixel pro Besuch)', type: 'bar', cols: [1], note: 'Durchschnittlich gescrollte Strecke pro Besuch eines Bereichs. Viel Scrollen mit vielen Richtungswechseln (Spalte D in den Diagrammdaten) deutet auf Suchen hin.'})); }
+    { const t = DD.table('Eingaben nach Feld', 'Wie Eingaben endeten, je Feld (Blatt Eingaben).', ['Feld', 'abgeschickt', 'abgebrochen', 'wieder gelöscht']);
+      xlCats(['Frage auf der Startseite', 'Frage im Chat', 'Raumsuche', 'Freitext im Fragebogen'], xlGroup(EG, 'feld')).forEach(l => { if(!xlSafe([['feld', l]])) return;
+        t.row(l, ['abgeschickt', 'abgebrochen', 'wieder gelöscht'].map(r => xlS(xlCnt(EG, [['feld', l], ['ergebnis', r]]), 'int'))); }); t.done();
+      CH.ext.push(t.chart({title: 'Eingaben: abgeschickt oder abgebrochen?', type: 'bar', cols: [1, 2, 3], note: 'Wie Eingaben in die Textfelder endeten: abgeschickt (blau), angefangen und stehen gelassen (orange), wieder gelöscht (grün). Viele Abbrüche bei Fragen an Campi zeigen Unsicherheit, was man fragen kann; die Texte stehen im Blatt „Eingaben“.'})); }
+    { const t = DD.table('Korrekturen pro Eingabe', 'Anzahl der Lösch-Tasten pro Eingabe (Blatt Eingaben, ohne Vorschläge).', ['Korrekturen', 'Eingaben']);
+      [['keine', 0, 0], ['1 bis 2', 1, 2], ['3 bis 5', 3, 5], ['6 bis 10', 6, 10], ['mehr als 10', 11, null]].forEach(([l, lo, hi]) => t.row(l, [xlS(xlCnt(EG, [['korr', {op: '>=', n: lo}]].concat(hi === null ? [] : [['korr', {op: '<=', n: hi}]])), 'int')])); t.done();
+      CH.ext.push(t.chart({title: 'Wie oft wird beim Tippen korrigiert?', type: 'col', cols: [1], note: 'Lösch-Tasten pro Eingabe. Viele Korrekturen können Tippfehler am Handy oder Umformulieren bedeuten.'})); }
+    { const t = DD.table('Ladezeit', 'Millisekunden bis zum ersten Bild (Blatt Teilnahmen, Spalte Erstes Bild).', ['Erstes Bild nach', 'Sitzungen']);
+      [['unter 1 s', 0, 999], ['1 bis 2 s', 1000, 1999], ['2 bis 4 s', 2000, 3999], ['über 4 s', 4000, null]].forEach(([l, lo, hi]) => t.row(l, [xlS(xlCnt(T, [['x_fcp', {op: '>=', n: lo}]].concat(hi === null ? [] : [['x_fcp', {op: '<=', n: hi}]])), 'int')])); t.done();
+      CH.ext.push(t.chart({title: 'Ladezeit bis zum ersten Bild', type: 'col', cols: [1], note: 'Wie schnell die App etwas angezeigt hat. Ab etwa 3 Sekunden springen viele Leute ab; lange Zeiten treten meist bei schlechtem Netz auf (Blatt Teilnahmen, Spalte „Netz“).'})); }
+    { const t = DD.table('Netzqualität', 'Vom Browser geschätzte Netzqualität zu Beginn (Blatt Teilnahmen).', ['Netz', 'Sitzungen']);
+      xlCats(['4g', '3g', '2g', 'slow-2g'], xlGroup(T, 'x_netz')).forEach(l => t.row(l, [xlS(xlCnt(T, [['x_netz', l]]), 'int')])); t.done();
+      CH.ext.push(t.chart({title: 'Netzqualität', type: 'bar', cols: [1], note: 'Netzqualität laut Browser (4g = schnell, auch bei WLAN). Safari und Firefox verraten das nicht; diese Sitzungen fehlen hier.'})); }
+    { const t = DD.table('Akkustand', 'Akkustand zu Beginn der Sitzung (Blatt Teilnahmen, nur Browser, die ihn verraten).', ['Akku', 'Sitzungen', 'davon am Laden']);
+      [['unter 20 %', 0, 19], ['20 bis 49 %', 20, 49], ['50 bis 79 %', 50, 79], ['80 bis 100 %', 80, 100]].forEach(([l, lo, hi]) => t.row(l, [xlS(xlCnt(T, [['x_akku', {op: '>=', n: lo}], ['x_akku', {op: '<=', n: hi}]]), 'int'), xlS(xlCnt(T, [['x_akku', {op: '>=', n: lo}], ['x_akku', {op: '<=', n: hi}], ['x_laedt', 'ja']]), 'int')])); t.done();
+      CH.ext.push(t.chart({title: 'Akkustand zu Beginn', type: 'col', cols: [1, 2], note: 'Akkustand zu Beginn der Sitzungen (blau) und wie viele davon am Laden waren (orange). Nur Browser, die den Akku verraten (vor allem Chrome auf Android).'})); }
+    { const t = DD.table('Sitzungen pro IP-Adresse', 'Wie viele Sitzungen von derselben IP-Adresse kamen (Blatt IP-Adressen).', ['Sitzungen je Adresse', 'IP-Adressen']);
+      [['1 Sitzung', 1, 1], ['2 bis 3', 2, 3], ['4 bis 10', 4, 10], ['mehr als 10', 11, null]].forEach(([l, lo, hi]) => t.row(l, [xlS(xlCnt(IPS, [['sitz', {op: '>=', n: lo}]].concat(hi === null ? [] : [['sitz', {op: '<=', n: hi}]])), 'int')])); t.done();
+      CH.ext.push(t.chart({title: 'Sitzungen pro IP-Adresse', type: 'col', cols: [1], note: 'Wie viele IP-Adressen eine, wenige oder viele Sitzungen hatten. Viele Sitzungen hinter einer Adresse sind meist ein gemeinsames WLAN (Hochschule, Wohnheim) oder dieselbe Person mehrmals.'})); }
+    { const t = DD.table('Erweiterte Kennzahlen', 'Kennzahlen der erweiterten Erhebung.', ['Kennzahl', 'Wert', 'So wird gezählt']);
+      const add = (key, label, cell, style, expl) => { const r = t.row(label, [xlS(cell, style), {v: expl, s: 'note'}]); kpiRows[key] = {f: 'Diagrammdaten!B' + (r + 1), v: cell.v, label, expl}; };
+      add('ips', 'IP-Adressen', xlCountA(IPS, 'ip'), 'int', 'Verschiedene IP-Adressen im Blatt IP-Adressen.');
+      add('inpab', 'Abgebrochene Eingaben', xlShare(xlCnt(EG, [['ergebnis', 'abgebrochen']]), xlCnt(EG, [['tasten', {op: '>=', n: 1}]])), 'pct', 'Eingaben mit Text, die nicht abgeschickt wurden, ÷ alle Eingaben mit mindestens einer Taste.');
+      add('fcp', 'Erstes Bild (Median, ms)', xlMedian(T, 'x_fcp'), 'int', 'Median der Spalte „Erstes Bild (ms)“ im Blatt Teilnahmen.');
+      add('scroll', 'Scrolltiefe (Median, %)', xlMedian(SZ, 'scroll'), 'int', 'Median der Scrolltiefe aller Seitenbesuche.');
+      t.done(); }
+  }
+
   /* ================= Dashboard ================= */
   const f = S.filter;
   const FL = {zeit: {alle: 'gesamter Zeitraum', heute: 'heute', '7': 'letzte 7 Tage', '30': 'letzte 30 Tage'}, modus: {alle: 'App-Test und Pilot', test: 'nur App-Test', pilot: 'nur Pilot'}};
@@ -2369,15 +2560,17 @@ async function xlBuild(v){
   const kpis = [k('n', 'kpi', 'mit Einwilligung'), k('quote', 'kpiPct', 'haben den Fragebogen abgeschickt'), k('dauer', 'kpiSec', 'Median vom Start bis zum Absenden'), k('ev', 'kpi', 'Klicks, Seiten, Suchen … im Filter'),
     k('h2a', 'kpiPct', {f: 'Hypothesen!I' + hyps[0].row + '&" · Ziel 30 %"', v: hyps[0].status + ' · Ziel 30 %'}), k('h2b', 'kpiPct', {f: 'Hypothesen!I' + hyps[1].row + '&" · Ziel 30 %"', v: hyps[1].status + ' · Ziel 30 %'}),
     k('pilotn', 'kpi', 'Geräte über den Pilot-Link (alle)'), k('oeff', 'kpi', 'Öffnungen mit 30 Min. Abstand'),
-    k('klick', 'kpi', 'auf Knöpfe, Links und Kacheln'), k('frust', 'kpi', 'drei schnelle Klicks auf dieselbe Stelle'), k('chat', 'kpi', 'im Chat gestellt'), k('suchleer', 'kpiPct', 'Raumsuchen ohne Treffer')];
+    k('klick', 'kpi', 'auf Knöpfe, Links und Kacheln'), k('frust', 'kpi', 'drei schnelle Klicks auf dieselbe Stelle'), k('chat', 'kpi', 'im Chat gestellt'), k('suchleer', 'kpiPct', 'Raumsuchen ohne Treffer')]
+    .concat(ext ? [k('ips', 'kpi', 'verschiedene Adressen'), k('inpab', 'kpiPct', 'angefangen, aber nicht abgeschickt'), k('fcp', 'kpi', 'Median bis zum ersten Bild'), k('scroll', 'kpi', 'Median aller Seitenbesuche, in %')] : []);
   const sections = [
     {title: 'Hypothesen', desc: 'H2a und H2b sind die Geschäftshypothesen, dazu kommen die Ziele des App-Tests. Definitionen, Zahlen und Status stehen im Blatt „Hypothesen“.', charts: CH.hyp},
     {title: 'App-Test: Aufgaben', desc: 'Ergebnisse der drei Aufgaben. Nur App-Test-Teilnahmen im Filter.', charts: CH.test},
     {title: 'Fragebogen', desc: 'Eine Grafik pro Auswahl- oder Skalenfrage. Freitexte stehen im Blatt „Antworten“.', charts: CH.survey},
     {title: 'Verhalten in der App', desc: 'Aus den aufgezeichneten Ereignissen aller Sitzungen im Filter (App-Test und Pilot): Seiten, Klicks, Chat, Raumsuche, Standort.', charts: CH.beh},
     {title: 'Wer hat teilgenommen?', desc: 'Geräte, Sprachen, Campus und Herkunft. Blau = App-Test-Teilnahmen, orange = Pilotnutzer.', charts: CH.who},
-    {title: 'Pilotphase', desc: 'Immer alle Pilotnutzer, unabhängig vom Filter. Grundlage für H2b.', charts: CH.pilot}];
-  const DB = xlDashboard({title: 'Campi · Auswertung', sub: 'Export vom ' + stamp + ' · Filter: ' + filterTxt + ' · Pilotdaten: immer alle · ' + T.data.length + ' Sitzungen, ' + E.data.length + ' Ereignisse, ' + users.length + ' Pilotnutzer',
+    {title: 'Pilotphase', desc: 'Immer alle Pilotnutzer, unabhängig vom Filter. Grundlage für H2b.', charts: CH.pilot},
+    {title: 'Erweiterte Daten', desc: 'Tipp-Positionen, Scrollen, Eingabeverhalten, Technik und IP-Adressen. Die Heatmaps stehen im Blatt „Tipp-Heatmap“.', charts: CH.ext}];
+  const DB = xlDashboard({title: 'Campi · Auswertung' + (ext ? ' (erweitert)' : ''), sub: (ext ? 'Erweiterter Export mit IP-Adressen, Tipp-Positionen, Scrollen, Eingaben und Technik · ' : 'Standard-Export (Datenarten bis Version 8) · ') + 'Export vom ' + stamp + ' · Filter: ' + filterTxt + ' · Pilotdaten: immer alle · ' + T.data.length + ' Sitzungen, ' + E.data.length + ' Ereignisse, ' + users.length + ' Pilotnutzer',
     how: 'So liest du das: Unter jedem Diagramm steht, was es zeigt. Alle Zahlen sind Formeln auf die Datenblätter und rechnen sich neu, wenn du dort etwas änderst. Was jede Spalte und jede Kennzahl bedeutet, steht im Blatt „Erklärung“. Inoffizieller Prototyp, Daten nur aus der App (App-Test und Pilotphase).'}, kpis, sections);
 
   /* ================= Erklärung ================= */
@@ -2393,7 +2586,10 @@ async function xlBuild(v){
   ex('Formeln', '', 'Kennzahlen, Hypothesen, Fragebogen und Diagrammdaten sind Formeln (ZÄHLENWENNS, MITTELWERTWENNS, SUMMENPRODUKT …) auf die Datenblätter. Änderst oder löschst du dort Zeilen, ändern sich die Ergebnisse mit. Die Diagramme im Dashboard lesen aus dem Blatt „Diagrammdaten“.');
   ex('Uhrzeiten', '', 'Alle Zeitpunkte sind in der Uhrzeit des Computers angegeben, auf dem exportiert wurde. „Beginn“ ist das erste Ereignis auf dem Gerät.');
   ex('Ja / nein, 1 / 0', '', 'Textspalten mit „ja“ oder „nein“ beschreiben Eigenschaften. Hilfsspalten mit 1 oder 0 sind zum Zählen gedacht: Ihre Summe ist die Anzahl der Fälle.');
-  ex('Datenschutz', '', 'Die Datei enthält keine Namen: Den Namen, den man in der App eintragen kann, entfernt die App aus allen Aufzeichnungen. Der Standort ist nur nach freiwilliger Freigabe und gerundet enthalten. Freitexte und Chat-Fragen stehen so da, wie sie eingetippt wurden. Gib die Datei nur an Personen weiter, die die Auswertung sehen dürfen.');
+  ex('Datenschutz', '', 'Die Datei enthält keine Namen: Den Namen, den man in der App eintragen kann, entfernt die App aus allen Aufzeichnungen. Der Standort ist nur nach freiwilliger Freigabe und gerundet enthalten. Freitexte und Chat-Fragen stehen so da, wie sie eingetippt wurden.' +
+    (ext ? ' Diese erweiterte Datei enthält außerdem IP-Adressen; zusammen mit anderen Angaben können sie einzelne Personen erkennbar machen. Gib sie nur an Personen weiter, die die Rohdaten sehen dürfen, und lösche sie, wenn sie nicht mehr gebraucht wird.' : ' Gib die Datei nur an Personen weiter, die die Auswertung sehen dürfen.'));
+  ex('Standard oder erweitert', '', ext ? 'Erweiterter Export: alle Datenarten des Standard-Exports und zusätzlich IP-Adressen (Blätter Teilnahmen, Ereignisse, IP-Adressen), Tipp-Positionen (Blatt Klicks und Tipp-Heatmap), Scrollen (Blatt Scrollen, Seitenzeiten), Eingabeverhalten (Blatt Eingaben) und Technik (Blatt Technik, Teilnahmen). Diese Daten erhebt die App ab Version 9; ältere Sitzungen haben dort leere Felder.'
+    : 'Standard-Export: die Datenarten bis Version 8 (Teilnahmen, Antworten, Seitenzeiten, Klicks, Raumsuche, KI-Fragen, Pilot). IP-Adressen, Tipp-Positionen, Scrollen, Eingabeverhalten und Technik stehen nur im erweiterten Export.');
   exSec('Dashboard: Kennzahlen');
   kpis.forEach(x => ex('Dashboard', x.label, kpiRows[Object.keys(kpiRows).find(kk => kpiRows[kk].label === x.label)].expl));
   exSec('Dashboard: Diagramme');
@@ -2405,7 +2601,9 @@ async function xlBuild(v){
   ex('Hypothesen', 'Ziel', 'Mindestwert, ab dem die Hypothese als bestätigt bzw. das Test-Ziel als erreicht gilt.');
   ex('Hypothesen', 'Mindestens n', 'Unter dieser Anzahl ist das Ergebnis zu unsicher; der Status lautet dann „Zu wenig Daten“ (bei H2b „Pilot läuft“, solange noch Personen im Pilot sind).');
   hyps.forEach(h => ex('Hypothesen', h.kurz + ': ' + h.text, h.krit + ' Daten: ' + h.src + '.'));
-  [[T, 'Teilnahmen'], [FB, 'Fragebogen'], [A, 'Antworten'], [E, 'Ereignisse'], [SZ, 'Seitenzeiten'], [K, 'Klicks'], [R, 'Raumsuche'], [C, 'KI-Fragen'], [WB, 'Wege und Bereiche'], [PE, 'Personen'], [P, 'Pilot'], [PO, 'Pilot-Öffnungen']].forEach(([t, nm]) => {
+  [[T, 'Teilnahmen'], [FB, 'Fragebogen'], [A, 'Antworten'], [E, 'Ereignisse'], [SZ, 'Seitenzeiten'], [K, 'Klicks'], [R, 'Raumsuche'], [C, 'KI-Fragen'], [WB, 'Wege und Bereiche'], [PE, 'Personen'], [P, 'Pilot'], [PO, 'Pilot-Öffnungen']]
+    .concat(ext ? [[HM, 'Tipp-Heatmap'], [SC, 'Scrollen'], [EG, 'Eingaben'], [TE, 'Technik'], [IPS, 'IP-Adressen']] : []).forEach(([t, nm]) => {
+    if(t === HM){ exSec('Blatt ' + nm); ex(nm, '', HM.rows[1][0].v); return; }
     exSec('Blatt ' + nm);
     if(t === FB){ ex(nm, '', 'Jede Frage des Fragenkatalogs mit Anzahl und Anteil je Antwort, gezählt mit Formeln aus dem Blatt „Antworten“. Spalte D zeigt bei H2a-Fragen, welche Antworten als Zustimmung zählen. Bei Skalen steht zusätzlich der Durchschnitt.');
       qList.forEach(e => ex(nm, 'F' + e.no, e.frage + ' (' + (TYP[e.typ] || e.typ) + (e.orphan ? ', nicht mehr im Fragenkatalog' : '') + ')')); return; }
@@ -2413,22 +2611,23 @@ async function xlBuild(v){
     t.cols.forEach(c => { if(c.d) ex(nm, c.h, c.d); });
   });
   exSec('Ereignis-Typen (Blatt Ereignisse, Spalte Typ)');
-  const types = Object.keys(EV_LABEL).concat(Array.from(new Set(E.data.map((x, i) => E.val(i, 'typ')))).filter(x => x && !(x in EV_LABEL)));
+  const types = Object.keys(EV_LABEL).filter(ty => ext || !EV_EXT.has(ty)).concat(Array.from(new Set(E.data.map((x, i) => E.val(i, 'typ')))).filter(x => x && !(x in EV_LABEL)));
   types.forEach(ty => ex(ty, EV_LABEL[ty] || ty, XL_EV_EXPL[ty] || 'Weiteres Ereignis der App.', xlS(xlCnt(E, [['typ', ty]]), 'int')));
   exSec('Diagrammdaten');
   ex('Diagrammdaten', '', 'Die Tabellen hinter den Diagrammen. Jede Tabelle hat eine kurze Beschreibung. Du kannst sie für eigene Diagramme verwenden.');
 
-  const sheets = [DB, EX, H, T.sheet(XL_PAL[0]), FB, A.sheet(XL_PAL[3]), E.sheet(XL_PAL[4]), SZ.sheet(XL_PAL[4]), K.sheet(XL_PAL[4]), R.sheet(XL_PAL[4]), C.sheet(XL_PAL[4]), WB.sheet(XL_PAL[0]), PE.sheet(XL_PAL[4]), P.sheet(XL_PAL[6]), PO.sheet(XL_PAL[6]), DD];
-  return XLW.build(sheets, {title: 'Campi Auswertung ' + stamp});
+  const sheets = [DB, EX, H, T.sheet(XL_PAL[0]), FB, A.sheet(XL_PAL[3]), E.sheet(XL_PAL[4]), SZ.sheet(XL_PAL[4]), K.sheet(XL_PAL[4]), R.sheet(XL_PAL[4]), C.sheet(XL_PAL[4]), WB.sheet(XL_PAL[0]), PE.sheet(XL_PAL[4]), P.sheet(XL_PAL[6]), PO.sheet(XL_PAL[6])]
+    .concat(ext ? [HM, SC.sheet(XL_PAL[7]), EG.sheet(XL_PAL[7]), TE.sheet(XL_PAL[7]), IPS.sheet(XL_PAL[7])] : [], [DD]);
+  return XLW.build(sheets, {title: 'Campi Auswertung ' + (ext ? 'erweitert ' : '') + stamp});
 }
-async function exportXlsx(){
+async function exportXlsx(ext){
   if(S.xlBusy) return;
-  S.xlBusy = true; S.error = ''; S.notice = 'Die Excel-Datei wird erstellt …'; render();
+  S.xlBusy = true; S.error = ''; S.notice = 'Die ' + (ext ? 'erweiterte ' : '') + 'Excel-Datei wird erstellt …'; render();
   try {
-    const blob = await xlBuild(view());
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'campi-auswertung-' + new Date().toISOString().slice(0, 10) + '.xlsx';
+    const blob = await xlBuild(view(), ext);
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'campi-auswertung-' + (ext ? 'erweitert-' : '') + new Date().toISOString().slice(0, 10) + '.xlsx';
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 3000);
-    S.notice = 'Die Excel-Datei ist fertig: Dashboard mit Diagrammen, Erklärungen und alle Daten.';
+    S.notice = ext ? 'Die erweiterte Excel-Datei ist fertig: zusätzlich IP-Adressen, Tipp-Heatmaps, Scrollen, Eingaben und Technik.' : 'Die Excel-Datei ist fertig: Dashboard mit Diagrammen, Erklärungen und alle Daten.';
   } catch(e){ S.notice = ''; S.error = 'Die Excel-Datei konnte nicht erstellt werden: ' + e.message; }
   S.xlBusy = false; render();
 }
@@ -2458,7 +2657,7 @@ function render(){
       '<button class="btn" type="submit" style="margin-top:18px;width:100%"' + (S.loginBusy ? ' disabled' : '') + '>' + (S.loginBusy ? 'Anmelden …' : 'Anmelden') + '</button></form></div>';
     return;
   }
-  const right = (S.data && S.admin ? '<button class="btn btn-2 btn-sm" type="button" data-a="xlsx-all"' + (S.xlBusy ? ' disabled' : '') + ' title="Dashboard mit Diagrammen, Erklärungen und alle Daten">' + icon('down2') + 'Excel</button>' : '') + '<span>' + esc(S.auth.email) + '</span><a class="btn-link" href="index.html" target="_blank" rel="noopener">Zur Testseite</a><button class="btn-link" type="button" data-a="logout">Abmelden</button>';
+  const right = (S.data && S.admin ? '<button class="btn btn-2 btn-sm" type="button" data-a="xlsx-all"' + (S.xlBusy ? ' disabled' : '') + ' title="Standard: Dashboard mit Diagrammen, Erklärungen und alle Datenarten bis Version 8">' + icon('down2') + 'Excel</button><button class="btn btn-2 btn-sm" type="button" data-a="xlsx-ext"' + (S.xlBusy ? ' disabled' : '') + ' title="Erweitert: zusätzlich IP-Adressen, Tipp-Positionen, Scrollen, Eingaben und Technik">' + icon('down2') + 'Excel erweitert</button>' : '') + '<span>' + esc(S.auth.email) + '</span><a class="btn-link" href="index.html" target="_blank" rel="noopener">Zur Testseite</a><button class="btn-link" type="button" data-a="logout">Abmelden</button>';
   if(S.admin === null){ app.innerHTML = '<div class="wrap">' + top(right) + '<p class="note">Einen Moment …</p></div>'; return; }
   if(S.admin === false){
     app.innerHTML = '<div class="wrap">' + top(right) + '<div class="alert err"><b>Kein Admin-Zugang</b>' + (S.error ? esc(S.error) + '<br>' : '') +
