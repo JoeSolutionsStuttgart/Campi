@@ -1,7 +1,7 @@
 // Campi · Service Worker: macht die App installierbar und offline nutzbar.
 // Seiten kommen zuerst aus dem Netz (damit Änderungen sofort ankommen), sonst aus dem Speicher.
 // Supabase, Kartenbilder und andere fremde Adressen werden nicht angefasst.
-const CACHE = 'campi-v2026-10-i';
+const CACHE = 'campi-v2026-10-j';
 const CORE = ['./', './index.html', './config.js', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));

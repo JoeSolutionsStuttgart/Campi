@@ -4,12 +4,15 @@
   node scripts/daten-pruefen.mjs [datei]   → "OK" oder eine Liste der Fehler (Exit-Code 1)
 */
 import {readFile, stat} from 'node:fs/promises';
+import {ladeQuellen, domains, erlaubt} from './quellen.mjs';
 
 const DATEI = process.argv[2] || process.env.DATEN_DATEI || 'daten.json';
 const SPRACHEN = ['de', 'en', 'es', 'it', 'fr', 'tr'];
 const TYPEN = ['vegan', 'vegetarisch', 'fleisch', 'fisch'];
 const ALLERGENE = ['Gluten', 'Milch', 'Ei', 'Senf', 'Sellerie', 'Soja', 'Sesam', 'Fisch', 'Krebstiere', 'Nuesse', 'Erdnuss', 'Sulfite', 'Lupine', 'Weichtiere'];
 const CAMPUS = ['SM', 'FL', 'GP'];
+const STAEDTE = ['Esslingen', 'Göppingen'];
+let DOMAINS = ['hs-esslingen.de', 'studierendenwerk-stuttgart.de'];
 const OBERSTE = ['version', 'stand', 'quelle', 'status', 'mensa', 'fristen', 'termine', 'uebersetzungen', 'typen', 'fehlende_uebersetzungen', 'hinweis'];
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const fehler = [];
@@ -110,14 +113,26 @@ async function main(){
     }
   }
 
-  /* Veranstaltungen */
+  /* Veranstaltungen: Hochschule und Städte, Links nur auf Domains aus quellen.json */
+  try { DOMAINS = domains(ladeQuellen()); } catch(e){ f('quellen.json', 'fehlt oder ist kein gültiges JSON: ' + e.message); }
   if(d.termine !== undefined){
     if(!Array.isArray(d.termine)) f('termine', 'muss eine Liste sein');
     else {
-      if(d.termine.length > 16) f('termine', 'höchstens 16 Einträge');
+      if(d.termine.length > 30) f('termine', 'höchstens 30 Einträge');
+      const anzahl = {hochschule: 0, Esslingen: 0, Göppingen: 0};
       d.termine.forEach((x, i) => {
         const p = `termine[${i}]`;
         if(!x || typeof x !== 'object'){ f(p, 'muss ein Objekt sein'); return; }
+        if(x.art !== undefined && !['hochschule', 'stadt'].includes(x.art)) f(`${p}.art`, 'muss hochschule oder stadt sein');
+        if(x.art === 'stadt'){
+          if(!STAEDTE.includes(x.stadt)) f(`${p}.stadt`, 'muss Esslingen oder Göppingen sein'); else anzahl[x.stadt]++;
+          if(x.campus !== undefined && x.campus !== null) f(`${p}.campus`, 'bei Veranstaltungen in der Stadt immer null');
+          if(!x.url) f(`${p}.url`, 'fehlt (Link der Veranstaltung oder der Quellseite)');
+        } else {
+          anzahl.hochschule++;
+          if(x.stadt !== undefined) f(`${p}.stadt`, 'nur bei art "stadt"');
+        }
+        if(typeof x.url === 'string' && /^https:\/\//.test(x.url) && !erlaubt(x.url, DOMAINS)) f(`${p}.url`, `Domain nicht in quellen.json (${x.url.slice(0, 60)})`);
         if(!istDatum(x.datum)) f(`${p}.datum`, 'muss JJJJ-MM-TT sein');
         else if(x.datum > grenzeNeu) f(`${p}.datum`, 'liegt zu weit in der Zukunft');
         if(x.zeit !== undefined && x.zeit !== null && x.zeit !== '' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(x.zeit)) f(`${p}.zeit`, 'muss HH:MM sein');
@@ -126,6 +141,8 @@ async function main(){
         mehrsprachig(`${p}.ort`, x.ort, 160, false);
         url(`${p}.url`, x.url);
       });
+      if(anzahl.hochschule > 12) f('termine', 'höchstens 12 Veranstaltungen der Hochschule');
+      STAEDTE.forEach(st => { if(anzahl[st] > 10) f('termine', `höchstens 10 Veranstaltungen in ${st}`); });
     }
   }
 
@@ -154,6 +171,7 @@ async function main(){
     process.exit(1);
   }
   const n = Object.values(d.mensa || {}).reduce((s, m) => s + (m.tage || []).reduce((a, t) => a + t.gerichte.length, 0), 0);
-  console.log(`OK · ${n} Gerichte, ${(d.fristen || []).length} Fristen, ${(d.termine || []).length} Veranstaltungen, ${(d.fehlende_uebersetzungen || []).length} Texte ohne Übersetzung`);
+  const tm = d.termine || [], zahl = fn => tm.filter(fn).length;
+  console.log(`OK · ${n} Gerichte, ${(d.fristen || []).length} Fristen, ${tm.length} Veranstaltungen (Hochschule ${zahl(x => x.art !== 'stadt')}, Esslingen ${zahl(x => x.art === 'stadt' && x.stadt === 'Esslingen')}, Göppingen ${zahl(x => x.art === 'stadt' && x.stadt === 'Göppingen')}), ${(d.fehlende_uebersetzungen || []).length} Texte ohne Übersetzung`);
 }
 main();

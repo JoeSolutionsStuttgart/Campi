@@ -1,6 +1,7 @@
 # Auftrag: daten.json für die Campus-App Campi aktualisieren
 
-Du läufst jeden Morgen um 1 Uhr in einem GitHub-Workflow. Niemand kann Rückfragen beantworten.
+Du läufst an jedem Werktag um 1 Uhr in einem GitHub-Workflow (nicht an Wochenenden und Feiertagen; was du heute
+findest, muss also bis zum nächsten Werktag reichen). Niemand kann Rückfragen beantworten.
 Campi ist ein inoffizieller Prototyp einer Campus-App für die Hochschule Esslingen
 (Standorte: `SM` Esslingen Stadtmitte, `FL` Esslingen Flandernstraße, `GP` Göppingen).
 Die App gibt es auf Deutsch (`de`), Englisch (`en`), Spanisch (`es`), Italienisch (`it`), Französisch (`fr`) und Türkisch (`tr`).
@@ -62,19 +63,16 @@ Format eines Eintrags:
 - Steht ein Datum nicht eindeutig da, lass den bisherigen Eintrag unverändert. Erfinde nie ein Datum.
 - Datumsformat immer `JJJJ-MM-TT`. Die Schlüssel `key` nicht verändern. Höchstens 6 Seitenaufrufe für diesen Schritt.
 
-## 4. Veranstaltungen (immer, ganz neu)
+## 4. Veranstaltungen der Hochschule (immer, ganz neu)
 
-Die App soll zeigen, was an der Hochschule wirklich los ist. Ersetze `termine` jeden Morgen vollständig durch
-die aktuellen Veranstaltungen der nächsten 21 Tage (ab heute), höchstens 10, nach Datum sortiert.
+Die App soll zeigen, was an der Hochschule wirklich los ist. Ersetze alle Einträge in `termine` mit `"art": "hochschule"`
+(und alle ohne `art`) jeden Morgen vollständig durch die aktuellen Veranstaltungen der nächsten 21 Tage (ab heute),
+höchstens 10, nach Datum sortiert.
 
-Quellen:
-1. https://www.hs-esslingen.de/hochschule/aktuelles/termine (Hauptquelle; bei Bedarf auch https://www.hs-esslingen.de/news/termine/kalender)
-2. Hochschulsport: https://www.hs-esslingen.de/studium/freizeit/hochschulsport
-3. AStA: https://www.hs-esslingen.de/studium/freizeit/asta
-4. Studierendenwerk Stuttgart (studierendenwerk-stuttgart.de), nur Veranstaltungen in Esslingen oder Göppingen
+Quellen: die Einträge unter `hochschule` in `quellen.json` (lies die Datei zuerst). Die erste ist die Hauptquelle.
 
 ```json
-{"datum": "2026-10-22", "zeit": "10:00", "campus": null,
+{"art": "hochschule", "datum": "2026-10-22", "zeit": "10:00", "campus": null,
  "titel": {"de": "Praxis- und Berufseinstiegsmesse", "en": "Internship and careers fair", "es": "…", "it": "…", "fr": "…", "tr": "…"},
  "ort": {"de": "Hochschule Esslingen", "en": "Esslingen University", "es": "…", "it": "…", "fr": "…", "tr": "…"},
  "url": "https://www.hs-esslingen.de/hochschule/aktuelles/termin/…"}
@@ -87,10 +85,37 @@ Quellen:
   wenn keine Uhrzeit dasteht. Titel kurz (höchstens 70 Zeichen), in allen sechs Sprachen.
 - `campus`: `SM`, `FL` oder `GP` nur, wenn der Standort auf der Seite steht (Göppinger Veranstaltungen: `GP`), sonst `null`.
   `ort`: der Ort laut Seite, sonst „Hochschule Esslingen“ oder „online“.
-- Findest du gar nichts Verlässliches, lass `termine` unverändert. Höchstens 10 Seitenaufrufe für diesen Schritt.
+- Findest du gar nichts Verlässliches, lass diese Einträge unverändert. Höchstens 10 Seitenaufrufe für diesen Schritt.
 
-## 5. Prüfen (immer, zum Schluss)
+## 5. Veranstaltungen in der Stadt (immer, ganz neu)
+
+Im Bereich „Stadtleben“ zeigt die App, was in Esslingen und Göppingen los ist. Ersetze alle Einträge mit
+`"art": "stadt"` vollständig durch Veranstaltungen der nächsten 14 Tage (ab heute): höchstens 8 für Esslingen und
+höchstens 6 für Göppingen, nach Datum sortiert.
+
+Quellen: die Einträge unter `stadt` in `quellen.json`, jeweils mit Stadt und dem Hinweis, was dort zu holen ist.
+
+```json
+{"art": "stadt", "stadt": "Esslingen", "datum": "2026-10-30", "zeit": "20:00", "campus": null,
+ "titel": {"de": "Poetry Slam Esslingen", "en": "Poetry slam Esslingen", "es": "…", "it": "…", "fr": "…", "tr": "…"},
+ "ort": {"de": "Kulturzentrum Dieselstraße", "en": "Dieselstrasse arts centre", "es": "…", "it": "…", "fr": "…", "tr": "…"},
+ "url": "https://dieselstrasse.de/programm/detail/2026-10-30/poetry-slam-esslingen"}
+```
+
+- Wähle, was Studierende interessiert, und mische die Quellen: Konzerte, Partys, Poetry Slam, Kabarett und Comedy, Theater,
+  besondere Kinoabende, Lesungen, Märkte und Stadtfeste (z. B. Weihnachtsmarkt), Sport mit Publikum (z. B. Handball).
+  Lass weg: Kinder- und Familienprogramm, Seniorenangebote, Kurse mit Anmeldung über mehrere Wochen, Gottesdienste,
+  geschlossene Gesellschaften, Abgesagtes und Ausverkauftes. Höchstens 2 Einträge derselben Quelle am selben Tag.
+- Läuft etwas über mehrere Tage (z. B. ein Markt), nimm einen Eintrag mit dem ersten Tag ab heute und schreib den
+  Zeitraum in den Titel, z. B. „Weihnachtsmarkt (bis 22.12.)“.
+- `stadt` ist immer `Esslingen` oder `Göppingen`, `campus` immer `null`. `ort`: Veranstaltungsort laut Seite.
+- `url`: der Link der Veranstaltung auf der Quellseite, sonst die Quellseite selbst. Nur Adressen auf den Domains aus
+  `quellen.json`, keine Ticketportale.
+- Nur Termine, die du selbst gelesen hast, mit Datum. Erfinde nichts. Liefert eine Quelle nichts Lesbares, nimm die
+  anderen. Findest du für eine Stadt gar nichts, behalte ihre bisherigen Einträge ab heute. Höchstens 12 Seitenaufrufe.
+
+## 6. Prüfen (immer, zum Schluss)
 
 Führe `node scripts/daten-pruefen.mjs` aus. Meldet das Skript Fehler, behebe sie in `daten.json` und prüfe erneut,
 bis „OK“ erscheint. Antworte am Ende mit einer kurzen Zusammenfassung: wie viele Übersetzungen, welche Fristen geändert
-(mit Quelle), wie viele Veranstaltungen.
+(mit Quelle), wie viele Veranstaltungen der Hochschule und wie viele je Stadt, welche Quellen nichts geliefert haben.

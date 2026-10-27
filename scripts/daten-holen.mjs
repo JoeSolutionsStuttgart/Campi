@@ -178,7 +178,7 @@ async function main(){
   const neu = {
     version: 1,
     stand: berlinTeile().iso,
-    quelle: 'Speiseplan: Studierendenwerk Stuttgart über OpenMensa · Fristen und Veranstaltungen: hs-esslingen.de',
+    quelle: 'Speiseplan: Studierendenwerk Stuttgart über OpenMensa · Fristen: hs-esslingen.de · Veranstaltungen: Hochschule, Esslingen und Göppingen (quellen.json)',
     status,
     mensa,
     fristen: Array.isArray(alt.fristen) ? alt.fristen : [],
