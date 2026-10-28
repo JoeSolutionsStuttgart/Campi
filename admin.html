@@ -968,7 +968,7 @@ const EV_LABEL = {ansicht:'Seite geöffnet', ansicht_ende:'Seite verlassen', kli
   aufgabe:'Aufgabe', schritt:'Schritt', sprache:'Sprache gewechselt', standort_gewechselt:'Campus gewechselt', standort:'Echter Standort', standort_status:'Standortfreigabe', standort_anfrage:'Standort angefragt', standort_erhalten:'Standort erhalten',
   ziel_erreicht:'Ziel erreicht', verlassen:'App verlassen', zurueck:'Zurück in der App', app_geoeffnet:'App geöffnet', installation:'Installation', karte:'Karte', raum_gewaehlt:'Raum gewählt', einwilligung:'Einwilligung',
   fragebogen:'Fragebogen', abgeschlossen:'Test abgeschlossen', abbruch:'Abbruch', fehler:'Fehler', fenster:'Fenstergröße', pilot_beigetreten:'Pilot beigetreten', pilot_beendet:'Pilot beendet', live_automatisch:'Live-Karte automatisch', danach:'Danach frei umgesehen',
-  scrollen:'Gescrollt', eingabe:'Eingabe', technik:'Technik des Geräts', akku:'Akku', netz:'Netzverbindung', ausrichtung:'Bildschirm gedreht'};
+  scrollen:'Gescrollt', eingabe:'Eingabe', technik:'Technik des Geräts', akku:'Akku', netz:'Netzverbindung', ausrichtung:'Bildschirm gedreht', frist_hinweis:'Fristen-Hinweis'};
 /* neu in Version 9 (erweiterte Erhebung): nur im erweiterten Excel-Export ausgewertet */
 const EV_EXT = new Set(['scrollen', 'eingabe', 'technik', 'akku', 'netz', 'ausrichtung']);
 const EV_EXT_KEYS = ['x_px', 'y_px', 'app_b', 'app_h', 'zeiger', 'druck_ms', 'scroll_y', 'scroll_px', 'scroll_anzahl', 'erstes_scrollen_ms', 'richtungswechsel', 'art'];
@@ -1888,7 +1888,8 @@ const XL_EV_EXPL = {
   technik: 'Nur erweiterter Export: technische Angaben einmal pro Sitzung (Ladezeiten, Netz, Speicher, Prozessorkerne, Ausrichtung, Sprachen).',
   akku: 'Nur erweiterter Export: Akkustand und ob geladen wird (nur Browser, die es verraten, z. B. Chrome auf Android).',
   netz: 'Nur erweiterter Export: Die Internetverbindung ist weggefallen, zurückgekommen oder hat sich geändert.',
-  ausrichtung: 'Nur erweiterter Export: Das Gerät wurde zwischen Hoch- und Querformat gedreht.'
+  ausrichtung: 'Nur erweiterter Export: Das Gerät wurde zwischen Hoch- und Querformat gedreht.',
+  frist_hinweis: 'Der einmalige Hinweis auf eine wichtige Frist (z. B. Prüfungsanmeldung) wurde gezeigt, geschlossen oder führte zu „Alle Fristen“.'
 };
 const XL_GEO = {ok: 'erlaubt', denied: 'abgelehnt', na: 'nicht verfügbar', error: 'Fehler', wait: 'angefragt', off: 'ausgeschaltet'};
 function xlDetail(e){

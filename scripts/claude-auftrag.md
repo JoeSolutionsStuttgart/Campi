@@ -56,6 +56,13 @@ Quellen, in dieser Reihenfolge (nur **hs-esslingen.de**):
 | `pruefungsanmeldung` | Zentrale Prüfungsanmeldung des laufenden Semesters | `von`, `bis` |
 | `rueckmeldung` | Rückmeldung zum nächsten Semester | `von`, `bis` |
 | `vorlesungsende` | Vorlesungsende des laufenden Semesters | `von` |
+| `moduleinschreibung` | Modul- bzw. Wahlpflichtanmeldung, nur wenn sie mit Datum auf hs-esslingen.de steht | `von`, `bis` |
+
+Weitere Anmeldefristen (z. B. `pruefungsabmeldung`, `bewerbung`) nur, wenn sie mit Datum auf hs-esslingen.de stehen.
+Setze `"wichtig": true` bei Fristen, für die Studierende selbst etwas tun müssen (Anmeldung, Rückmeldung, Abmeldung).
+Die App markiert sie dann, sobald sie laufen oder in 3 Tagen beginnen, und zeigt einmal einen Hinweis.
+Kennst du die Seite, auf der man sich anmeldet (auf hs-esslingen.de, aus einem Abruf oder einer Suche), trag sie in
+`aktion_url` ein; sonst weglassen.
 
 Format eines Eintrags:
 
@@ -116,7 +123,9 @@ Quellen: die Einträge unter `stadt` in `quellen.json`, jeweils mit Stadt und de
   geschlossene Gesellschaften, Abgesagtes und Ausverkauftes. Höchstens 2 Einträge derselben Quelle am selben Tag.
 - Läuft etwas über mehrere Tage (z. B. ein Markt), nimm einen Eintrag mit dem ersten Tag ab heute und schreib den
   Zeitraum in den Titel, z. B. „Weihnachtsmarkt (bis 22.12.)“.
-- `stadt` ist immer `Esslingen`, `Göppingen` oder `Stuttgart`, `campus` immer `null`. `ort`: Veranstaltungsort laut Seite.
+- `stadt` ist immer `Esslingen`, `Göppingen` oder `Stuttgart`, `campus` immer `null`.
+- `kat`: `ausgehen` (Konzerte, Partys, Slam, Festivals), `kultur` (Theater, Kabarett, Lesung, Kino, Ausstellung, Markt),
+  `sport` (Spiele, Läufe) oder `essen` (Food-Festivals, Märkte mit Essen). Danach filtert die App unter „Stadtleben“. `ort`: Veranstaltungsort laut Seite.
 - `url`: der Link der Veranstaltung auf der Quellseite, sonst die Quellseite selbst. Nur Adressen auf den Domains aus
   `quellen.json`, keine Ticketportale.
 - Nur Termine, die du selbst gelesen hast, mit Datum. Erfinde nichts. Liefert eine Quelle nichts Lesbares, nimm die

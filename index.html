@@ -590,6 +590,40 @@ a{color:inherit}
 
 /* Version 10: Link zur Website eines Stadtleben-Tipps */
 .place .place-link{display:inline-block;margin-top:6px;font-weight:700}
+
+/* Version 11: important deadlines, linked events, tappable city tips */
+.tab{position:relative}
+.tab-dot{position:absolute;top:5px;left:calc(50% + 7px);width:10px;height:10px;border-radius:50%;background:var(--a-accent);box-shadow:0 0 0 2px var(--a-surface)}
+.seg button{position:relative}
+.seg .tab-dot{top:6px;left:auto;right:10px}
+.dl-banner{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:16px;border:2px solid var(--a-accent);background:var(--a-accent-soft);color:var(--a-accent-on-soft);font:inherit;cursor:pointer}
+.dl-banner b{display:block;font-weight:800}
+.dl-banner .tsub{display:block;font-size:13px;margin-top:2px}
+.dl-banner > svg{margin-left:auto;flex:none}
+.dl-banner-ico{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--a-accent);color:var(--a-on-accent);flex:none}
+.dl-banner-ico svg,.dl-pill svg{width:16px;height:16px}
+.row-dl-hot{background:var(--a-accent-soft);border-radius:12px;padding-left:10px;padding-right:10px}
+.dl-pill{display:inline-flex;align-items:center;gap:5px;align-self:flex-start;margin-top:6px;padding:3px 10px 3px 8px;border-radius:999px;background:var(--a-accent);color:var(--a-on-accent);font-size:12px;font-weight:800}
+.row .rt .dl-pill{display:inline-flex}
+.dl-go{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-weight:700}
+.dl-go svg{width:14px;height:14px}
+.dl-pop{display:flex;gap:12px;align-items:flex-start;padding:4px 2px 16px}
+.dl-pop b{font-size:17px}
+.dl-pop p{margin:4px 0 0}
+.dl-pop-hint{color:var(--a-muted);font-size:14px}
+.dl-pop-ico{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--a-accent);color:var(--a-on-accent);flex:none}
+.sheet-dl .btn-row{flex-wrap:wrap}
+.row-link{text-decoration:none;color:inherit;align-items:center}
+.row-link:hover b,.row-link:focus-visible b{text-decoration:underline}
+.row-go{margin-left:auto;padding-left:8px;color:var(--a-muted);flex:none}
+.row-go svg{width:16px;height:16px}
+.datebox-txt b{font-size:12px;line-height:1.15}
+.place-a{display:flex;text-decoration:none;color:inherit}
+.place-a:hover,.place-a:focus-visible{border-color:var(--a-primary)}
+.place-go{display:inline-flex;align-items:center;gap:5px;margin-top:6px;font-weight:700;font-size:14px;color:var(--a-primary)}
+.place-go svg{width:15px;height:15px}
+.place-head{margin:6px 2px 0;font-size:16px}
+.sheet-dl a.btn{text-decoration:none}
 </style>
 </head>
 <body>
@@ -1229,6 +1263,29 @@ const STR_DATA10 = {
 };
 Object.keys(STR_DATA10).forEach(l => Object.assign(STR[l], STR_DATA10[l]));
 
+/* Version 11: wichtige Fristen, Stadtleben-Kategorien für Veranstaltungen, Karte */
+const STR_DATA11 = {
+  de: {dl_now:'Läuft · noch {n} Tage', dl_now1:'Läuft · noch 1 Tag', dl_last:'Läuft · heute letzter Tag', dl_soon:'Beginnt in {n} Tagen', dl_soon1:'Beginnt morgen', dl_today:'Beginnt heute',
+    dl_go:'Zur Anmeldung', dl_more:'Mehr dazu', dl_all:'Alle Fristen', dl_ok:'Verstanden', dl_pop:'Wichtige Frist', dl_pop_end:'Frist endet bald', dl_dot:'Wichtige Frist',
+    place_map:'Auf der Karte', places_head:'Tipps für {city}', ev_cat_none:'Keine Veranstaltungen in „{cat}“ in den nächsten 14 Tagen.'},
+  en: {dl_now:'Open · {n} days left', dl_now1:'Open · 1 day left', dl_last:'Open · last day today', dl_soon:'Starts in {n} days', dl_soon1:'Starts tomorrow', dl_today:'Starts today',
+    dl_go:'Register now', dl_more:'More info', dl_all:'All deadlines', dl_ok:'Got it', dl_pop:'Important deadline', dl_pop_end:'Deadline ends soon', dl_dot:'Important deadline',
+    place_map:'On the map', places_head:'Tips for {city}', ev_cat_none:'No events in “{cat}” in the next 14 days.'},
+  es: {dl_now:'Abierto · quedan {n} días', dl_now1:'Abierto · queda 1 día', dl_last:'Abierto · hoy es el último día', dl_soon:'Empieza en {n} días', dl_soon1:'Empieza mañana', dl_today:'Empieza hoy',
+    dl_go:'Inscribirse', dl_more:'Más información', dl_all:'Todos los plazos', dl_ok:'Entendido', dl_pop:'Plazo importante', dl_pop_end:'El plazo termina pronto', dl_dot:'Plazo importante',
+    place_map:'En el mapa', places_head:'Consejos para {city}', ev_cat_none:'No hay eventos de «{cat}» en los próximos 14 días.'},
+  it: {dl_now:'Aperto · mancano {n} giorni', dl_now1:'Aperto · manca 1 giorno', dl_last:'Aperto · oggi è l’ultimo giorno', dl_soon:'Inizia tra {n} giorni', dl_soon1:'Inizia domani', dl_today:'Inizia oggi',
+    dl_go:'Iscriviti', dl_more:'Maggiori informazioni', dl_all:'Tutte le scadenze', dl_ok:'Capito', dl_pop:'Scadenza importante', dl_pop_end:'La scadenza sta per finire', dl_dot:'Scadenza importante',
+    place_map:'Sulla mappa', places_head:'Consigli per {city}', ev_cat_none:'Nessun evento in «{cat}» nei prossimi 14 giorni.'},
+  fr: {dl_now:'Ouvert · encore {n} jours', dl_now1:'Ouvert · encore 1 jour', dl_last:'Ouvert · dernier jour aujourd’hui', dl_soon:'Commence dans {n} jours', dl_soon1:'Commence demain', dl_today:'Commence aujourd’hui',
+    dl_go:'S’inscrire', dl_more:'En savoir plus', dl_all:'Tous les délais', dl_ok:'Compris', dl_pop:'Délai important', dl_pop_end:'Le délai se termine bientôt', dl_dot:'Délai important',
+    place_map:'Sur la carte', places_head:'Conseils pour {city}', ev_cat_none:'Aucun événement « {cat} » dans les 14 prochains jours.'},
+  tr: {dl_now:'Açık · {n} gün kaldı', dl_now1:'Açık · 1 gün kaldı', dl_last:'Açık · bugün son gün', dl_soon:'{n} gün sonra başlıyor', dl_soon1:'Yarın başlıyor', dl_today:'Bugün başlıyor',
+    dl_go:'Kayıt ol', dl_more:'Daha fazla bilgi', dl_all:'Tüm son tarihler', dl_ok:'Anladım', dl_pop:'Önemli son tarih', dl_pop_end:'Son tarih yaklaşıyor', dl_dot:'Önemli son tarih',
+    place_map:'Haritada', places_head:'{city} için ipuçları', ev_cat_none:'Önümüzdeki 14 günde “{cat}” etkinliği yok.'}
+};
+Object.keys(STR_DATA11).forEach(l => Object.assign(STR[l], STR_DATA11[l]));
+
 
 /* ================= Campus-Daten: Hochschule Esslingen =================
    Drei Standorte: Esslingen Stadtmitte, Esslingen Flandernstraße, Göppingen.
@@ -1647,7 +1704,7 @@ function applyDaten(j){
       const von = ISO_RE.test(f.von) ? f.von : null, bis = ISO_RE.test(f.bis) ? f.bis : null, tt = cleanX(f.titel, 120);
       if(!tt || !(von || bis)) return;
       const old = DEADLINES.find(d => d.key === f.key);
-      const entry = {key: f.key, von, bis, t: tt, wo: cleanX(f.hinweis, 160) || (old && old.wo) || null, url: cleanUrl(f.quelle), live: true};
+      const entry = {key: f.key, von, bis, t: tt, wo: cleanX(f.hinweis, 160) || (old && old.wo) || null, url: cleanUrl(f.quelle), aktion_url: cleanUrl(f.aktion_url), wichtig: f.wichtig === true, live: true};
       if(old) Object.assign(old, entry); else DEADLINES.push(entry);
       LIVE.fristen = true;
     });
@@ -1660,7 +1717,7 @@ function applyDaten(j){
       const n = cleanX(e.titel, 120); if(!n) return null;
       const city = e.art === 'stadt' ? (CITY_CAL[e.stadt] ? e.stadt : null) : null;
       if(e.art === 'stadt' && !city) return null;
-      return {when: e.datum, time: /^\d{2}:\d{2}$/.test(e.zeit) ? e.zeit : '', c: !city && CAMPUS[e.campus] ? e.campus : null, city, n, s: cleanX(e.ort, 160) || {de: ''}, url: cleanUrl(e.url), live: true};
+      return {when: e.datum, time: /^\d{2}:\d{2}$/.test(e.zeit) ? e.zeit : '', c: !city && CAMPUS[e.campus] ? e.campus : null, city, n, s: cleanX(e.ort, 160) || {de: ''}, url: cleanUrl(e.url), k: ['kultur', 'sport', 'ausgehen', 'essen'].includes(e.kat) ? e.kat : null, live: true};
     }).filter(Boolean);
     if(ev.length){ EVENTS.length = 0; ev.forEach(x => EVENTS.push(x)); LIVE.termine = ev.some(x => !x.city); LIVE.stadt = ev.some(x => x.city); }
   }
@@ -1912,7 +1969,7 @@ function eventList(){
 }
 function eventRows(evs){
   if(!evs.length) return '<p class="muted">' + esc(t('no_events')) + '</p><a class="link" href="' + EVENTS_URL + '" target="_blank" rel="noopener" data-act="ext" data-ext="kalender">' + esc(t('events_cal')) + '</a>';
-  return '<div class="rows">' + evs.map(e => '<div class="row"><div class="rt"><b>' + esc(L(e.n)) + '</b><span>' + esc([L(e.s), e.city].filter(Boolean).join(' · ')) + '</span></div><span class="rv">' + esc(eventWhen(e) + (e.time ? ', ' + e.time : '')) + '</span></div>').join('') + '</div>';
+  return evRowsHTML(evs, EVENTS_URL, 'termin');
 }
 /* events in the town of the chosen campus (Esslingen or Göppingen), from today on */
 function cityEventList(city, days){
@@ -1922,12 +1979,7 @@ function cityEventList(city, days){
 }
 function cityEventRows(evs, city){
   if(!evs.length) return '<p class="muted">' + esc(t('city_ev_none')) + '</p><a class="link" href="' + esc(CITY_CAL[city] || EVENTS_URL) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('city_cal', {city})) + '</a>';
-  const mon = tl('months'), wd = OH_DAYS[LANG].split('|');
-  return '<div class="rows">' + evs.map(e => {
-    const d = new Date(e.when + 'T12:00:00'), sub = [wd[(d.getDay() + 6) % 7] + (e.time ? ', ' + e.time : ''), L(e.s)].filter(Boolean).join(' · ');
-    const title = e.url ? '<a class="ev-link" href="' + esc(e.url) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadt-termin">' + esc(L(e.n)) + icon('ext') + '</a>' : esc(L(e.n));
-    return '<div class="row row-ev"><span class="datebox"><b>' + d.getDate() + '</b><span>' + esc(mon[d.getMonth()]) + '</span></span><div class="rt"><b>' + title + '</b><span>' + esc(sub) + '</span></div></div>';
-  }).join('') + '</div>';
+  return evRowsHTML(evs, CITY_CAL[city] || EVENTS_URL, 'stadt-termin');
 }
 function eventWhen(e, lang){
   if(e.when === 'today') return t('today', null, lang);
@@ -2056,7 +2108,7 @@ function mensaPreviewHTML(){
 function screenStart(){
   const c = C(), nx = ROOMS[c.next.room], ch = c.change, nw = ROOMS[ch.now], was = ROOMS[ch.was];
   const uniEv = eventList().slice(0, 2), evs = uniEv.length >= 2 ? uniEv : uniEv.concat(cityEventList(cityName(), 7).slice(0, 2 - uniEv.length));
-  return '<div class="pad stack">' + installCardHTML() +
+  return '<div class="pad stack">' + installCardHTML() + deadlineBannerHTML() +
     '<section class="hero"><div class="hero-top"><p class="hero-date">' + esc(dateLabel()) + '</p>' + campusPill() + '</div><div class="hero-hi"><h1 class="hero-title">' + esc(greeting()) + (userName() ? ', ' + esc(userName()) : '') + '</h1><button class="name-btn" type="button" data-act="sheet" data-sheet="name" aria-label="' + esc(t(userName() ? 'name_edit' : 'name_add')) + '">' + icon('edit') + '</button></div>' +
       '<label class="ask-hint" for="ask-home">' + icon('spark') + '<span>' + esc(t('ask_hint')) + '</span></label>' +
       '<form class="ask ask-home" data-form="ask-home"><span class="ask-caret" aria-hidden="true"></span><input id="ask-home" name="q" placeholder="' + esc(t('ask_ph')) + '" autocomplete="off" enterkeyhint="send"><button type="submit" aria-label="' + esc(t('ask_send')) + '">' + icon('send') + '</button></form></section>' +
@@ -2313,8 +2365,7 @@ function screenDiscover(){
   if(studi){
     const mon = tl('months');
     const evs = eventList();
-    body = '<section class="card"><div class="sec-head"><h3>' + esc(t('deadlines')) + '</h3></div><div class="rows">' +
-      deadlineList().map(d => { const dt = new Date((d.bis || d.von) + 'T12:00:00'); return '<div class="row"><div class="rt"><b>' + esc(L(d.t)) + '</b><span>' + esc(fmtRangeL(d.von, d.bis) + (d.wo && L(d.wo) ? ' · ' + L(d.wo) : '')) + '</span></div><span class="datebox"><b>' + dt.getDate() + '</b><span>' + esc(mon[dt.getMonth()]) + '</span></span></div>'; }).join('') + '</div></section>' +
+    body = '<section class="card"><div class="sec-head"><h3>' + esc(t('deadlines')) + '</h3></div><div class="rows">' + deadlineRowsHTML() + '</div></section>' +
       '<section class="card"><div class="sec-head"><h3>' + esc(t('contacts')) + '</h3></div><div class="rows">' +
       CONTACTS.map(k => {
         if(k.n){ const r = ROOMS[k.n], h = roomHours(r); return '<div class="row"><div class="rt"><b>' + esc(roomName(r)) + '</b><span>' + esc((r.code ? r.code + ' · ' : '') + buildingLabel(r) + ', ' + L(CAMPUS[r.c].short) + (h ? ' · ' + h : '')) + '</span></div><button class="link contact-btn" type="button" data-act="route" data-room="' + r.id + '">' + esc(t('route_short')) + '</button></div>'; }
@@ -2324,28 +2375,28 @@ function screenDiscover(){
       (LIVE.fristen || LIVE.termine ? '<p class="src">' + icon('doc') + esc(t('live_src', {stand: standText()})) + '</p>' : '');
   } else {
     const all = placesFor(cityName());
-    const cats = PLACE_CATS.filter(k => k === 'alle' || all.some(p => p.c === k));
+    const cats = PLACE_CATS.filter(k => k === 'alle' || all.some(p => p.c === k) || cityEventList(cityName(), 14).some(e => evCat(e) === k));
     if(!cats.includes(state.cat)) state.cat = 'alle';
     const list = all.filter(p => state.cat === 'alle' || p.c === state.cat);
-    const catIcon = {essen:'cutlery', kultur:'city', sport:'walk', ausgehen:'people'};
-    const city = cityName(), cev = cityEventList(city, 14).slice(0, 12), near = CITY_NEAR[state.campus], nev = near ? cityEventList(near, 14).slice(0, 8) : [];
-    body = '<section class="card"><div class="sec-head"><h3>' + esc(t('city_events', {city})) + '</h3>' + (cev.length ? '<a class="link" href="' + esc(CITY_CAL[city] || EVENTS_URL) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a>' : '') + '</div>' +
-      cityEventRows(cev, city) + (LIVE.stadt ? '<p class="src">' + icon('doc') + esc(t('city_ev_src', {stand: standText()})) + '</p>' : '') + '</section>' +
+    const city = cityName(), near = CITY_NEAR[state.campus], inCat = e => state.cat === 'alle' || evCat(e) === state.cat;
+    const cevAll = cityEventList(city, 14), cev = cevAll.filter(inCat).slice(0, 12), nev = near ? cityEventList(near, 14).filter(inCat).slice(0, 8) : [];
+    body = '<div class="chips" aria-label="' + esc(t('category')) + '">' + cats.map(k => '<button class="chip" type="button" data-act="cat" data-cat="' + k + '" aria-pressed="' + (state.cat === k) + '">' + esc(t('cat_' + k)) + '</button>').join('') + '</div>' +
+      '<section class="card"><div class="sec-head"><h3>' + esc(t('city_events', {city})) + '</h3><a class="link" href="' + esc(CITY_CAL[city] || EVENTS_URL) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a></div>' +
+      (cev.length || !cevAll.length ? cityEventRows(cev, city) : '<p class="muted">' + esc(t('ev_cat_none', {cat: t('cat_' + state.cat)})) + '</p>') + (LIVE.stadt ? '<p class="src">' + icon('doc') + esc(t('city_ev_src', {stand: standText()})) + '</p>' : '') + '</section>' +
       (nev.length ? '<section class="card"><div class="sec-head"><h3>' + esc(t('city_events_near', {city: near})) + '</h3><a class="link" href="' + esc(CITY_CAL[near]) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a></div>' + cityEventRows(nev, near) + '</section>' : '') +
-      '<div class="chips" aria-label="' + esc(t('category')) + '">' + cats.map(k => '<button class="chip" type="button" data-act="cat" data-cat="' + k + '" aria-pressed="' + (state.cat === k) + '">' + esc(t('cat_' + k)) + '</button>').join('') + '</div>' +
-      list.map(p => { const way = p.m ? travelText(p.m) : '', where = [p.a, way].filter(Boolean).join(' · ');
-        return '<article class="card place"><span class="tico">' + icon(catIcon[p.c]) + '</span><div><b>' + esc(p.n) + '</b><p>' + esc(L(p.s)) + '</p>' + (where ? '<p>' + esc(where) + '</p>' : '') +
-          (p.url ? '<a class="link place-link" href="' + esc(p.url) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadt-ort">' + esc(t('place_web')) + '</a>' : '') + '</div></article>'; }).join('') +
+      (list.length ? '<h3 class="place-head">' + esc(t('places_head', {city})) + '</h3>' : '') +
+      list.map(p => placeCardHTML(p, city)).join('') +
       '<p class="src">' + icon('doc') + esc(LIVE_PLACES[city] ? t('city_src_live', {city, d: fmtDayShort(LIVE.orte)}) : t('city_src', {city})) + '</p>';
   }
   return '<div class="pad stack">' +
     screenHead(t('disc_title'), studi ? t('disc_studi') : t('disc_city', {city: cityName()})) +
-    '<div class="seg" role="tablist"><button type="button" role="tab" data-act="seg" data-seg="studi" aria-selected="' + studi + '">' + esc(t('seg_studi')) + '</button><button type="button" role="tab" data-act="seg" data-seg="stadt" aria-selected="' + !studi + '">' + esc(t('seg_city')) + '</button></div>' +
+    '<div class="seg" role="tablist"><button type="button" role="tab" data-act="seg" data-seg="studi" aria-selected="' + studi + '">' + esc(t('seg_studi')) + (importantDeadlines().length ? '<span class="tab-dot" role="img" aria-label="' + esc(t('dl_dot')) + '"></span>' : '') + '</button><button type="button" role="tab" data-act="seg" data-seg="stadt" aria-selected="' + !studi + '">' + esc(t('seg_city')) + '</button></div>' +
     body + '</div>';
 }
 
 /* ---------- sheets (language, campus) ---------- */
 function sheetHTML(){
+  if(state.sheet === 'frist') return deadlineSheetHTML();
   if(state.sheet === 'lang'){
     return '<div class="sheet-back" data-act="sheet-close"></div><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h"><div class="sheet-head"><h2 id="sheet-h">' + esc(t('lang_title')) + '</h2><button class="mo-close" type="button" data-act="sheet-close" aria-label="' + esc(t('close')) + '">' + icon('close') + '</button></div><div class="sheet-list">' +
       LANGS.map(l => '<button class="sheet-opt" type="button" data-act="lang" data-lang="' + l + '" lang="' + l + '" aria-pressed="' + (l === LANG) + '"><span class="code">' + l.toUpperCase() + '</span><span>' + esc(LANG_NAMES[l]) + '</span>' + (l === LANG ? icon('check') : '') + '</button>').join('') + '</div></div>';
@@ -2753,7 +2804,8 @@ function renderTabbar(){
   tb.innerHTML = TABS.map(x => {
     const cur = state.tab === x[0];
     if(x[0] === 'chat') return '<button class="tab tab-ai" type="button" data-act="tab" data-tab="chat"' + (cur ? ' aria-current="page"' : '') + '><span class="ai-ico">' + icon('spark') + '</span>' + esc(t(x[1])) + '</button>';
-    return '<button class="tab" type="button" data-act="tab" data-tab="' + x[0] + '"' + (cur ? ' aria-current="page"' : '') + '>' + icon(x[2]) + esc(t(x[1])) + '</button>';
+    const dot = x[0] === 'discover' && importantDeadlines().length ? '<span class="tab-dot" role="img" aria-label="' + esc(t('dl_dot')) + '"></span>' : '';
+    return '<button class="tab" type="button" data-act="tab" data-tab="' + x[0] + '"' + (cur ? ' aria-current="page"' : '') + '>' + icon(x[2]) + dot + esc(t(x[1])) + '</button>';
   }).join('');
 }
 function renderScreen(keepScroll){
@@ -2769,6 +2821,7 @@ function renderScreen(keepScroll){
   renderTabbar();
   const hb = document.querySelector('.help-btn'); if(hb){ if(state.tab === 'help') hb.setAttribute('aria-current', 'page'); else hb.removeAttribute('aria-current'); }
   geoAfterRender();
+  if(state.mode === 'app') setTimeout(maybeDeadlinePopup, 700);
   studyAfterScreen();
 }
 function go(tab, opts){
@@ -2914,6 +2967,101 @@ function understand(q){
     });
   });
   return {c: found, words: base ? base.split(' ').length : 0, text: base};
+}
+
+
+/* ================= Version 11: wichtige Fristen, verlinkte Veranstaltungen, anklickbare Stadtleben-Tipps =================
+   Wichtige Fristen (Prüfungsanmeldung, Rückmeldung, Modulanmeldung … oder "wichtig": true in den Live-Daten):
+   - laufen sie gerade oder beginnen in höchstens 3 Tagen, bekommt "Entdecken" einen Punkt, die Startseite einen Hinweis
+     und die Frist unter "Studileben" eine Markierung mit Restzeit und Link;
+   - einmal pro Frist erscheint beim Öffnen der App ein Hinweis, ein zweites Mal in den letzten 2 Tagen. */
+const DL_IMPORTANT = ['pruefungsanmeldung', 'rueckmeldung', 'moduleinschreibung', 'modulanmeldung', 'wahlpflichtanmeldung', 'pruefungsabmeldung', 'bewerbung'];
+const DL_SEEN_KEY = 'campi-fristen-gesehen-v1';
+function dayDiff(a, b){ return Math.round((Date.parse(b + 'T12:00:00') - Date.parse(a + 'T12:00:00')) / 864e5); }
+/* status of a deadline today: null (not important or not now), or {kind:'now'|'soon', left, inDays, phase} */
+function dlStatus(d){
+  if(!d || !(DL_IMPORTANT.includes(d.key) || d.wichtig === true) || !d.bis) return null;
+  const today = isoDay(NOW);
+  if(today > d.bis) return null;
+  if(d.von && today < d.von){ const n = dayDiff(today, d.von); return n <= 3 ? {kind: 'soon', inDays: n, phase: 'start'} : null; }
+  const left = dayDiff(today, d.bis);
+  return {kind: 'now', left, phase: left <= 2 ? 'ende' : 'start'};
+}
+function importantDeadlines(){ return DEADLINES.map(d => ({d, st: dlStatus(d)})).filter(x => x.st).sort((a, b) => a.d.bis.localeCompare(b.d.bis)); }
+function dlLabel(st, lang){
+  if(st.kind === 'soon') return st.inDays <= 0 ? t('dl_today', null, lang) : t(st.inDays === 1 ? 'dl_soon1' : 'dl_soon', {n: st.inDays}, lang);
+  return st.left <= 0 ? t('dl_last', null, lang) : t(st.left === 1 ? 'dl_now1' : 'dl_now', {n: st.left}, lang);
+}
+function dlLink(d){ return cleanUrl(d.aktion_url) || d.url || null; }
+function dlBadge(st){ return '<span class="dl-pill' + (st.kind === 'now' && st.left <= 2 ? ' dl-pill-urgent' : '') + '">' + icon('bell') + esc(dlLabel(st)) + '</span>'; }
+/* start page: one line per important deadline */
+function deadlineBannerHTML(){
+  const list = importantDeadlines(); if(!list.length) return '';
+  return list.slice(0, 2).map(({d, st}) => '<button class="dl-banner" type="button" data-act="discover" data-seg="studi" data-ext="frist-banner"><span class="dl-banner-ico">' + icon('bell') + '</span><span><b>' + esc(L(d.t)) + '</b><span class="tsub">' + esc(dlLabel(st) + ' · ' + fmtRangeL(d.von, d.bis)) + '</span></span>' + icon('arrow') + '</button>').join('');
+}
+/* Studileben: deadline rows, important ones highlighted with time left and a link */
+function deadlineRowsHTML(){
+  const mon = tl('months');
+  return deadlineList().map(d => {
+    const st = dlStatus(d), dt = new Date((d.bis || d.von) + 'T12:00:00'), link = dlLink(d);
+    return '<div class="row' + (st ? ' row-dl-hot' : '') + '"><div class="rt"><b>' + esc(L(d.t)) + '</b><span>' + esc(fmtRangeL(d.von, d.bis) + (d.wo && L(d.wo) ? ' · ' + L(d.wo) : '')) + '</span>' +
+      (st ? dlBadge(st) : '') + (st && link ? '<a class="link dl-go" href="' + esc(link) + '" target="_blank" rel="noopener" data-act="ext" data-ext="frist">' + esc(t(d.aktion_url ? 'dl_go' : 'dl_more')) + icon('ext') + '</a>' : '') +
+      '</div><span class="datebox"><b>' + dt.getDate() + '</b><span>' + esc(mon[dt.getMonth()]) + '</span></span></div>';
+  }).join('');
+}
+/* one-time popup */
+function dlSeen(){ try { return JSON.parse(lsGet(DL_SEEN_KEY) || '{}') || {}; } catch(e){ return {}; } }
+function dlSeenId(d, st){ return d.key + '|' + (d.von || '') + '|' + d.bis + '|' + st.phase; }
+let dlPopupChecked = false;
+function maybeDeadlinePopup(){
+  if(window.__CAMPI_NO_POPUP__ === true) return;   /* only set by automated tests of older features */
+  if(state.mode !== 'app' || ST.active || state.sheet || $('map-overlay') || $('st-layer')) return;
+  const seen = dlSeen(), next = importantDeadlines().find(x => !seen[dlSeenId(x.d, x.st)]);
+  if(!next) return;
+  seen[dlSeenId(next.d, next.st)] = new Date().toISOString(); lsSet(DL_SEEN_KEY, JSON.stringify(seen));
+  state.frist = next.d.key;
+  track('frist_hinweis', {aktion: 'gezeigt', frist: next.d.key, phase: next.st.phase, tage: next.st.kind === 'now' ? next.st.left : -next.st.inDays});
+  openSheet('frist');
+}
+function deadlineSheetHTML(){
+  const d = DEADLINES.find(x => x.key === state.frist), st = d && dlStatus(d);
+  if(!d || !st) return '';
+  const link = dlLink(d);
+  return '<div class="sheet-back" data-act="frist-ok"></div><div class="sheet sheet-dl" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h"><div class="sheet-head"><h2 id="sheet-h">' + esc(t(st.phase === 'ende' ? 'dl_pop_end' : 'dl_pop')) + '</h2><button class="mo-close" type="button" data-act="frist-ok" aria-label="' + esc(t('close')) + '">' + icon('close') + '</button></div>' +
+    '<div class="dl-pop"><span class="dl-pop-ico">' + icon('bell') + '</span><div><b>' + esc(L(d.t)) + '</b><p>' + esc(fmtRangeL(d.von, d.bis)) + '</p>' + dlBadge(st) + (d.wo && L(d.wo) ? '<p class="dl-pop-hint">' + esc(L(d.wo)) + '</p>' : '') + '</div></div>' +
+    '<div class="btn-row">' + (link ? '<a class="btn btn-primary" href="' + esc(link) + '" target="_blank" rel="noopener" data-act="ext" data-ext="frist-popup">' + icon('ext') + esc(t(d.aktion_url ? 'dl_go' : 'dl_more')) + '</a>' : '') +
+    '<button class="btn btn-soft" type="button" data-act="frist-all">' + esc(t('dl_all')) + '</button><button class="btn btn-soft" type="button" data-act="frist-ok">' + esc(t('dl_ok')) + '</button></div></div>';
+}
+
+/* ---------- events: every row is a link (event page, otherwise the calendar) ---------- */
+const EV_CATS = ['kultur', 'sport', 'ausgehen', 'essen'];
+function evCat(e){
+  if(e.k) return e.k;
+  const s = ((e.n && e.n.de) || '') + ' ' + ((e.s && e.s.de) || '');
+  if(/handball|fu(ss|ß)ball|basketball|volleyball|lauf\b|marathon|turnier|sport|fitness|yoga|klettern|schwimm|eishockey|\bspiel\b/i.test(s)) return 'sport';
+  if(/party|club|disco|\bdj\b|konzert|festival|live|jazz|rock|metal|pop|rap|hip.?hop|kneipe|bar\b|slam|tanz|bal-folk|karaoke|quiz/i.test(s)) return 'ausgehen';
+  if(/street.?food|food|brunch|kulinar|wein|bier|essen|markt.*genuss/i.test(s)) return 'essen';
+  return 'kultur';
+}
+function evRowsHTML(evs, fallback, ext){
+  const mon = tl('months'), wd = OH_DAYS[LANG].split('|');
+  return '<div class="rows">' + evs.map(e => {
+    const iso = ISO_RE.test(e.when), d = iso ? new Date(e.when + 'T12:00:00') : null;
+    const when = iso ? wd[(d.getDay() + 6) % 7] + (e.time ? ', ' + e.time : '') : eventWhen(e) + (e.time ? ', ' + e.time : '');
+    const sub = [when, L(e.s), e.city && !iso ? e.city : ''].filter(Boolean).join(' · ');
+    const href = e.url || fallback;
+    return '<a class="row row-ev row-link" href="' + esc(href) + '" target="_blank" rel="noopener" data-act="ext" data-ext="' + ext + '">' +
+      (iso ? '<span class="datebox"><b>' + d.getDate() + '</b><span>' + esc(mon[d.getMonth()]) + '</span></span>' : '<span class="datebox datebox-txt"><b>' + esc(eventWhen(e)) + '</b></span>') +
+      '<div class="rt"><b>' + esc(L(e.n)) + '</b><span>' + esc(sub) + '</span></div><span class="row-go" aria-hidden="true">' + icon('ext') + '</span></a>';
+  }).join('') + '</div>';
+}
+/* ---------- Stadtleben places: the whole card opens the website or the map ---------- */
+function placeHref(p, city){ return p.url || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p.n + ', ' + (p.a || city)); }
+function placeCardHTML(p, city){
+  const catIcon = {essen:'cutlery', kultur:'city', sport:'walk', ausgehen:'people'};
+  const way = p.m ? travelText(p.m) : '', where = [p.a, way].filter(Boolean).join(' · ');
+  return '<a class="card place place-a" href="' + esc(placeHref(p, city)) + '" target="_blank" rel="noopener" data-act="ext" data-ext="' + (p.url ? 'stadt-ort-web' : 'stadt-ort-karte') + '"><span class="tico">' + icon(catIcon[p.c] || 'city') + '</span><div><b>' + esc(p.n) + '</b><p>' + esc(L(p.s)) + '</p>' + (where ? '<p>' + esc(where) + '</p>' : '') +
+    '<span class="place-go">' + icon(p.url ? 'ext' : 'pin') + esc(t(p.url ? 'place_web' : 'place_map')) + '</span></div></a>';
 }
 
 /* ================= Settings view (Hochschul-Bereich) ================= */
@@ -3538,7 +3686,7 @@ function sessionMeta(){
 function screenKey(){
   if(state.mode !== 'app') return 'einstellungen';
   const base = state.tab === 'discover' ? 'entdecken-' + state.discover : state.tab === 'rooms' ? 'raeume-' + state.view : ({start:'start', chat:'chat', mensa:'mensa', help:'hilfe'})[state.tab] || state.tab;
-  return base + ($('map-overlay') ? '+karte' : '') + (state.sheet ? '+' + ({lang:'sprache', campus:'standort', name:'name', install:'app-anleitung'}[state.sheet] || state.sheet) : '');
+  return base + ($('map-overlay') ? '+karte' : '') + (state.sheet ? '+' + ({lang:'sprache', campus:'standort', name:'name', install:'app-anleitung', frist:'frist-hinweis'}[state.sheet] || state.sheet) : '');
 }
 function studySampleScroll(){
   if(!ST.tracking) return;
@@ -3959,7 +4107,8 @@ function studyOverlayHTML(){
       const where = t(REMOTE ? 'st_where_remote' : 'st_where_local');
       return stScreen(stLangRow() + '<p class="st-kicker">' + esc(CFG.projekt) + '</p><h1 id="st-h">' + esc(t('st_title')) + '</h1>' +
         '<p>' + esc(t('st_text')) + '</p>' +
-        '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('st_box2')) + ' ' + (REMOTE ? esc(t('st_ip')) + ' ' : '') + esc(where) + ' ' + esc(t('st_map_note')) + '</p>' +
+        '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('st_box1')) + '</p>' +
+        '<p>' + esc(t('st_box2')) + ' ' + (REMOTE ? esc(t('st_ip')) + ' ' : '') + esc(where) + ' ' + esc(t('st_map_note')) + '</p>' +
         (CFG.kontakt ? '<p>' + esc(t('st_contact', {c: CFG.kontakt})) + '</p>' : '') + '</div>' +
         stForm('intro',
           stQ(esc(t('q_semester')), stRadio('semester', [{v:'1. Semester', l:t('o_sem1')}, {v:'2. bis 3. Semester', l:t('o_sem2')}, {v:'4. Semester oder höher', l:t('o_sem4')}, {v:'Ich studiere nicht', l:t('o_semx')}])) +
@@ -3974,7 +4123,7 @@ function studyOverlayHTML(){
       const where = t(REMOTE ? 'st_where_remote' : 'st_where_local');
       return stScreen(stLangRow() + '<p class="st-kicker">' + esc(CFG.projekt) + '</p><h1 id="st-h">' + esc(t('pi_title')) + '</h1>' +
         '<p>' + esc(t('pi_text')) + '</p>' +
-        '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('st_box2')) + ' ' + (REMOTE ? esc(t('st_ip')) + ' ' : '') + esc(where) + '</p>' +
+        '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('pi_box1')) + '</p><p>' + esc(t('st_box2')) + ' ' + (REMOTE ? esc(t('st_ip')) + ' ' : '') + esc(where) + '</p>' +
         (CFG.kontakt ? '<p>' + esc(t('st_contact', {c: CFG.kontakt})) + '</p>' : '') + '</div>' +
         stForm('pilot',
           (geoAvailable() ? '<label class="st-check st-check-soft"><input type="checkbox" name="standort_freigabe" value="ja"><span>' + esc(t('st_geo_pilot')) + '</span></label>' : '') +
@@ -4424,6 +4573,8 @@ document.addEventListener('click', e => {
     case 'sheet-close': { const was = state.sheet; if(was === 'install') track('installation', {aktion: 'anleitung_zu', quelle: 'nachlesen', plattform: ST.guidePlat, sekunden: Math.round((performance.now() - (ST.guideSince || performance.now())) / 1000)});
       closeSheet(); const b = document.querySelector(was === 'name' ? '.name-btn' : was === 'install' ? '.guide-link, .install-card [data-act="guide"]' : '.lang-btn'); if(b) b.focus(); } break;
     case 'guide': openGuide(el.dataset.src); break;
+    case 'frist-ok': track('frist_hinweis', {aktion: 'geschlossen', frist: state.frist}); closeSheet(); break;
+    case 'frist-all': track('frist_hinweis', {aktion: 'alle_fristen', frist: state.frist}); go('discover', {seg: 'studi'}); break;
     case 'help-ask': go('chat'); ask(el.dataset.q, 'hilfe'); break;
     case 'help-faq': break;
     case 'guide-plat': setGuidePlat(el.dataset.plat); break;

@@ -110,6 +110,9 @@ async function main(){
         mehrsprachig(`${p}.titel`, x.titel, 120, true);
         mehrsprachig(`${p}.hinweis`, x.hinweis, 160, false);
         url(`${p}.quelle`, x.quelle);
+        url(`${p}.aktion_url`, x.aktion_url);
+        if(x.aktion_url && !/^https:\/\/([a-z0-9-]+\.)*hs-esslingen\.de(\/|$)/i.test(x.aktion_url)) f(`${p}.aktion_url`, 'nur Links auf hs-esslingen.de');
+        if(x.wichtig !== undefined && typeof x.wichtig !== 'boolean') f(`${p}.wichtig`, 'muss true oder false sein');
         if(x.quelle && !/^https:\/\/([a-z0-9-]+\.)*hs-esslingen\.de(\/|$)/i.test(x.quelle)) f(`${p}.quelle`, 'Fristen nur mit Quelle auf hs-esslingen.de');
       });
     }
@@ -139,6 +142,7 @@ async function main(){
         else if(x.datum > grenzeNeu) f(`${p}.datum`, 'liegt zu weit in der Zukunft');
         if(x.zeit !== undefined && x.zeit !== null && x.zeit !== '' && !/^([01]\d|2[0-3]):[0-5]\d$/.test(x.zeit)) f(`${p}.zeit`, 'muss HH:MM sein');
         if(x.campus !== undefined && x.campus !== null && !CAMPUS.includes(x.campus)) f(`${p}.campus`, 'muss SM, FL, GP oder null sein');
+        if(x.kat !== undefined && x.kat !== null && !KATEGORIEN.includes(x.kat)) f(`${p}.kat`, `muss ${KATEGORIEN.join(', ')} oder null sein`);
         mehrsprachig(`${p}.titel`, x.titel, 120, true);
         mehrsprachig(`${p}.ort`, x.ort, 160, false);
         url(`${p}.url`, x.url);
