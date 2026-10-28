@@ -2076,7 +2076,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261028-124813';
+const CAMPI_BUILD = '20261028-125613';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -2108,7 +2108,7 @@ function logoHTML(){
   return '<span class="logo mono" aria-hidden="true">' + esc(initials(b.name)) + '</span>';
 }
 function renderAppbar(){
-  $('appbar').innerHTML = '<div class="brand" id="brand">' + logoHTML() + '<div class="brand-txt"><span class="brand-name">' + esc(state.b.name) + '</span><span class="brand-sub">' + esc(t('brand_sub')) + '</span>' + '<button class="brand-app" type="button" data-act="guide" data-src="kopfzeile">' + icon('install') + '<span>' + esc(t('app_info_btn')) + '</span></button>' + '</div></div>' +
+  $('appbar').innerHTML = '<div class="brand" id="brand">' + logoHTML() + '<div class="brand-txt"><span class="brand-name">' + esc(state.b.name) + '</span><span class="brand-sub">' + esc(t('brand_sub')) + '</span>' + (standalone() ? '' : '<button class="brand-app" type="button" data-act="guide" data-src="kopfzeile">' + icon('install') + '<span>' + esc(t('app_info_btn')) + '</span></button>') + '</div></div>' +
     '<button class="help-btn" type="button" data-act="tab" data-tab="help" aria-label="' + esc(t('help_btn')) + '"' + (state.tab === 'help' ? ' aria-current="page"' : '') + '>' + icon('help') + '</button>' +
     '<button class="lang-btn" type="button" data-act="sheet" data-sheet="lang" aria-label="' + esc(t('lang_btn')) + ': ' + esc(LANG_NAMES[LANG]) + '">' + icon('globe') + '<span>' + LANG.toUpperCase() + '</span></button>';
 }
