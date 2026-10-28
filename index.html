@@ -633,6 +633,19 @@ a{color:inherit}
 .brand-app{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:3px;padding:2px 8px 2px 6px;border-radius:999px;border:1px solid var(--a-line);background:var(--a-surface);color:var(--a-primary);font:inherit;font-size:11px;font-weight:800;line-height:1.4;cursor:pointer;white-space:nowrap}
 .brand-app svg{width:12px;height:12px;flex:none}
 .brand-app:hover,.brand-app:focus-visible{border-color:var(--a-primary)}
+
+/* Version 13: pull to refresh, new version bar */
+.ptr{position:relative;height:0;z-index:30;pointer-events:none}
+.ptr-in{position:absolute;left:50%;top:0;display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border-radius:999px;background:var(--a-surface);color:var(--a-fg);border:1px solid var(--a-line);box-shadow:0 6px 18px rgba(0,0,0,.14);font-size:13px;font-weight:700;white-space:nowrap;opacity:0;transform:translate(-50%,var(--ptr-y,-56px));transition:opacity .15s}
+.ptr-in svg{width:16px;height:16px;transform:rotate(90deg);transition:transform .2s;color:var(--a-primary)}
+.ptr.ptr-on .ptr-in{opacity:1}
+.ptr.ptr-ready .ptr-in svg{transform:rotate(-90deg)}
+.ptr.ptr-busy .ptr-in svg{animation:ptr-spin .8s linear infinite}
+@keyframes ptr-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.ptr.ptr-busy .ptr-in svg{animation:none}}
+.upd-bar{position:absolute;left:12px;right:12px;bottom:84px;z-index:40;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;border:0;background:var(--a-primary);color:var(--a-on-primary);font:inherit;font-size:14px;text-align:left;box-shadow:0 8px 24px rgba(0,0,0,.2);cursor:pointer}
+.upd-bar svg{width:18px;height:18px;flex:none}
+.upd-bar b{margin-left:auto;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -1305,6 +1318,17 @@ const STR_DATA12 = {
   tr: {app_info_btn:'Uygulama olarak kullan', app_info:'Uygulama olarak Campi', app_info_s:'Campi’yi ana ekranına nasıl eklersin', ask_ex_app:'Campi’yi uygulama olarak nasıl kullanırım?'}
 };
 Object.keys(STR_DATA12).forEach(l => { Object.assign(STR[l], STR_DATA12[l]); if(STR[l].ask_examples && STR[l].ask_examples.indexOf(STR_DATA12[l].ask_ex_app) < 0) STR[l].ask_examples += '|' + STR_DATA12[l].ask_ex_app; });
+
+/* Version 13: Ziehen zum Aktualisieren, neue Version */
+const STR_DATA13 = {
+  de: {ptr_pull:'Zum Aktualisieren ziehen', ptr_release:'Loslassen zum Aktualisieren', ptr_loading:'Wird aktualisiert …', upd_bar:'Neue Version von Campi', upd_go:'Aktualisieren'},
+  en: {ptr_pull:'Pull to refresh', ptr_release:'Release to refresh', ptr_loading:'Refreshing …', upd_bar:'New version of Campi', upd_go:'Update'},
+  es: {ptr_pull:'Desliza para actualizar', ptr_release:'Suelta para actualizar', ptr_loading:'Actualizando …', upd_bar:'Nueva versión de Campi', upd_go:'Actualizar'},
+  it: {ptr_pull:'Trascina per aggiornare', ptr_release:'Rilascia per aggiornare', ptr_loading:'Aggiornamento …', upd_bar:'Nuova versione di Campi', upd_go:'Aggiorna'},
+  fr: {ptr_pull:'Tirer pour actualiser', ptr_release:'Relâcher pour actualiser', ptr_loading:'Actualisation …', upd_bar:'Nouvelle version de Campi', upd_go:'Mettre à jour'},
+  tr: {ptr_pull:'Yenilemek için çek', ptr_release:'Yenilemek için bırak', ptr_loading:'Yenileniyor …', upd_bar:'Campi’nin yeni sürümü', upd_go:'Güncelle'}
+};
+Object.keys(STR_DATA13).forEach(l => Object.assign(STR[l], STR_DATA13[l]));
 
 
 /* ================= Campus-Daten: Hochschule Esslingen =================
@@ -2051,10 +2075,13 @@ function setRoom(id){
 }
 
 /* ================= App rendering ================= */
+/* build number: set by the build script, used to notice a newer version on the server */
+const CAMPI_BUILD = '20261028-123303';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
     '<header class="appbar" id="appbar"></header>' +
+    '<div class="ptr" id="ptr" aria-hidden="true"><span class="ptr-in">' + icon('arrow') + '<span class="ptr-txt"></span></span></div>' +
     '<main class="screen" id="screen"></main>' +
     '<nav class="tabbar" id="tabbar"></nav>' +
   '</div></div>';
@@ -4548,6 +4575,84 @@ try { if(screen.orientation && screen.orientation.addEventListener) screen.orien
 window.addEventListener('unhandledrejection', e => { track('fehler', {meldung: String((e.reason && (e.reason.message || e.reason)) || 'Promise').slice(0, 160), art: 'promise'}); });
 
 
+/* ================= Version 13: Neu laden durch Herunterziehen, Hinweis auf neue Version =================
+   - Auf dem Handy (auch als App vom Home-Bildschirm, wo der Browser kein eigenes „Ziehen zum Aktualisieren“ hat):
+     oben auf einer Seite weit nach unten ziehen und loslassen lädt Campi neu. Nicht während des App-Tests.
+   - Die GitHub-Version prüft beim Öffnen und beim Zurückkehren in die App, ob es eine neuere Fassung gibt,
+     und lädt sie dann (ohne dass man die App vom Home-Bildschirm löschen muss). */
+const PTR = {y0: null, x0: 0, dy: 0, on: false, busy: false};
+const PTR_LIMIT = 95;
+function ptrEl(){ return $('ptr'); }
+function ptrAllowed(){
+  const sc = $('screen');
+  return state.mode === 'app' && !ST.active && !state.sheet && !$('map-overlay') && !$('st-layer') && sc && sc.scrollTop <= 0 && state.tab !== 'chat';
+}
+function ptrShow(dy){
+  const el = ptrEl(); if(!el) return;
+  const d = Math.min(dy * 0.5, 80), ready = dy * 0.5 >= PTR_LIMIT * 0.5 + 10;
+  el.style.setProperty('--ptr-y', (d - 56) + 'px');
+  el.classList.toggle('ptr-ready', ready); el.classList.add('ptr-on');
+  const tx = el.querySelector('.ptr-txt'); if(tx) tx.textContent = t(ready ? 'ptr_release' : 'ptr_pull');
+  return ready;
+}
+function ptrHide(){ const el = ptrEl(); if(!el) return; el.classList.remove('ptr-on', 'ptr-ready'); el.style.removeProperty('--ptr-y'); }
+function ptrReload(why){
+  if(PTR.busy) return; PTR.busy = true;
+  const el = ptrEl(); if(el){ el.classList.add('ptr-on', 'ptr-busy'); el.style.setProperty('--ptr-y', '16px'); const tx = el.querySelector('.ptr-txt'); if(tx) tx.textContent = t('ptr_loading'); }
+  track('neu_geladen', {ausloeser: why || 'ziehen'});
+  try { endScreen('neu_geladen'); persistOutbox(true); } catch(e){}
+  const go = () => { try { location.reload(); } catch(e){ location.href = location.href; } };
+  Promise.race([flush(true), new Promise(r => setTimeout(r, 800))]).then(go, go);
+}
+document.addEventListener('touchstart', e => {
+  if(e.touches.length !== 1 || !e.target.closest || !e.target.closest('#screen') || !ptrAllowed()){ PTR.y0 = null; return; }
+  PTR.y0 = e.touches[0].clientY; PTR.x0 = e.touches[0].clientX; PTR.dy = 0; PTR.on = false;
+}, {passive: true});
+document.addEventListener('touchmove', e => {
+  if(PTR.y0 === null) return;
+  const dy = e.touches[0].clientY - PTR.y0, dx = Math.abs(e.touches[0].clientX - PTR.x0);
+  const sc = $('screen');
+  if(!PTR.on && (dy < 8 || dx > dy || (sc && sc.scrollTop > 0))){ if(dy < -4 || dx > 12) PTR.y0 = null; return; }
+  PTR.on = true; PTR.dy = dy;
+  if(e.cancelable) e.preventDefault();
+  ptrShow(dy);
+}, {passive: false});
+document.addEventListener('touchend', () => {
+  if(PTR.y0 === null) return;
+  const ready = PTR.on && PTR.dy * 0.5 >= PTR_LIMIT * 0.5 + 10;
+  PTR.y0 = null; PTR.on = false;
+  if(ready) ptrReload('ziehen'); else ptrHide();
+}, {passive: true});
+document.addEventListener('touchcancel', () => { PTR.y0 = null; PTR.on = false; ptrHide(); }, {passive: true});
+
+/* a newer version on the server? (GitHub version only: the page has a manifest and runs over http/https) */
+let updChecked = 0, updShown = false;
+function checkForUpdate(why){
+  if(!/^https?:$/.test(location.protocol) || !document.querySelector('link[rel="manifest"]') || updShown || PTR.busy) return;
+  if(Date.now() - updChecked < 15 * 1000) return;
+  updChecked = Date.now();
+  try { if(navigator.serviceWorker && navigator.serviceWorker.getRegistration) navigator.serviceWorker.getRegistration().then(r => { if(r) r.update().catch(() => {}); }).catch(() => {}); } catch(e){}
+  fetch(location.pathname + '?v=' + Date.now(), {cache: 'no-store'}).then(r => r.ok ? r.text() : '').then(html => {
+    const m = /CAMPI_BUILD = '([0-9a-z-]+)'/.exec(html || '');
+    if(!m || m[1] === CAMPI_BUILD) return;
+    updShown = true;
+    track('neue_version', {von: CAMPI_BUILD, auf: m[1], grund: why || ''});
+    /* nobody is in the middle of something: just load it; otherwise show a small bar */
+    /* reload by itself only once per version and browser session, so a stale cache can never cause a reload loop */
+    let tried = ''; try { tried = sessionStorage.getItem('campi-update-tried') || ''; } catch(e){}
+    const busy = ST.active || state.sheet || (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName));
+    if(!busy && tried !== m[1]){ try { sessionStorage.setItem('campi-update-tried', m[1]); } catch(e){} ptrReload('neue_version'); }
+    else showUpdateBar();
+  }).catch(() => {});
+}
+function showUpdateBar(){
+  if($('upd-bar')) return;
+  const app = $('app'); if(!app) return;
+  app.insertAdjacentHTML('beforeend', '<button class="upd-bar" id="upd-bar" type="button" data-act="reload-app">' + icon('install') + '<span>' + esc(t('upd_bar')) + '</span><b>' + esc(t('upd_go')) + '</b></button>');
+}
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') checkForUpdate('zurueck'); });
+
+
 /* ================= Mode switching ================= */
 function wantsAdmin(){ return /^#(einstellungen|settings|admin)$/i.test(location.hash || ''); }
 function render(){
@@ -4598,6 +4703,7 @@ document.addEventListener('click', e => {
     case 'sheet-close': { const was = state.sheet; if(was === 'install') track('installation', {aktion: 'anleitung_zu', quelle: 'nachlesen', plattform: ST.guidePlat, sekunden: Math.round((performance.now() - (ST.guideSince || performance.now())) / 1000)});
       closeSheet(); const b = document.querySelector(was === 'name' ? '.name-btn' : was === 'install' ? '.guide-link, .install-card [data-act="guide"]' : '.lang-btn'); if(b) b.focus(); } break;
     case 'guide': openGuide(el.dataset.src); break;
+    case 'reload-app': ptrReload('hinweis'); break;
     case 'frist-ok': track('frist_hinweis', {aktion: 'geschlossen', frist: state.frist}); closeSheet(); break;
     case 'frist-all': track('frist_hinweis', {aktion: 'alle_fristen', frist: state.frist}); go('discover', {seg: 'studi'}); break;
     case 'help-ask': go('chat'); ask(el.dataset.q, 'hilfe'); break;
@@ -4718,6 +4824,7 @@ if(state.mode === 'app'){
   else if(!ST.active && /^#app-tipp$/i.test(location.hash)){ previewGuide(); clearHash(); }
 }
 if(REMOTE && pendingCount()) flush();
+setTimeout(() => checkForUpdate('start'), 2500);
 /* current menu, deadlines and events: daten.json (GitHub workflow, every night), the claude.ai database
    (Claude every morning) and the menu straight from OpenMensa; the newest wins */
 loadDaten().then(loadOpenMensa, loadOpenMensa);
