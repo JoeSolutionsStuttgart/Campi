@@ -1,0 +1,139 @@
+# Campi · aktualisiert an jedem Werktag um 1 Uhr deutscher Zeit daten.json
+# (nicht an Samstagen, Sonntagen und Feiertagen in Baden-Württemberg, siehe scripts/arbeitstag.mjs):
+#   1. Speiseplan der Mensen Stadtmitte und Flandernstraße (Studierendenwerk Stuttgart über OpenMensa)
+#   2. Claude übersetzt die Gerichte, prüft Fristen auf hs-esslingen.de und sucht Veranstaltungen
+#      der Hochschule und der Städte Esslingen und Göppingen auf den Seiten aus quellen.json
+#   3. daten.json wird geprüft und veröffentlicht. Andere Dateien werden nie geändert.
+# Ohne Claude-Zugang (Secret ANTHROPIC_API_KEY oder CLAUDE_CODE_OAUTH_TOKEN) läuft nur Schritt 1,
+# die Gerichte stehen dann in allen Sprachen auf Deutsch.
+
+name: Daten aktualisieren
+
+on:
+  schedule:
+    # GitHub rechnet in UTC: 23:00 UTC ist 1 Uhr Sommerzeit (MESZ), 0:00 UTC ist 1 Uhr Winterzeit (MEZ).
+    # Sonntag bis Donnerstag 23:00 UTC = Montag bis Freitag 1 Uhr MESZ; Montag bis Freitag 0:00 UTC = 1 Uhr MEZ.
+    # Der Schritt "Tag und Uhrzeit prüfen" lässt pro Nacht nur einen Lauf weiterarbeiten und überspringt Feiertage.
+    - cron: '0 23 * * 0-4'
+    - cron: '0 0 * * 1-5'
+  workflow_dispatch: # "Run workflow" startet sofort einen Lauf
+    inputs:
+      trotzdem:
+        description: 'Auch an einem Wochenende oder Feiertag aktualisieren'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write   # daten.json committen
+  pages: write      # GitHub Pages neu bauen lassen
+  id-token: write   # von claude-code-action empfohlen
+
+concurrency:
+  group: daten-aktualisieren
+  cancel-in-progress: false
+
+jobs:
+  aktualisieren:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HAT_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+      HAT_OAUTH: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v6
+
+      - name: Node einrichten
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Tag und Uhrzeit prüfen
+        id: plan
+        run: |
+          STUNDE=$(TZ=Europe/Berlin date +%-H)
+          HEUTE=$(TZ=Europe/Berlin date +%F)
+          STAND=$(node -e "try{const j=JSON.parse(require('fs').readFileSync('daten.json','utf8'));process.stdout.write(String(j.stand||'').slice(0,10))}catch(e){}")
+          ARBEITSTAG=$(node scripts/arbeitstag.mjs "$HEUTE" --ja-nein)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "$ARBEITSTAG" = "ja" ] || [ "${{ inputs.trotzdem }}" = "true" ]; then LAUF=true; else LAUF=false; fi
+          elif [ "$ARBEITSTAG" != "ja" ]; then LAUF=false
+          elif [ "$STUNDE" -ge 1 ] && [ "$STUNDE" -le 4 ] && [ "$STAND" != "$HEUTE" ]; then LAUF=true
+          else LAUF=false; fi
+          echo "In Deutschland ist es $STUNDE Uhr am $HEUTE. Werktag: $ARBEITSTAG. Letzter Stand: ${STAND:-keiner}. Aktualisieren: $LAUF"
+          echo "heute=$HEUTE" >> "$GITHUB_OUTPUT"
+          echo "lauf=$LAUF" >> "$GITHUB_OUTPUT"
+
+      - name: Quellen lesen (quellen.json)
+        id: quellen
+        if: steps.plan.outputs.lauf == 'true'
+        env:
+          MODELL: ${{ vars.CLAUDE_MODELL || 'claude-sonnet-5-5' }}
+        run: node scripts/quellen.mjs --github
+
+      - name: Speiseplan holen (OpenMensa)
+        if: steps.plan.outputs.lauf == 'true'
+        run: |
+          node scripts/daten-holen.mjs
+          cp daten.json "$RUNNER_TEMP/daten-ohne-ki.json"
+
+      - name: Claude übersetzt, prüft Fristen und sucht Veranstaltungen
+        if: steps.plan.outputs.lauf == 'true' && env.HAT_API_KEY == 'true'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Heute ist der ${{ steps.plan.outputs.heute }} (deutsche Zeit).
+            Lies scripts/claude-auftrag.md und erledige den Auftrag darin. Ändere nur daten.json.
+          claude_args: ${{ steps.quellen.outputs.claude_args }}
+
+      - name: Claude übersetzt, prüft Fristen und sucht Veranstaltungen (Claude-Abo)
+        if: steps.plan.outputs.lauf == 'true' && env.HAT_API_KEY != 'true' && env.HAT_OAUTH == 'true'
+        continue-on-error: true
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Heute ist der ${{ steps.plan.outputs.heute }} (deutsche Zeit).
+            Lies scripts/claude-auftrag.md und erledige den Auftrag darin. Ändere nur daten.json.
+          claude_args: ${{ steps.quellen.outputs.claude_args }}
+
+      - name: daten.json prüfen
+        if: steps.plan.outputs.lauf == 'true'
+        run: |
+          # alles außer daten.json zurücksetzen, falls doch etwas anderes verändert wurde
+          git diff --name-only -- . ':(exclude)daten.json' | xargs -r git checkout --
+          node scripts/daten-holen.mjs --anwenden || true
+          if ! node scripts/daten-pruefen.mjs; then
+            echo "::warning::daten.json war nach dem KI-Schritt fehlerhaft. Veröffentlicht wird der Speiseplan ohne die KI-Änderungen."
+            cp "$RUNNER_TEMP/daten-ohne-ki.json" daten.json
+            node scripts/daten-holen.mjs --anwenden
+            node scripts/daten-pruefen.mjs
+          fi
+          node scripts/daten-pruefen.mjs >> "$GITHUB_STEP_SUMMARY"
+
+      - name: daten.json veröffentlichen
+        id: commit
+        if: steps.plan.outputs.lauf == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add daten.json
+          if git diff --cached --quiet; then echo "Keine Änderungen."; echo "neu=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          git commit -m "Daten vom ${{ steps.plan.outputs.heute }}"
+          git push || (git pull --rebase && git push)
+          echo "neu=true" >> "$GITHUB_OUTPUT"
+
+      - name: GitHub Pages neu bauen
+        if: steps.commit.outputs.neu == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api --method POST "repos/${{ github.repository }}/pages/builds" > /dev/null; then
+            echo "Pages-Build angestoßen."
+          else
+            echo "Pages-Build nicht angestoßen. Die App lädt daten.json dann direkt aus dem Repository."
+          fi
