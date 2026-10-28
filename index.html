@@ -2076,7 +2076,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261028-125613';
+const CAMPI_BUILD = '20261028-205009';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -3466,7 +3466,7 @@ function geoSetStatus(s){ if(GEO.status === s) return; GEO.status = s; track('st
 function geoStart(why){
   if(GEO.watch !== null){ if(GEO.status !== 'ok') liveRefresh(); return; }
   if(!('geolocation' in navigator) || !window.isSecureContext){ geoSetStatus('na'); liveRefresh(); return; }
-  if(!GEO.pos) geoSetStatus('wait'); GEO.startedAt = performance.now();
+  if(!GEO.pos) geoSetStatus('wait'); GEO.startedAt = performance.now(); GEO.startWall = Date.now();
   track('standort_anfrage', {ausloeser: why || 'knopf'});
   try {
     GEO.watch = navigator.geolocation.watchPosition(geoOk, geoErr, {enableHighAccuracy:true, maximumAge:5000, timeout:25000});
@@ -3494,6 +3494,9 @@ function geoOk(p){
   liveRefresh();
 }
 function geoErr(e){
+  GEO.errSeen = GEO.errSeen || {};
+  const code = e && e.code || 0;
+  if(!GEO.errSeen[code]){ GEO.errSeen[code] = true; track('standort_fehler', {code, art: {1:'abgelehnt', 2:'nicht_verfuegbar', 3:'zeitueberschreitung'}[code] || 'unbekannt', hatte_position: !!GEO.pos}); }
   if(e && e.code === 1){ geoSetStatus('denied'); if(GEO.watch !== null){ try { navigator.geolocation.clearWatch(GEO.watch); } catch(x){} GEO.watch = null; } }
   else if(!GEO.pos) geoSetStatus('error');
   liveRefresh();
@@ -3525,6 +3528,17 @@ document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'hidden'){ if(GEO.watch !== null){ try { navigator.geolocation.clearWatch(GEO.watch); } catch(e){} GEO.watch = null; GEO.resume = true; } }
   else if(GEO.resume){ GEO.resume = false; if(GEO.keep || (state.tab === 'rooms' && state.view === 'live')){ GEO.status = 'off'; geoStart('zurueck'); } }
 });
+
+/* watchdog: some phones (above all iPhones) silently stop delivering positions; restart the watch when it went quiet */
+setInterval(() => {
+  if(!GEO.keep || !ST.geoOk || !ST.tracking || document.visibilityState !== 'visible' || GEO.status === 'denied' || GEO.status === 'na') return;
+  const quiet = GEO.startWall ? Date.now() - Math.max(GEO.pos ? GEO.pos.t : 0, GEO.startWall) : 1e9;
+  if(GEO.watch === null || quiet > 90000){
+    if(GEO.watch !== null){ try { navigator.geolocation.clearWatch(GEO.watch); } catch(e){} GEO.watch = null; }
+    GEO.restarts = (GEO.restarts || 0) + 1;
+    if(GEO.restarts <= 20){ track('standort_neustart', {stille_s: Math.round(quiet / 1000), nr: GEO.restarts}); geoStart('neustart'); }
+  }
+}, 30000);
 
 /* map interactions: drag to pan, buttons to zoom */
 let drag = null;
@@ -3583,7 +3597,7 @@ function geoAction(a, el){
           eigene Sitzung mit derselben zufälligen Pilot-Nummer. Daraus berechnet die Admin-Seite die Nutzung in Woche 2.
    Jedes Ereignis hat einen Zeitstempel (zeitpunkt) und die Zeit seit Sitzungsbeginn (zeit_ms). Jede Ansicht endet mit
    ansicht_ende und der aktiven Verweildauer (ohne Zeit im Hintergrund). */
-const STUDY_VERSION = '2026-10-e';
+const STUDY_VERSION = '2026-10-f';
 const OUTBOX_KEY = 'campi-outbox-v2', STUDY_DONE_KEY = 'campi-studie-fertig-v1', PILOT_KEY = 'campi-pilot-v1', INSTALL_LATER_KEY = 'campi-install-spaeter', GUIDE_KEY = 'campi-app-anleitung-v1';
 const NEW_OPEN_AFTER_MS = 30 * 60 * 1000;
 const DEFAULT_QUESTIONS = [
@@ -3946,6 +3960,8 @@ function startPilotSession(why){
   renderStudy();
   if(state.tab === 'start') renderScreen(true);
   if(why === 'start') maybeShowGuide();
+  /* location was shared when joining: start it again on every opening, not only on the live map */
+  if(info.geo && why !== 'beitritt') geoStart('oeffnen');
 }
 function joinPilot(d){
   const info = {id: uuid(), seit: new Date().toISOString(), geo: d.standort_freigabe === 'ja'};

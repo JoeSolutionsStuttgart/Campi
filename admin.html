@@ -965,7 +965,7 @@ function exportGeo(v){
 
 /* ---------- persons: who clicked what and when, time per page ---------- */
 const EV_LABEL = {ansicht:'Seite geöffnet', ansicht_ende:'Seite verlassen', klick:'Klick', leer_klick:'Klick ins Leere', frust_klick:'Frust-Klick', suche:'Suche', chat_frage:'Frage an Campi', chat_antwort:'Antwort von Campi',
-  aufgabe:'Aufgabe', schritt:'Schritt', sprache:'Sprache gewechselt', standort_gewechselt:'Campus gewechselt', standort:'Echter Standort', standort_status:'Standortfreigabe', standort_anfrage:'Standort angefragt', standort_erhalten:'Standort erhalten',
+  aufgabe:'Aufgabe', schritt:'Schritt', sprache:'Sprache gewechselt', standort_gewechselt:'Campus gewechselt', standort:'Echter Standort', standort_status:'Standortfreigabe', standort_anfrage:'Standort angefragt', standort_erhalten:'Standort erhalten', standort_fehler:'Standort-Fehler', standort_neustart:'Standort neu gestartet',
   ziel_erreicht:'Ziel erreicht', verlassen:'App verlassen', zurueck:'Zurück in der App', app_geoeffnet:'App geöffnet', installation:'Installation', karte:'Karte', raum_gewaehlt:'Raum gewählt', einwilligung:'Einwilligung',
   fragebogen:'Fragebogen', abgeschlossen:'Test abgeschlossen', abbruch:'Abbruch', fehler:'Fehler', fenster:'Fenstergröße', pilot_beigetreten:'Pilot beigetreten', pilot_beendet:'Pilot beendet', live_automatisch:'Live-Karte automatisch', danach:'Danach frei umgesehen',
   scrollen:'Gescrollt', eingabe:'Eingabe', technik:'Technik des Geräts', akku:'Akku', netz:'Netzverbindung', ausrichtung:'Bildschirm gedreht', frist_hinweis:'Fristen-Hinweis', neu_geladen:'Neu geladen', neue_version:'Neue Version geladen'};
@@ -1865,6 +1865,8 @@ const XL_EV_EXPL = {
   standort: 'Echter Standort nach freiwilliger Freigabe, gerundet, mit Entfernung zum Ziel und zur Campus-Mitte.',
   standort_status: 'Ergebnis der Standortfreigabe: erlaubt, abgelehnt, nicht verfügbar, Fehler.',
   standort_anfrage: 'Technisch: Der Standort wurde beim Gerät angefragt.',
+  standort_fehler: 'Technisch: Das Gerät hat keinen Standort geliefert (abgelehnt, nicht verfügbar oder Zeitüberschreitung).',
+  standort_neustart: 'Technisch: Es kamen über 90 s keine Standorte, die Abfrage wurde neu gestartet.',
   standort_erhalten: 'Technisch: Das Gerät hat einen Standort geliefert.',
   ziel_erreicht: 'Mit eingeschaltetem Standort am Zielgebäude angekommen.',
   verlassen: 'Die App oder der Tab wurde in den Hintergrund gelegt.',
