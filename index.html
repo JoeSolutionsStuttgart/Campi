@@ -624,6 +624,15 @@ a{color:inherit}
 .place-go svg{width:15px;height:15px}
 .place-head{margin:6px 2px 0;font-size:16px}
 .sheet-dl a.btn{text-decoration:none}
+
+/* Version 12: small "Campi als App" hint on the start page */
+.app-info{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:14px;border:1px dashed var(--a-line);background:var(--a-surface);color:var(--a-fg);font:inherit;text-align:left;cursor:pointer}
+.app-info b{display:block;font-size:14px;font-weight:800}
+.app-info .tsub{display:block;font-size:12.5px;color:var(--a-muted)}
+.app-info > svg{margin-left:auto;flex:none;width:18px;height:18px;color:var(--a-muted)}
+.app-info-ico{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--a-primary-soft);color:var(--a-primary-on-soft);flex:none}
+.app-info-ico svg{width:17px;height:17px}
+.app-info:hover,.app-info:focus-visible{border-style:solid;border-color:var(--a-primary)}
 </style>
 </head>
 <body>
@@ -1285,6 +1294,17 @@ const STR_DATA11 = {
     place_map:'Haritada', places_head:'{city} için ipuçları', ev_cat_none:'Önümüzdeki 14 günde “{cat}” etkinliği yok.'}
 };
 Object.keys(STR_DATA11).forEach(l => Object.assign(STR[l], STR_DATA11[l]));
+
+/* Version 12: Hinweis „Campi als App“ auf der Startseite und passende Beispielfrage */
+const STR_DATA12 = {
+  de: {app_info:'Campi als App', app_info_s:'So legst du Campi auf deinen Home-Bildschirm', ask_ex_app:'Wie nutze ich Campi als App?'},
+  en: {app_info:'Campi as an app', app_info_s:'How to put Campi on your home screen', ask_ex_app:'How do I use Campi as an app?'},
+  es: {app_info:'Campi como app', app_info_s:'Cómo poner Campi en tu pantalla de inicio', ask_ex_app:'¿Cómo uso Campi como app?'},
+  it: {app_info:'Campi come app', app_info_s:'Come mettere Campi nella schermata Home', ask_ex_app:'Come uso Campi come app?'},
+  fr: {app_info:'Campi comme app', app_info_s:'Ajouter Campi à ton écran d’accueil', ask_ex_app:'Comment utiliser Campi comme une app ?'},
+  tr: {app_info:'Uygulama olarak Campi', app_info_s:'Campi’yi ana ekranına nasıl eklersin', ask_ex_app:'Campi’yi uygulama olarak nasıl kullanırım?'}
+};
+Object.keys(STR_DATA12).forEach(l => { Object.assign(STR[l], STR_DATA12[l]); if(STR[l].ask_examples && STR[l].ask_examples.indexOf(STR_DATA12[l].ask_ex_app) < 0) STR[l].ask_examples += '|' + STR_DATA12[l].ask_ex_app; });
 
 
 /* ================= Campus-Daten: Hochschule Esslingen =================
@@ -2083,6 +2103,11 @@ setInterval(() => {
   askTick = (askTick + 1) % (ex.length + 1);
   i.placeholder = askTick === 0 ? t('ask_ph') : ex[askTick - 1];
 }, 3200);
+/* small hint on the start page: how to use Campi like an app (hidden when it already runs from the home screen) */
+function appInfoHTML(){
+  if(standalone()) return '';
+  return '<button class="app-info" type="button" data-act="guide" data-src="start-info"><span class="app-info-ico">' + icon('install') + '</span><span><b>' + esc(t('app_info')) + '</b><span class="tsub">' + esc(t('app_info_s')) + '</span></span>' + icon('arrow') + '</button>';
+}
 function greeting(){ const h = NOW.getHours(); return t(h < 11 ? 'greet_m' : (h < 18 ? 'greet_d' : 'greet_e')); }
 function tile(ic, title, sub, attrs){ return '<button class="tile" type="button" ' + attrs + '><span class="tico">' + icon(ic) + '</span><span><b>' + esc(title) + '</b><span class="tsub">' + esc(sub) + '</span></span></button>'; }
 function typeLabel(ty, lang){ return t('ty_' + ty, null, lang); }
@@ -2112,6 +2137,7 @@ function screenStart(){
     '<section class="hero"><div class="hero-top"><p class="hero-date">' + esc(dateLabel()) + '</p>' + campusPill() + '</div><div class="hero-hi"><h1 class="hero-title">' + esc(greeting()) + (userName() ? ', ' + esc(userName()) : '') + '</h1><button class="name-btn" type="button" data-act="sheet" data-sheet="name" aria-label="' + esc(t(userName() ? 'name_edit' : 'name_add')) + '">' + icon('edit') + '</button></div>' +
       '<label class="ask-hint" for="ask-home">' + icon('spark') + '<span>' + esc(t('ask_hint')) + '</span></label>' +
       '<form class="ask ask-home" data-form="ask-home"><span class="ask-caret" aria-hidden="true"></span><input id="ask-home" name="q" placeholder="' + esc(t('ask_ph')) + '" autocomplete="off" enterkeyhint="send"><button type="submit" aria-label="' + esc(t('ask_send')) + '">' + icon('send') + '</button></form></section>' +
+    appInfoHTML() +
     '<section class="card"><div class="label">' + esc(t('next_label', {time: c.next.time})) + '</div><h2>' + esc(L(c.next.course)) + '</h2><p class="sub">' + esc(roomName(nx)) + ' · ' + esc(roomWhere(nx)) + '</p>' +
       '<button class="btn btn-primary btn-block" type="button" data-act="route" data-room="' + nx.id + '">' + icon('pin') + esc(t('show_route')) + '</button></section>' +
     '<section class="notice"><span class="notice-ico">' + icon('bell') + '</span><div><strong>' + esc(t('change_title')) + '</strong><p>' + esc(t('change_text', {course: L(ch.course), 'new': nw.code, old: was.code})) + '</p><button class="link" type="button" data-act="route" data-room="' + nw.id + '">' + esc(t('route_to', {room: nw.code})) + '</button></div></section>' +
@@ -2383,7 +2409,7 @@ function screenDiscover(){
     body = '<div class="chips" aria-label="' + esc(t('category')) + '">' + cats.map(k => '<button class="chip" type="button" data-act="cat" data-cat="' + k + '" aria-pressed="' + (state.cat === k) + '">' + esc(t('cat_' + k)) + '</button>').join('') + '</div>' +
       '<section class="card"><div class="sec-head"><h3>' + esc(t('city_events', {city})) + '</h3><a class="link" href="' + esc(CITY_CAL[city] || EVENTS_URL) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a></div>' +
       (cev.length || !cevAll.length ? cityEventRows(cev, city) : '<p class="muted">' + esc(t('ev_cat_none', {cat: t('cat_' + state.cat)})) + '</p>') + (LIVE.stadt ? '<p class="src">' + icon('doc') + esc(t('city_ev_src', {stand: standText()})) + '</p>' : '') + '</section>' +
-      (nev.length ? '<section class="card"><div class="sec-head"><h3>' + esc(t('city_events_near', {city: near})) + '</h3><a class="link" href="' + esc(CITY_CAL[near]) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a></div>' + cityEventRows(nev, near) + '</section>' : '') +
+      (near ? '<section class="card card-near"><div class="sec-head"><h3>' + esc(t('city_events_near', {city: near})) + '</h3><a class="link" href="' + esc(CITY_CAL[near]) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a></div>' + cityEventRows(nev, near) + '</section>' : '') +
       (list.length ? '<h3 class="place-head">' + esc(t('places_head', {city})) + '</h3>' : '') +
       list.map(p => placeCardHTML(p, city)).join('') +
       '<p class="src">' + icon('doc') + esc(LIVE_PLACES[city] ? t('city_src_live', {city, d: fmtDayShort(LIVE.orte)}) : t('city_src', {city})) + '</p>';
@@ -2882,8 +2908,8 @@ const LEX = {
     'uygulama nasil calisiyor', 'campi nasil calisiyor', 'nasil kullanilir', 'nasil kullanirim', 'kullanim kilavuzu', 'campi neler yapabilir'],
   INSTALL: ['homescreen', 'home screen', 'home bildschirm', 'homebildschirm', 'startbildschirm', 'app installieren', 'campi installieren', 'als app', 'wie eine app', 'aufs handy laden', 'app herunterladen',
     'install the app', 'install campi', 'add to home', 'as an app', 'like an app', 'download the app',
-    'pantalla de inicio', 'instalar la app', 'instalar campi', 'como una app', 'descargar la app',
-    'schermata home', 'installare l app', 'installare campi', 'come un app', 'scaricare l app',
+    'pantalla de inicio', 'instalar la app', 'instalar campi', 'como una app', 'como app', 'descargar la app',
+    'schermata home', 'installare l app', 'installare campi', 'come un app', 'come app', 'scaricare l app',
     'ecran d accueil', 'installer l app', 'installer campi', 'comme une app', 'telecharger l app',
     'ana ekran*', 'uygulamayi yukle*', 'campi yi yukle*', 'uygulama gibi', 'uygulamayi indir*'],
   IT: ['passwort*', 'password*', 'login', 'kennung', 'account', 'e mail', 'email', 'drucken', 'drucker', 'print*', 'contrasena', 'stampa*', 'imprim*', 'sifre*', 'yazdir*', 'moodle', 'portal', 'zugangsdaten'],
