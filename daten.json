@@ -1,5 +1,3363 @@
 {
  "version": 1,
- "stand": null,
- "hinweis": "Wird jede Nacht um 1 Uhr vom Workflow Daten aktualisieren gefüllt (.github/workflows/daten-aktualisieren.yml)."
+ "stand": "2026-10-28T09:47:54+01:00",
+ "quelle": "Speiseplan: Studierendenwerk Stuttgart über OpenMensa · Fristen: hs-esslingen.de · Veranstaltungen: Hochschule, Esslingen und Göppingen · gesammelt von Claude",
+ "fristen": [
+  {
+   "bis": "2026-11-09",
+   "hinweis": {
+    "de": "online, Bachelor und Master · danach bis 16.11. nur gegen Gebühr",
+    "en": "online, Bachelor and Master · until 16 Nov only for a fee",
+    "es": "en línea, grado y máster · hasta el 16/11 solo con tasa",
+    "fr": "en ligne, licence et master · jusqu’au 16/11 contre frais",
+    "it": "online, triennale e magistrale · fino al 16/11 solo a pagamento",
+    "tr": "çevrimiçi, lisans ve yüksek lisans · 16.11’e kadar sadece ücretli"
+   },
+   "key": "pruefungsanmeldung",
+   "quelle": "https://www.hs-esslingen.de/fileadmin/media/Aktuelles/Semestertermine/Semestertermine_WiSe26_v4.pdf",
+   "titel": {
+    "de": "Prüfungsanmeldung Wintersemester 2026/27",
+    "en": "Exam registration, winter semester 2026/27",
+    "es": "Inscripción a exámenes, semestre de invierno 2026/27",
+    "fr": "Inscription aux examens, semestre d’hiver 2026/27",
+    "it": "Iscrizione agli esami, semestre invernale 2026/27",
+    "tr": "2026/27 kış dönemi sınav kaydı"
+   },
+   "von": "2026-10-26"
+  },
+  {
+   "bis": "2027-01-24",
+   "hinweis": {
+    "de": "Semesterbeitrag überweisen",
+    "en": "Pay the semester fee",
+    "es": "Pagar la tasa semestral",
+    "fr": "Payer les frais semestriels",
+    "it": "Pagare il contributo semestrale",
+    "tr": "Dönem harcını yatır"
+   },
+   "key": "rueckmeldung",
+   "quelle": "https://www.hs-esslingen.de/fileadmin/media/Aktuelles/Semestertermine/Semestertermine_WiSe26_v4.pdf",
+   "titel": {
+    "de": "Rückmeldung Sommersemester 2027",
+    "en": "Re-registration, summer semester 2027",
+    "es": "Renovación de matrícula, semestre de verano 2027",
+    "fr": "Réinscription, semestre d’été 2027",
+    "it": "Rinnovo dell’iscrizione, semestre estivo 2027",
+    "tr": "2027 yaz dönemi kayıt yenileme"
+   },
+   "von": "2027-01-08"
+  },
+  {
+   "hinweis": {
+    "de": "Wintersemester 2026/27 · Prüfungszeitraum 25.01.–12.02.2027",
+    "en": "Winter semester 2026/27 · exams 25 Jan–12 Feb 2027",
+    "es": "Semestre de invierno 2026/27 · exámenes 25/01–12/02/2027",
+    "fr": "Semestre d’hiver 2026/27 · examens 25/01–12/02/2027",
+    "it": "Semestre invernale 2026/27 · esami 25/01–12/02/2027",
+    "tr": "2026/27 kış dönemi · sınavlar 25.01–12.02.2027"
+   },
+   "key": "vorlesungsende",
+   "quelle": "https://www.hs-esslingen.de/fileadmin/media/Aktuelles/Semestertermine/Semestertermine_WiSe26_v4.pdf",
+   "titel": {
+    "de": "Ende der Vorlesungszeit",
+    "en": "Last day of lectures",
+    "es": "Fin del periodo de clases",
+    "fr": "Fin des cours",
+    "it": "Fine delle lezioni",
+    "tr": "Derslerin sona ermesi"
+   },
+   "von": "2027-01-22"
+  }
+ ],
+ "termine": [
+  {
+   "art": "hochschule",
+   "campus": null,
+   "datum": "2026-10-28",
+   "ort": {
+    "de": "KOMMA Esslingen, Maille 5–9",
+    "en": "KOMMA Esslingen, Maille 5–9",
+    "es": "KOMMA Esslingen, Maille 5–9",
+    "fr": "KOMMA Esslingen, Maille 5–9",
+    "it": "KOMMA Esslingen, Maille 5–9",
+    "tr": "KOMMA Esslingen, Maille 5–9"
+   },
+   "titel": {
+    "de": "SIP & Connect by GründES!: Community Night",
+    "en": "SIP & Connect by GründES!: community night",
+    "es": "SIP & Connect de GründES!: noche de comunidad",
+    "fr": "SIP & Connect par GründES! : soirée communauté",
+    "it": "SIP & Connect di GründES!: community night",
+    "tr": "GründES! SIP & Connect: topluluk gecesi"
+   },
+   "url": "https://www.hs-esslingen.de/hochschule/aktuelles/termin/sip-connect-by-gruendes-01-community-night",
+   "zeit": "17:30"
+  },
+  {
+   "art": "hochschule",
+   "campus": null,
+   "datum": "2026-10-28",
+   "ort": {
+    "de": "Raum F01.-110",
+    "en": "Room F01.-110",
+    "es": "Sala F01.-110",
+    "fr": "Salle F01.-110",
+    "it": "Aula F01.-110",
+    "tr": "F01.-110 salonu"
+   },
+   "titel": {
+    "de": "IT-Kolloquium: KI im industriellen Umfeld",
+    "en": "IT colloquium: AI in industry",
+    "es": "Coloquio de TI: IA en la industria",
+    "fr": "Colloque IT : l’IA dans l’industrie",
+    "it": "Colloquio IT: IA in ambito industriale",
+    "tr": "BT kolokyumu: Endüstride yapay zekâ"
+   },
+   "url": "https://www.hs-esslingen.de/hochschule/aktuelles/termin/it-kolloquium",
+   "zeit": "17:30"
+  },
+  {
+   "art": "hochschule",
+   "campus": null,
+   "datum": "2026-10-29",
+   "ort": {
+    "de": "online",
+    "en": "online",
+    "es": "en línea",
+    "fr": "en ligne",
+    "it": "online",
+    "tr": "çevrimiçi"
+   },
+   "titel": {
+    "de": "career days: Gehaltsgespräche – kenne deinen Marktwert",
+    "en": "career days: salary talks – know your market value",
+    "es": "career days: negociar el sueldo, conoce tu valor",
+    "fr": "career days : négocier son salaire",
+    "it": "career days: trattative salariali, conosci il tuo valore",
+    "tr": "career days: maaş görüşmesi – piyasa değerini bil"
+   },
+   "url": "https://www.hs-esslingen.de/hochschule/aktuelles/termin/career-days-special-finanzfit-finanzbildung-fuer-studierende-online-workshop-gehaltsgespraeche-kenne-deinen-marktwert-mit-coach-und-trainerin-sarah-groetzinger-am-291026",
+   "zeit": "17:30"
+  },
+  {
+   "art": "hochschule",
+   "campus": "GP",
+   "datum": "2026-10-29",
+   "ort": {
+    "de": "Campus Göppingen",
+    "en": "Göppingen campus",
+    "es": "Campus de Göppingen",
+    "fr": "Campus de Göppingen",
+    "it": "Campus di Göppingen",
+    "tr": "Göppingen kampüsü"
+   },
+   "titel": {
+    "de": "Göppinger Technikforum: Geschichte der Raumfahrt",
+    "en": "Göppingen technology forum: history of spaceflight",
+    "es": "Foro técnico de Göppingen: historia de los viajes espaciales",
+    "fr": "Forum technique de Göppingen : histoire du spatial",
+    "it": "Forum tecnico di Göppingen: storia dei viaggi spaziali",
+    "tr": "Göppingen Teknik Forumu: uzay yolculuğunun tarihi"
+   },
+   "url": "https://www.hs-esslingen.de/hochschule/aktuelles/termin/goeppinger-technikforum-entwicklungsgeschichte-der-raumfahrt-mit-einblicken-aus-30-jahre-beruflicher-erfahrung",
+   "zeit": "18:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-29",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Queer Expression",
+    "en": "Queer Expression",
+    "es": "Queer Expression",
+    "fr": "Queer Expression",
+    "it": "Queer Expression",
+    "tr": "Queer Expression"
+   },
+   "url": "https://dieselstrasse.de/programm/detail/2026-10-29/queer-expression",
+   "zeit": "18:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-29",
+   "ort": {
+    "de": "EWS Arena, Göppingen",
+    "en": "EWS Arena, Göppingen",
+    "es": "EWS Arena, Göppingen",
+    "fr": "EWS Arena, Göppingen",
+    "it": "EWS Arena, Göppingen",
+    "tr": "EWS Arena, Göppingen"
+   },
+   "stadt": "Göppingen",
+   "titel": {
+    "de": "Handball: FRISCH AUF! – VfL Gummersbach",
+    "en": "Handball: FRISCH AUF! vs VfL Gummersbach",
+    "es": "Balonmano: FRISCH AUF! – VfL Gummersbach",
+    "fr": "Handball : FRISCH AUF! – VfL Gummersbach",
+    "it": "Pallamano: FRISCH AUF! – VfL Gummersbach",
+    "tr": "Hentbol: FRISCH AUF! – VfL Gummersbach"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46154562&date=2026-10-29",
+   "zeit": "19:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-30",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Poetry Slam Esslingen",
+    "en": "Poetry slam Esslingen",
+    "es": "Poetry slam Esslingen",
+    "fr": "Poetry slam Esslingen",
+    "it": "Poetry slam Esslingen",
+    "tr": "Esslingen şiir slamı"
+   },
+   "url": "https://dieselstrasse.de/programm/detail/2026-10-30/poetry-slam-esslingen",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-30",
+   "ort": {
+    "de": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "en": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "es": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "fr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "it": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "tr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Klaus Birk: Affen im Kopf (Comedy)",
+    "en": "Klaus Birk: Affen im Kopf (comedy)",
+    "es": "Klaus Birk: Affen im Kopf (comedia)",
+    "fr": "Klaus Birk : Affen im Kopf (humour)",
+    "it": "Klaus Birk: Affen im Kopf (comicità)",
+    "tr": "Klaus Birk: Affen im Kopf (komedi)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46879100&date=2026-10-30",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-31",
+   "ort": {
+    "de": "EWS Arena, Göppingen",
+    "en": "EWS Arena, Göppingen",
+    "es": "EWS Arena, Göppingen",
+    "fr": "EWS Arena, Göppingen",
+    "it": "EWS Arena, Göppingen",
+    "tr": "EWS Arena, Göppingen"
+   },
+   "stadt": "Göppingen",
+   "titel": {
+    "de": "Core Fest (Metalcore, Hardcore, Deathcore)",
+    "en": "Core Fest (metalcore, hardcore, deathcore)",
+    "es": "Core Fest (metalcore, hardcore, deathcore)",
+    "fr": "Core Fest (metalcore, hardcore, deathcore)",
+    "it": "Core Fest (metalcore, hardcore, deathcore)",
+    "tr": "Core Fest (metalcore, hardcore, deathcore)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=44552084&date=2026-10-31",
+   "zeit": "13:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-31",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Martina Brandl",
+    "en": "Martina Brandl",
+    "es": "Martina Brandl",
+    "fr": "Martina Brandl",
+    "it": "Martina Brandl",
+    "tr": "Martina Brandl"
+   },
+   "url": "https://dieselstrasse.de/programm/detail/2026-10-31/martina-brandl",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-31",
+   "ort": {
+    "de": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "en": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "es": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "fr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "it": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "tr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Reiner Kröhnert: ER – Jetzt wird’s MERZwürdig! (Kabarett)",
+    "en": "Reiner Kröhnert: ER – Jetzt wird’s MERZwürdig! (cabaret)",
+    "es": "Reiner Kröhnert: ER – Jetzt wird’s MERZwürdig! (cabaret)",
+    "fr": "Reiner Kröhnert : ER – Jetzt wird’s MERZwürdig! (cabaret)",
+    "it": "Reiner Kröhnert: ER – Jetzt wird’s MERZwürdig! (cabaret)",
+    "tr": "Reiner Kröhnert: ER – Jetzt wird’s MERZwürdig! (kabare)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46521720&date=2026-10-31",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-01",
+   "ort": {
+    "de": "Odeon, Mörikestraße 18, Göppingen",
+    "en": "Odeon, Mörikestraße 18, Göppingen",
+    "es": "Odeon, Mörikestraße 18, Göppingen",
+    "fr": "Odeon, Mörikestraße 18, Göppingen",
+    "it": "Odeon, Mörikestraße 18, Göppingen",
+    "tr": "Odeon, Mörikestraße 18, Göppingen"
+   },
+   "stadt": "Göppingen",
+   "titel": {
+    "de": "Ich grolle nicht (Bühne)",
+    "en": "Ich grolle nicht (stage)",
+    "es": "Ich grolle nicht (escena)",
+    "fr": "Ich grolle nicht (scène)",
+    "it": "Ich grolle nicht (spettacolo)",
+    "tr": "Ich grolle nicht (sahne)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46154994&date=2026-11-01",
+   "zeit": "17:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-01",
+   "ort": {
+    "de": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "en": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "es": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "fr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "it": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "tr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Barbara Gräsle: GitarrenWeltReise (Konzert)",
+    "en": "Barbara Gräsle: guitar world tour (concert)",
+    "es": "Barbara Gräsle: vuelta al mundo en guitarra (concierto)",
+    "fr": "Barbara Gräsle : tour du monde à la guitare (concert)",
+    "it": "Barbara Gräsle: giro del mondo in chitarra (concerto)",
+    "tr": "Barbara Gräsle: gitarla dünya turu (konser)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=47255389&date=2026-11-01",
+   "zeit": "18:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-02",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Waterwheel (Konzert)",
+    "en": "Waterwheel (concert)",
+    "es": "Waterwheel (concierto)",
+    "fr": "Waterwheel (concert)",
+    "it": "Waterwheel (concerto)",
+    "tr": "Waterwheel (konser)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=44932735&date=2026-11-02",
+   "zeit": "19:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-04",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "To Athena (Konzert)",
+    "en": "To Athena (concert)",
+    "es": "To Athena (concierto)",
+    "fr": "To Athena (concert)",
+    "it": "To Athena (concerto)",
+    "tr": "To Athena (konser)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=45381414&date=2026-11-04",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-06",
+   "ort": {
+    "de": "EWS Arena, Göppingen",
+    "en": "EWS Arena, Göppingen",
+    "es": "EWS Arena, Göppingen",
+    "fr": "EWS Arena, Göppingen",
+    "it": "EWS Arena, Göppingen",
+    "tr": "EWS Arena, Göppingen"
+   },
+   "stadt": "Göppingen",
+   "titel": {
+    "de": "Handball: Frisch Auf Frauen – Buxtehuder SV",
+    "en": "Women’s handball: Frisch Auf vs Buxtehuder SV",
+    "es": "Balonmano femenino: Frisch Auf – Buxtehuder SV",
+    "fr": "Handball féminin : Frisch Auf – Buxtehuder SV",
+    "it": "Pallamano femminile: Frisch Auf – Buxtehuder SV",
+    "tr": "Kadın hentbolu: Frisch Auf – Buxtehuder SV"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46154563&date=2026-11-06",
+   "zeit": "19:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-06",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Strange Rituals Festival (bis 07.11.)",
+    "en": "Strange Rituals Festival (until 7 Nov)",
+    "es": "Strange Rituals Festival (hasta el 07/11)",
+    "fr": "Strange Rituals Festival (jusqu’au 07/11)",
+    "it": "Strange Rituals Festival (fino al 07/11)",
+    "tr": "Strange Rituals Festival (07.11’e kadar)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=45700418&date=2026-11-06",
+   "zeit": "19:30"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-06",
+   "ort": {
+    "de": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "en": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "es": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "fr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "it": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "tr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Weber & James: Gentlemans Guide (Konzert)",
+    "en": "Weber & James: Gentlemans Guide (concert)",
+    "es": "Weber & James: Gentlemans Guide (concierto)",
+    "fr": "Weber & James : Gentlemans Guide (concert)",
+    "it": "Weber & James: Gentlemans Guide (concerto)",
+    "tr": "Weber & James: Gentlemans Guide (konser)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46795031&date=2026-11-06",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-06",
+   "ort": {
+    "de": "Odeon, Mörikestraße 18, Göppingen",
+    "en": "Odeon, Mörikestraße 18, Göppingen",
+    "es": "Odeon, Mörikestraße 18, Göppingen",
+    "fr": "Odeon, Mörikestraße 18, Göppingen",
+    "it": "Odeon, Mörikestraße 18, Göppingen",
+    "tr": "Odeon, Mörikestraße 18, Göppingen"
+   },
+   "stadt": "Göppingen",
+   "titel": {
+    "de": "Aki Takase & Alexander von Schlippenbach (Konzert)",
+    "en": "Aki Takase & Alexander von Schlippenbach (concert)",
+    "es": "Aki Takase & Alexander von Schlippenbach (concierto)",
+    "fr": "Aki Takase & Alexander von Schlippenbach (concert)",
+    "it": "Aki Takase & Alexander von Schlippenbach (concerto)",
+    "tr": "Aki Takase & Alexander von Schlippenbach (konser)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46154995&date=2026-11-06",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-07",
+   "ort": {
+    "de": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "en": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "es": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "fr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "it": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "tr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Maria Vollmer: Hinter’m Höhepunkt geht’s weiter (Comedy)",
+    "en": "Maria Vollmer: Hinter’m Höhepunkt geht’s weiter (comedy)",
+    "es": "Maria Vollmer: Hinter’m Höhepunkt geht’s weiter (comedia)",
+    "fr": "Maria Vollmer : Hinter’m Höhepunkt geht’s weiter (humour)",
+    "it": "Maria Vollmer: Hinter’m Höhepunkt geht’s weiter (comicità)",
+    "tr": "Maria Vollmer: Hinter’m Höhepunkt geht’s weiter (komedi)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=47255391&date=2026-11-07",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-08",
+   "ort": {
+    "de": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "en": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "es": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "fr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "it": "Kabarett der Galgenstricke, Webergasse 9, Esslingen",
+    "tr": "Kabarett der Galgenstricke, Webergasse 9, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Stefan Dreher: Disneyland am Neckar – ein Horb-Krimi (Lesung)",
+    "en": "Stefan Dreher: Disneyland am Neckar – crime novel reading",
+    "es": "Stefan Dreher: Disneyland am Neckar – lectura de novela negra",
+    "fr": "Stefan Dreher : Disneyland am Neckar – lecture de polar",
+    "it": "Stefan Dreher: Disneyland am Neckar – lettura di un giallo",
+    "tr": "Stefan Dreher: Disneyland am Neckar – polisiye okuma"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=47255392&date=2026-11-08",
+   "zeit": "10:30"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-08",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Tanzen! nach Herzenslust",
+    "en": "Dance to your heart’s content",
+    "es": "¡Baila a gusto!",
+    "fr": "Danser à cœur joie !",
+    "it": "Balla quanto vuoi!",
+    "tr": "Doyasıya dans!"
+   },
+   "url": "https://dieselstrasse.de/programm/detail/2026-11-08/tanzen-nach-herzenslust",
+   "zeit": "16:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-08",
+   "ort": {
+    "de": "Odeon, Mörikestraße 18, Göppingen",
+    "en": "Odeon, Mörikestraße 18, Göppingen",
+    "es": "Odeon, Mörikestraße 18, Göppingen",
+    "fr": "Odeon, Mörikestraße 18, Göppingen",
+    "it": "Odeon, Mörikestraße 18, Göppingen",
+    "tr": "Odeon, Mörikestraße 18, Göppingen"
+   },
+   "stadt": "Göppingen",
+   "titel": {
+    "de": "Melanie Haupt (Konzert)",
+    "en": "Melanie Haupt (concert)",
+    "es": "Melanie Haupt (concierto)",
+    "fr": "Melanie Haupt (concert)",
+    "it": "Melanie Haupt (concerto)",
+    "tr": "Melanie Haupt (konser)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46529258&date=2026-11-08",
+   "zeit": "17:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-08",
+   "ort": {
+    "de": "EWS Arena, Göppingen",
+    "en": "EWS Arena, Göppingen",
+    "es": "EWS Arena, Göppingen",
+    "fr": "EWS Arena, Göppingen",
+    "it": "EWS Arena, Göppingen",
+    "tr": "EWS Arena, Göppingen"
+   },
+   "stadt": "Göppingen",
+   "titel": {
+    "de": "Hazel Brugger: Good Evening Europe",
+    "en": "Hazel Brugger: Good Evening Europe (comedy)",
+    "es": "Hazel Brugger: Good Evening Europe (comedia)",
+    "fr": "Hazel Brugger : Good Evening Europe (humour)",
+    "it": "Hazel Brugger: Good Evening Europe (comicità)",
+    "tr": "Hazel Brugger: Good Evening Europe (komedi)"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=43023788&date=2026-11-08",
+   "zeit": "19:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-08",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Bal-Folk (Tanzabend mit Livemusik)",
+    "en": "Bal-folk (folk dance night)",
+    "es": "Bal-folk (baile folk)",
+    "fr": "Bal-folk (bal folk)",
+    "it": "Bal-folk (serata di danze folk)",
+    "tr": "Bal-folk (halk dansı gecesi)"
+   },
+   "url": "https://dieselstrasse.de/programm/detail/2026-11-08/bal-folk",
+   "zeit": "19:30"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-10",
+   "ort": {
+    "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "es": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "fr": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "it": "Dieselstrasse, Dieselstr. 26, Esslingen",
+    "tr": "Dieselstrasse, Dieselstr. 26, Esslingen"
+   },
+   "stadt": "Esslingen",
+   "titel": {
+    "de": "Celtic Nights Esslingen",
+    "en": "Celtic Nights Esslingen",
+    "es": "Celtic Nights Esslingen",
+    "fr": "Celtic Nights Esslingen",
+    "it": "Celtic Nights Esslingen",
+    "tr": "Celtic Nights Esslingen"
+   },
+   "url": "https://www.wasgehtapp.de/termin_details.php?id=46078268&date=2026-11-10",
+   "zeit": "20:00"
+  },
+  {
+   "art": "hochschule",
+   "campus": null,
+   "datum": "2026-11-18",
+   "ort": {
+    "de": "Hochschule Esslingen",
+    "en": "Esslingen University",
+    "es": "Universidad de Esslingen",
+    "fr": "Université d’Esslingen",
+    "it": "Università di Esslingen",
+    "tr": "Esslingen Üniversitesi"
+   },
+   "titel": {
+    "de": "Studieninfotag an allen drei Standorten",
+    "en": "Study information day on all three campuses",
+    "es": "Jornada informativa en los tres campus",
+    "fr": "Journée d’information sur les trois campus",
+    "it": "Giornata informativa nei tre campus",
+    "tr": "Üç kampüste tanıtım günü"
+   },
+   "url": "https://www.hs-esslingen.de/hochschule/aktuelles/termin/studieninfotag",
+   "zeit": "09:00"
+  }
+ ],
+ "mensa": {
+  "SM": {
+   "openmensa_id": 396,
+   "tage": [
+    {
+     "datum": "2026-10-26",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Gnocchi mit Tomatensauce und Rucolagarnitur",
+        "en": "Gnocchi with tomato sauce and rocket",
+        "es": "Ñoquis con salsa de tomate y rúcula",
+        "fr": "Gnocchis sauce tomate et roquette",
+        "it": "Gnocchi al pomodoro con rucola",
+        "tr": "Domates soslu ve rokalı gnocchi"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Hähnchengyros mit Tzatziki und Pommes frites",
+        "en": "Chicken gyros with tzatziki and fries",
+        "es": "Gyros de pollo con tzatziki y patatas fritas",
+        "fr": "Gyros de poulet, tzatziki et frites",
+        "it": "Gyros di pollo con tzatziki e patatine",
+        "tr": "Cacıklı tavuk gyros ve patates kızartması"
+       },
+       "preis": 5.3,
+       "preis_bedienstete": 8.3,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Pommes frites",
+        "en": "French fries",
+        "es": "Patatas fritas",
+        "fr": "Frites",
+        "it": "Patatine fritte",
+        "tr": "Patates kızartması"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Kirschjoghurt",
+        "en": "Cherry yoghurt",
+        "es": "Yogur de cereza",
+        "fr": "Yaourt à la cerise",
+        "it": "Yogurt alla ciliegia",
+        "tr": "Vişneli yoğurt"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegetarisch"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-27",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Blumenkohl-Kartoffel-Curry und Reis",
+        "en": "Cauliflower and potato curry with rice",
+        "es": "Curry de coliflor y patata con arroz",
+        "fr": "Curry de chou-fleur et pommes de terre, riz",
+        "it": "Curry di cavolfiore e patate con riso",
+        "tr": "Pilavlı karnabahar ve patates körisi"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie",
+        "Soja"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Börek mit Spinatfüllung und Bulgur-Gemüsesalat",
+        "en": "Spinach börek with bulgur vegetable salad",
+        "es": "Börek de espinacas con ensalada de bulgur y verduras",
+        "fr": "Börek aux épinards, salade de boulgour aux légumes",
+        "it": "Börek agli spinaci con insalata di bulgur e verdure",
+        "tr": "Ispanaklı börek, sebzeli bulgur salatası"
+       },
+       "preis": 5,
+       "preis_bedienstete": 8,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Gebackener Fleischkäse an Bratensauce mit grobem Senf und Kartoffelsalat",
+        "en": "Baked Fleischkäse (Swabian meatloaf) with gravy, wholegrain mustard and potato salad",
+        "es": "Fleischkäse al horno (pastel de carne suabo) con salsa, mostaza en grano y ensalada de patata",
+        "fr": "Fleischkäse au four (pain de viande souabe), jus de rôti, moutarde à l’ancienne et salade de pommes de terre",
+        "it": "Fleischkäse al forno (polpettone svevo) con sugo d’arrosto, senape in grani e insalata di patate",
+        "tr": "Fırında Fleischkäse (Şvaben köfte ekmeği), et sosu, tane hardal ve patates salatası"
+       },
+       "preis": 4.9,
+       "preis_bedienstete": 7.9,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Reis",
+        "en": "Rice",
+        "es": "Arroz",
+        "fr": "Riz",
+        "it": "Riso",
+        "tr": "Pirinç"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Kartoffelsalat",
+        "en": "Potato salad",
+        "es": "Ensalada de patata",
+        "fr": "Salade de pommes de terre",
+        "it": "Insalata di patate",
+        "tr": "Patates salatası"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Nuesse"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Veganes Mousse au chocolat",
+        "en": "Vegan chocolate mousse",
+        "es": "Mousse de chocolate vegana",
+        "fr": "Mousse au chocolat vegan",
+        "it": "Mousse al cioccolato vegana",
+        "tr": "Vegan çikolatalı mus"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegan"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-28",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Bandnudeln mit Rucola-Sonnenblumenkernpesto",
+        "en": "Tagliatelle with rocket and sunflower seed pesto",
+        "es": "Tallarines con pesto de rúcula y pipas de girasol",
+        "fr": "Tagliatelles au pesto de roquette et graines de tournesol",
+        "it": "Tagliatelle al pesto di rucola e semi di girasole",
+        "tr": "Roka ve ayçekirdeği pestolu yassı makarna"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Sellerie"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Mini-Frühlingsrollen mit fruchtiger Currysauce und Duftreis",
+        "en": "Mini spring rolls with fruity curry sauce and fragrant rice",
+        "es": "Mini rollitos de primavera con salsa de curry afrutada y arroz aromático",
+        "fr": "Mini nems, sauce curry fruitée et riz parfumé",
+        "it": "Mini involtini primavera con salsa al curry fruttata e riso profumato",
+        "tr": "Meyveli köri soslu mini bahar rulosu ve yasemin pirinci"
+       },
+       "preis": 5,
+       "preis_bedienstete": 8,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Paniertes Schweineschnitzel mit Preiselbeeren, Rahmsauce und Spätzle",
+        "en": "Breaded pork schnitzel with lingonberries, cream sauce and Spätzle (Swabian egg noodles)",
+        "es": "Escalope de cerdo empanado con arándanos rojos, salsa de nata y Spätzle (pasta suaba)",
+        "fr": "Escalope de porc panée, airelles, sauce à la crème et Spätzle (pâtes souabes)",
+        "it": "Cotoletta di maiale impanata con mirtilli rossi, salsa alla panna e Spätzle (gnocchetti svevi)",
+        "tr": "Yaban mersinli, kremalı soslu pane domuz şnitzel ve Spätzle (Švap eriştesi)"
+       },
+       "preis": 5.4,
+       "preis_bedienstete": 8.4,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Ei"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Spätzle",
+        "en": "Spätzle (Swabian egg noodles)",
+        "es": "Spätzle (pasta suaba de huevo)",
+        "fr": "Spätzle (pâtes souabes)",
+        "it": "Spätzle (gnocchetti svevi)",
+        "tr": "Spätzle (Şvaben eriştesi)"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Sahneschokopudding",
+        "en": "Chocolate cream pudding",
+        "es": "Pudin de chocolate con nata",
+        "fr": "Crème dessert chocolat",
+        "it": "Budino al cioccolato e panna",
+        "tr": "Kremalı çikolatalı puding"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegetarisch"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-29",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Sellerie"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Vollkornreispfanne mit Zucchini, Paprika und Auberginen",
+        "en": "Brown rice stir-fry with courgette, pepper and aubergine",
+        "es": "Salteado de arroz integral con calabacín, pimiento y berenjena",
+        "fr": "Poêlée de riz complet aux courgettes, poivrons et aubergines",
+        "it": "Padellata di riso integrale con zucchine, peperoni e melanzane",
+        "tr": "Kabak, biber ve patlıcanlı esmer pirinç tava"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie",
+        "Soja"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Hausgemachte Lasagne mit Sojabolognese",
+        "en": "Homemade lasagne with soy bolognese",
+        "es": "Lasaña casera con boloñesa de soja",
+        "fr": "Lasagnes maison à la bolognaise de soja",
+        "it": "Lasagne fatte in casa al ragù di soia",
+        "tr": "Ev yapımı soya bolonezli lazanya"
+       },
+       "preis": 4.2,
+       "preis_bedienstete": 7.2,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Ei",
+        "Senf",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Scharfe Chicken Wings mit Barbecuesauce, Farmersalat und Country Potatoes",
+        "en": "Spicy chicken wings with barbecue sauce, farmer's salad and country potatoes",
+        "es": "Alitas de pollo picantes con salsa barbacoa, ensalada campestre y patatas gajo",
+        "fr": "Ailes de poulet épicées, sauce barbecue, salade fermière et potatoes",
+        "it": "Ali di pollo piccanti con salsa barbecue, insalata contadina e patate country",
+        "tr": "Barbekü soslu acılı tavuk kanadı, köy salatası ve elma dilim patates"
+       },
+       "preis": 5.4,
+       "preis_bedienstete": 8.4,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Country Potatoes",
+        "en": "Country potatoes (seasoned potato wedges)",
+        "es": "Patatas gajo especiadas",
+        "fr": "Potatoes épicées",
+        "it": "Patate country speziate",
+        "tr": "Baharatlı elma dilim patates"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Bayerische Creme mit Zimtkirschen",
+        "en": "Bavarian cream with cinnamon cherries",
+        "es": "Crema bávara con cerezas a la canela",
+        "fr": "Crème bavaroise aux cerises à la cannelle",
+        "it": "Crema bavarese con ciliegie alla cannella",
+        "tr": "Tarçınlı kirazlı Bavyera kreması"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": null
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-30",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Spätzle-Pilzpfanne",
+        "en": "Spätzle (Swabian egg noodles) and mushroom pan",
+        "es": "Sartén de Spätzle (pasta suaba) con setas",
+        "fr": "Poêlée de Spätzle (pâtes souabes) aux champignons",
+        "it": "Padellata di Spätzle (gnocchetti svevi) e funghi",
+        "tr": "Mantarlı Spätzle (Şvabya eriştesi) tavası"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Senf",
+        "Sellerie",
+        "Soja",
+        "Sesam",
+        "Fisch",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Seelachs in der Sesampanade mit Sweet Chili Gemüse Sauce und Reis",
+        "en": "Sesame-crusted pollock with sweet chilli vegetable sauce and rice",
+        "es": "Abadejo rebozado con sésamo, salsa de verduras sweet chili y arroz",
+        "fr": "Lieu noir pané au sésame, sauce aux légumes sweet chili et riz",
+        "it": "Merluzzo nero in panatura al sesamo con salsa di verdure sweet chili e riso",
+        "tr": "Susamlı kaplamada kömür balığı, tatlı acı sebze sosu ve pilav"
+       },
+       "preis": 5.4,
+       "preis_bedienstete": 8.4,
+       "typ": "fisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Reis",
+        "en": "Rice",
+        "es": "Arroz",
+        "fr": "Riz",
+        "it": "Riso",
+        "tr": "Pirinç"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Soja"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Kokosmilchreis mit Mango",
+        "en": "Coconut rice pudding with mango",
+        "es": "Arroz con leche de coco y mango",
+        "fr": "Riz au lait de coco et mangue",
+        "it": "Riso al latte di cocco con mango",
+        "tr": "Mangolu hindistancevizi sütlü pirinç tatlısı"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegan"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-31",
+     "gerichte": [],
+     "geschlossen": true
+    },
+    {
+     "datum": "2026-11-02",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie",
+        "Soja"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Spinatnudeln",
+        "en": "Spinach noodles",
+        "es": "Fideos de espinacas",
+        "fr": "Nouilles aux épinards",
+        "it": "Pasta agli spinaci",
+        "tr": "Ispanaklı erişte"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Maultaschen mit Zwiebelsauce und Kartoffelsalat",
+        "en": "Maultaschen (Swabian dumplings) with onion sauce and potato salad",
+        "es": "Maultaschen (raviolis suabos) con salsa de cebolla y ensalada de patatas",
+        "fr": "Maultaschen (raviolis souabes), sauce à l’oignon et salade de pommes de terre",
+        "it": "Maultaschen (ravioli svevi) con salsa di cipolle e insalata di patate",
+        "tr": "Maultaschen (Svabya mantısı), soğan soslu ve patates salatalı"
+       },
+       "preis": 5.2,
+       "preis_bedienstete": 8.2,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Kartoffelsalat",
+        "en": "Potato salad",
+        "es": "Ensalada de patata",
+        "fr": "Salade de pommes de terre",
+        "it": "Insalata di patate",
+        "tr": "Patates salatası"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Heidelbeerjoghurt",
+        "en": "Blueberry yoghurt",
+        "es": "Yogur de arándanos",
+        "fr": "Yaourt aux myrtilles",
+        "it": "Yogurt ai mirtilli",
+        "tr": "Yaban mersinli yoğurt"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegetarisch"
+      }
+     ],
+     "geschlossen": false
+    }
+   ]
+  },
+  "FL": {
+   "openmensa_id": 397,
+   "tage": [
+    {
+     "datum": "2026-10-26",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Gnocchi mit Tomatensauce und Rucolagarnitur",
+        "en": "Gnocchi with tomato sauce and rocket",
+        "es": "Ñoquis con salsa de tomate y rúcula",
+        "fr": "Gnocchis sauce tomate et roquette",
+        "it": "Gnocchi al pomodoro con rucola",
+        "tr": "Domates soslu ve rokalı gnocchi"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Hähnchengyros mit Tzatziki und Pommes frites",
+        "en": "Chicken gyros with tzatziki and fries",
+        "es": "Gyros de pollo con tzatziki y patatas fritas",
+        "fr": "Gyros de poulet, tzatziki et frites",
+        "it": "Gyros di pollo con tzatziki e patatine",
+        "tr": "Cacıklı tavuk gyros ve patates kızartması"
+       },
+       "preis": 5.3,
+       "preis_bedienstete": 8.3,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Pommes frites",
+        "en": "French fries",
+        "es": "Patatas fritas",
+        "fr": "Frites",
+        "it": "Patatine fritte",
+        "tr": "Patates kızartması"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Kirschjoghurt",
+        "en": "Cherry yoghurt",
+        "es": "Yogur de cereza",
+        "fr": "Yaourt à la cerise",
+        "it": "Yogurt alla ciliegia",
+        "tr": "Vişneli yoğurt"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegetarisch"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-27",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Blumenkohl-Kartoffel-Curry und Reis",
+        "en": "Cauliflower and potato curry with rice",
+        "es": "Curry de coliflor y patata con arroz",
+        "fr": "Curry de chou-fleur et pommes de terre, riz",
+        "it": "Curry di cavolfiore e patate con riso",
+        "tr": "Pilavlı karnabahar ve patates körisi"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie",
+        "Soja"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Börek mit Spinatfüllung und Bulgur-Gemüsesalat",
+        "en": "Spinach börek with bulgur vegetable salad",
+        "es": "Börek de espinacas con ensalada de bulgur y verduras",
+        "fr": "Börek aux épinards, salade de boulgour aux légumes",
+        "it": "Börek agli spinaci con insalata di bulgur e verdure",
+        "tr": "Ispanaklı börek, sebzeli bulgur salatası"
+       },
+       "preis": 5,
+       "preis_bedienstete": 8,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Gebackener Fleischkäse an Bratensauce mit grobem Senf und Kartoffelsalat",
+        "en": "Baked Fleischkäse (Swabian meatloaf) with gravy, wholegrain mustard and potato salad",
+        "es": "Fleischkäse al horno (pastel de carne suabo) con salsa, mostaza en grano y ensalada de patata",
+        "fr": "Fleischkäse au four (pain de viande souabe), jus de rôti, moutarde à l’ancienne et salade de pommes de terre",
+        "it": "Fleischkäse al forno (polpettone svevo) con sugo d’arrosto, senape in grani e insalata di patate",
+        "tr": "Fırında Fleischkäse (Şvaben köfte ekmeği), et sosu, tane hardal ve patates salatası"
+       },
+       "preis": 4.9,
+       "preis_bedienstete": 7.9,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Reis",
+        "en": "Rice",
+        "es": "Arroz",
+        "fr": "Riz",
+        "it": "Riso",
+        "tr": "Pirinç"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Kartoffelsalat",
+        "en": "Potato salad",
+        "es": "Ensalada de patata",
+        "fr": "Salade de pommes de terre",
+        "it": "Insalata di patate",
+        "tr": "Patates salatası"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Nuesse"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Veganes Mousse au chocolat",
+        "en": "Vegan chocolate mousse",
+        "es": "Mousse de chocolate vegana",
+        "fr": "Mousse au chocolat vegan",
+        "it": "Mousse al cioccolato vegana",
+        "tr": "Vegan çikolatalı mus"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegan"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-28",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Bandnudeln mit Rucola-Sonnenblumenkernpesto",
+        "en": "Tagliatelle with rocket and sunflower seed pesto",
+        "es": "Tallarines con pesto de rúcula y pipas de girasol",
+        "fr": "Tagliatelles au pesto de roquette et graines de tournesol",
+        "it": "Tagliatelle al pesto di rucola e semi di girasole",
+        "tr": "Roka ve ayçekirdeği pestolu yassı makarna"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Sellerie"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Mini-Frühlingsrollen mit fruchtiger Currysauce und Duftreis",
+        "en": "Mini spring rolls with fruity curry sauce and fragrant rice",
+        "es": "Mini rollitos de primavera con salsa de curry afrutada y arroz aromático",
+        "fr": "Mini nems, sauce curry fruitée et riz parfumé",
+        "it": "Mini involtini primavera con salsa al curry fruttata e riso profumato",
+        "tr": "Meyveli köri soslu mini bahar rulosu ve yasemin pirinci"
+       },
+       "preis": 5,
+       "preis_bedienstete": 8,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Paniertes Schweineschnitzel mit Preiselbeeren, Rahmsauce und Spätzle",
+        "en": "Breaded pork schnitzel with lingonberries, cream sauce and Spätzle (Swabian egg noodles)",
+        "es": "Escalope de cerdo empanado con arándanos rojos, salsa de nata y Spätzle (pasta suaba)",
+        "fr": "Escalope de porc panée, airelles, sauce à la crème et Spätzle (pâtes souabes)",
+        "it": "Cotoletta di maiale impanata con mirtilli rossi, salsa alla panna e Spätzle (gnocchetti svevi)",
+        "tr": "Yaban mersinli, kremalı soslu pane domuz şnitzel ve Spätzle (Švap eriştesi)"
+       },
+       "preis": 5.4,
+       "preis_bedienstete": 8.4,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Ei"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Spätzle",
+        "en": "Spätzle (Swabian egg noodles)",
+        "es": "Spätzle (pasta suaba de huevo)",
+        "fr": "Spätzle (pâtes souabes)",
+        "it": "Spätzle (gnocchetti svevi)",
+        "tr": "Spätzle (Şvaben eriştesi)"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Sahneschokopudding",
+        "en": "Chocolate cream pudding",
+        "es": "Pudin de chocolate con nata",
+        "fr": "Crème dessert chocolat",
+        "it": "Budino al cioccolato e panna",
+        "tr": "Kremalı çikolatalı puding"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegetarisch"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-29",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Sellerie"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Vollkornreispfanne mit Zucchini, Paprika und Auberginen",
+        "en": "Brown rice stir-fry with courgette, pepper and aubergine",
+        "es": "Salteado de arroz integral con calabacín, pimiento y berenjena",
+        "fr": "Poêlée de riz complet aux courgettes, poivrons et aubergines",
+        "it": "Padellata di riso integrale con zucchine, peperoni e melanzane",
+        "tr": "Kabak, biber ve patlıcanlı esmer pirinç tava"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie",
+        "Soja"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Hausgemachte Lasagne mit Sojabolognese",
+        "en": "Homemade lasagne with soy bolognese",
+        "es": "Lasaña casera con boloñesa de soja",
+        "fr": "Lasagnes maison à la bolognaise de soja",
+        "it": "Lasagne fatte in casa al ragù di soia",
+        "tr": "Ev yapımı soya bolonezli lazanya"
+       },
+       "preis": 4.2,
+       "preis_bedienstete": 7.2,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Ei",
+        "Senf",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Scharfe Chicken Wings mit Barbecuesauce, Farmersalat und Country Potatoes",
+        "en": "Spicy chicken wings with barbecue sauce, farmer's salad and country potatoes",
+        "es": "Alitas de pollo picantes con salsa barbacoa, ensalada campestre y patatas gajo",
+        "fr": "Ailes de poulet épicées, sauce barbecue, salade fermière et potatoes",
+        "it": "Ali di pollo piccanti con salsa barbecue, insalata contadina e patate country",
+        "tr": "Barbekü soslu acılı tavuk kanadı, köy salatası ve elma dilim patates"
+       },
+       "preis": 5.4,
+       "preis_bedienstete": 8.4,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Country Potatoes",
+        "en": "Country potatoes (seasoned potato wedges)",
+        "es": "Patatas gajo especiadas",
+        "fr": "Potatoes épicées",
+        "it": "Patate country speziate",
+        "tr": "Baharatlı elma dilim patates"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Bayerische Creme mit Zimtkirschen",
+        "en": "Bavarian cream with cinnamon cherries",
+        "es": "Crema bávara con cerezas a la canela",
+        "fr": "Crème bavaroise aux cerises à la cannelle",
+        "it": "Crema bavarese con ciliegie alla cannella",
+        "tr": "Tarçınlı kirazlı Bavyera kreması"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": null
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-30",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Spätzle-Pilzpfanne",
+        "en": "Spätzle (Swabian egg noodles) and mushroom pan",
+        "es": "Sartén de Spätzle (pasta suaba) con setas",
+        "fr": "Poêlée de Spätzle (pâtes souabes) aux champignons",
+        "it": "Padellata di Spätzle (gnocchetti svevi) e funghi",
+        "tr": "Mantarlı Spätzle (Şvabya eriştesi) tavası"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Senf",
+        "Sellerie",
+        "Soja",
+        "Sesam",
+        "Fisch",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Seelachs in der Sesampanade mit Sweet Chili Gemüse Sauce und Reis",
+        "en": "Sesame-crusted pollock with sweet chilli vegetable sauce and rice",
+        "es": "Abadejo rebozado con sésamo, salsa de verduras sweet chili y arroz",
+        "fr": "Lieu noir pané au sésame, sauce aux légumes sweet chili et riz",
+        "it": "Merluzzo nero in panatura al sesamo con salsa di verdure sweet chili e riso",
+        "tr": "Susamlı kaplamada kömür balığı, tatlı acı sebze sosu ve pilav"
+       },
+       "preis": 5.4,
+       "preis_bedienstete": 8.4,
+       "typ": "fisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Reis",
+        "en": "Rice",
+        "es": "Arroz",
+        "fr": "Riz",
+        "it": "Riso",
+        "tr": "Pirinç"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Mousse mit Blutorangen-Geschmack",
+        "en": "Blood orange mousse",
+        "es": "Mousse de naranja sanguina",
+        "fr": "Mousse à l’orange sanguine",
+        "it": "Mousse all’arancia rossa",
+        "tr": "Kan portakalı aromalı mus"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegetarisch"
+      }
+     ],
+     "geschlossen": false
+    },
+    {
+     "datum": "2026-10-31",
+     "gerichte": [],
+     "geschlossen": true
+    },
+    {
+     "datum": "2026-11-02",
+     "gerichte": [
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Vorspeise",
+        "en": "Starter",
+        "es": "Entrante",
+        "fr": "Entrée",
+        "it": "Antipasto",
+        "tr": "Başlangıç"
+       },
+       "name": {
+        "de": "Tagessuppe",
+        "en": "Soup of the day",
+        "es": "Sopa del día",
+        "fr": "Soupe du jour",
+        "it": "Zuppa del giorno",
+        "tr": "Günün çorbası"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Sellerie",
+        "Soja"
+       ],
+       "kategorie": {
+        "de": "Veganer Renner",
+        "en": "Vegan favourite",
+        "es": "Favorito vegano",
+        "fr": "Le favori vegan",
+        "it": "Il preferito vegano",
+        "tr": "Vegan favori"
+       },
+       "name": {
+        "de": "Spinatnudeln",
+        "en": "Spinach noodles",
+        "es": "Fideos de espinacas",
+        "fr": "Nouilles aux épinards",
+        "it": "Pasta agli spinaci",
+        "tr": "Ispanaklı erişte"
+       },
+       "preis": 2.99,
+       "preis_bedienstete": 5.99,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Hauptgericht",
+        "en": "Main dish",
+        "es": "Plato principal",
+        "fr": "Plat principal",
+        "it": "Piatto principale",
+        "tr": "Ana yemek"
+       },
+       "name": {
+        "de": "Maultaschen mit Zwiebelsauce und Kartoffelsalat",
+        "en": "Maultaschen (Swabian dumplings) with onion sauce and potato salad",
+        "es": "Maultaschen (raviolis suabos) con salsa de cebolla y ensalada de patatas",
+        "fr": "Maultaschen (raviolis souabes), sauce à l’oignon et salade de pommes de terre",
+        "it": "Maultaschen (ravioli svevi) con salsa di cipolle e insalata di patate",
+        "tr": "Maultaschen (Svabya mantısı), soğan soslu ve patates salatalı"
+       },
+       "preis": 5.2,
+       "preis_bedienstete": 8.2,
+       "typ": "fleisch"
+      },
+      {
+       "allergene": [
+        "Gluten",
+        "Milch",
+        "Ei",
+        "Senf",
+        "Sellerie",
+        "Sesam",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Buffet",
+        "en": "Buffet",
+        "es": "Bufé",
+        "fr": "Buffet",
+        "it": "Buffet",
+        "tr": "Büfe"
+       },
+       "name": {
+        "de": "Salatbuffet",
+        "en": "Salad buffet",
+        "es": "Bufé de ensaladas",
+        "fr": "Buffet de salades",
+        "it": "Buffet di insalate",
+        "tr": "Salata büfesi"
+       },
+       "preis": 1.1,
+       "preis_bedienstete": 1.6,
+       "typ": "vegetarisch"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Tagesgemüse",
+        "en": "Vegetables of the day",
+        "es": "Verduras del día",
+        "fr": "Légumes du jour",
+        "it": "Verdure del giorno",
+        "tr": "Günün sebzesi"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": null
+      },
+      {
+       "allergene": [
+        "Senf",
+        "Sellerie",
+        "Sulfite"
+       ],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Kartoffelsalat",
+        "en": "Potato salad",
+        "es": "Ensalada de patata",
+        "fr": "Salade de pommes de terre",
+        "it": "Insalata di patate",
+        "tr": "Patates salatası"
+       },
+       "preis": 1.29,
+       "preis_bedienstete": 1.69,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [],
+       "kategorie": {
+        "de": "Beilage",
+        "en": "Side dish",
+        "es": "Guarnición",
+        "fr": "Accompagnement",
+        "it": "Contorno",
+        "tr": "Garnitür"
+       },
+       "name": {
+        "de": "Beilagensalat",
+        "en": "Side salad",
+        "es": "Ensalada de acompañamiento",
+        "fr": "Salade d’accompagnement",
+        "it": "Insalata di contorno",
+        "tr": "Yan salata"
+       },
+       "preis": 0.99,
+       "preis_bedienstete": 1.39,
+       "typ": "vegan"
+      },
+      {
+       "allergene": [
+        "Milch"
+       ],
+       "kategorie": {
+        "de": "Dessert",
+        "en": "Dessert",
+        "es": "Postre",
+        "fr": "Dessert",
+        "it": "Dessert",
+        "tr": "Tatlı"
+       },
+       "name": {
+        "de": "Heidelbeerjoghurt",
+        "en": "Blueberry yoghurt",
+        "es": "Yogur de arándanos",
+        "fr": "Yaourt aux myrtilles",
+        "it": "Yogurt ai mirtilli",
+        "tr": "Yaban mersinli yoğurt"
+       },
+       "preis": 1.09,
+       "preis_bedienstete": 1.49,
+       "typ": "vegetarisch"
+      }
+     ],
+     "geschlossen": false
+    }
+   ]
+  }
+ }
 }
