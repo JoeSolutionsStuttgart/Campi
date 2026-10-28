@@ -587,6 +587,9 @@ a{color:inherit}
 .ev-link{color:inherit;text-decoration:none;display:inline}
 .ev-link .ic{width:14px;height:14px;margin-left:5px;vertical-align:-1px;color:var(--a-muted)}
 .card .src{margin-top:12px}
+
+/* Version 10: Link zur Website eines Stadtleben-Tipps */
+.place .place-link{display:inline-block;margin-top:6px;font-weight:700}
 </style>
 </head>
 <body>
@@ -1213,7 +1216,18 @@ const STR_DATA9 = {
     pi_consent:'Pilot döneme katılıyorum ve bu verilerin bu proje için kaydedilmesini ve değerlendirilmesini kabul ediyorum.',
     help_f3a:'Yalnızca uygulama testinde ve pilot dönemde, ve yalnızca onay verirsen, Campi’nin nasıl kullanıldığı kaydedilir: sayfalar, dokunuşlar, kaydırma, girişler, cihazın teknik bilgileri ve veritabanına gönderirken IP adresi. Adın cihazında kalır; konumun yalnızca izninle ve yuvarlanarak kaydedilir.'}
 };
-/*Object.keys(STR_DATA9).forEach(l => Object.assign(STR[l], STR_DATA9[l]));*/
+Object.keys(STR_DATA9).forEach(l => Object.assign(STR[l], STR_DATA9[l]));
+
+/* Version 10: Stadtleben-Tipps aus den Live-Daten, Veranstaltungen in Stuttgart */
+const STR_DATA10 = {
+  de: {city_events_near:'Auch in {city}', place_web:'Website', city_src_live:'Tipps für {city}, von Claude auf Stadt- und Veranstalterseiten geprüft am {d}'},
+  en: {city_events_near:'Also in {city}', place_web:'Website', city_src_live:'Tips for {city}, checked by Claude on city and venue websites on {d}'},
+  es: {city_events_near:'También en {city}', place_web:'Web', city_src_live:'Consejos para {city}, revisados por Claude en webs de la ciudad y de los locales el {d}'},
+  it: {city_events_near:'Anche a {city}', place_web:'Sito web', city_src_live:'Consigli per {city}, verificati da Claude sui siti della città e dei locali il {d}'},
+  fr: {city_events_near:'Aussi à {city}', place_web:'Site web', city_src_live:'Conseils pour {city}, vérifiés par Claude sur les sites de la ville et des lieux le {d}'},
+  tr: {city_events_near:'{city} şehrinde de', place_web:'Web sitesi', city_src_live:'{city} için ipuçları, Claude tarafından şehir ve mekân sitelerinde {d} tarihinde kontrol edildi'}
+};
+Object.keys(STR_DATA10).forEach(l => Object.assign(STR[l], STR_DATA10[l]));
 
 
 /* ================= Campus-Daten: Hochschule Esslingen =================
@@ -1529,7 +1543,9 @@ const EVENTS = [];
 const EVENTS_URL = 'https://www.hs-esslingen.de/hochschule/aktuelles/termine';
 const SPORT_URL = 'https://www.hs-esslingen.de/studium/freizeit/hochschulsport';
 /* Veranstaltungskalender der Städte (Link, wenn gerade keine Termine vorliegen) */
-const CITY_CAL = {Esslingen: 'https://www.esslingen-info.com/veranstaltungen/veranstaltungskalender', 'Göppingen': 'https://eventkalender.erlebe-dein-goeppingen.de/eventkalender'};
+const CITY_CAL = {Esslingen: 'https://www.esslingen-info.com/veranstaltungen/veranstaltungskalender', 'Göppingen': 'https://eventkalender.erlebe-dein-goeppingen.de/eventkalender', Stuttgart: 'https://rausgegangen.de/stuttgart/'};
+/* Stuttgart ist von beiden Esslinger Standorten in rund 15 Minuten erreichbar: dort zusätzlich zeigen */
+const CITY_NEAR = {SM: 'Stuttgart', FL: 'Stuttgart'};
 
 /* city life: well-known public places, example selection */
 const PLACES = {
@@ -1553,6 +1569,9 @@ const PLACES = {
   ]
 };
 const PLACE_CATS = ['alle','essen','kultur','sport','ausgehen'];
+/* aktuelle Stadtleben-Tipps aus den Live-Daten (Claude prüft sie einmal pro Woche), sonst die Auswahl oben */
+const LIVE_PLACES = {};
+function placesFor(city){ return LIVE_PLACES[city] || PLACES[city] || []; }
 
 /* calibrated positions from the database (table "orte") replace the estimates */
 const ORT_KEY = 'campi-orte-v1';
@@ -1585,7 +1604,7 @@ function ortList(){
    Claude übersetzt dabei die Gerichte, prüft Fristen auf hs-esslingen.de und sucht Veranstaltungen der Hochschule
    und der Städte Esslingen und Göppingen auf den Seiten aus quellen.json.
    Fehlt die Datei oder ist sie fehlerhaft, zeigt die App die eingebauten Beispieldaten. */
-const LIVE = {ok:false, stand:null, quelle:'', mensa:false, fristen:false, termine:false, stadt:false, tr:{}, typen:{}, mensaStand:null, via:''};
+const LIVE = {ok:false, stand:null, quelle:'', mensa:false, fristen:false, termine:false, stadt:false, orte:null, tr:{}, typen:{}, mensaStand:null, via:''};
 const ISO_RE = /^\d{4}-\d{2}-\d{2}$/;
 const DISH_TYPES = ['vegan', 'vegetarisch', 'fleisch', 'fisch'];
 function isoDay(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
@@ -1636,7 +1655,7 @@ function applyDaten(j){
   /* events */
   if(Array.isArray(j.termine)){
     /* art "stadt": events in Esslingen or Göppingen (city life); everything else: the university */
-    const ev = j.termine.slice(0, 30).map(e => {
+    const ev = j.termine.slice(0, 60).map(e => {
       if(!e || !ISO_RE.test(e.datum)) return null;
       const n = cleanX(e.titel, 120); if(!n) return null;
       const city = e.art === 'stadt' ? (CITY_CAL[e.stadt] ? e.stadt : null) : null;
@@ -1645,10 +1664,23 @@ function applyDaten(j){
     }).filter(Boolean);
     if(ev.length){ EVENTS.length = 0; ev.forEach(x => EVENTS.push(x)); LIVE.termine = ev.some(x => !x.city); LIVE.stadt = ev.some(x => x.city); }
   }
+  /* city life: places checked by Claude once a week; a city needs at least 4 valid entries */
+  if(j.stadtleben && typeof j.stadtleben === 'object'){
+    const sl = j.stadtleben;
+    ['Esslingen', 'Göppingen'].forEach(city => {
+      const arr = (Array.isArray(sl[city]) ? sl[city] : []).slice(0, 24).map(o => {
+        if(!o || typeof o.name !== 'string' || !o.name.trim() || !PLACE_CATS.includes(o.kat) || o.kat === 'alle') return null;
+        const s = cleanX(o.text, 200); if(!s) return null;
+        const name = o.name.trim().slice(0, 80), old = (PLACES[city] || []).find(p => p.n.toLowerCase() === name.toLowerCase());
+        return {c: o.kat, n: name, s, a: typeof o.adresse === 'string' ? o.adresse.trim().slice(0, 100) : '', url: cleanUrl(o.url), m: old ? old.m : null, live: true};
+      }).filter(Boolean);
+      if(arr.length >= 4){ LIVE_PLACES[city] = arr; LIVE.orte = ISO_RE.test(sl.geprueft) ? sl.geprueft : j.stand.slice(0, 10); }
+    });
+  }
   /* translation cache and type corrections, reused for dishes fetched directly from OpenMensa */
   if(j.uebersetzungen && typeof j.uebersetzungen === 'object') Object.keys(j.uebersetzungen).slice(0, 3000).forEach(k => { const x = cleanX(Object.assign({de: k}, j.uebersetzungen[k]), 160); if(x) LIVE.tr[k] = x; });
   if(j.typen && typeof j.typen === 'object') Object.keys(j.typen).slice(0, 3000).forEach(k => { if(DISH_TYPES.includes(j.typen[k])) LIVE.typen[k] = j.typen[k]; });
-  LIVE.ok = LIVE.mensa || LIVE.fristen || LIVE.termine || LIVE.stadt;
+  LIVE.ok = LIVE.mensa || LIVE.fristen || LIVE.termine || LIVE.stadt || !!LIVE.orte;
   LIVE.stand = j.stand; LIVE.quelle = typeof j.quelle === 'string' ? j.quelle.slice(0, 200) : '';
   if(LIVE.mensa) LIVE.mensaStand = j.stand;
   mergeOpenMensa();
@@ -2270,6 +2302,7 @@ function screenMensa(){
 }
 
 /* ---------- discover ---------- */
+function fmtDayShort(iso){ try { return new Date(iso + 'T12:00:00').toLocaleDateString(LOCALES[LANG], {day:'numeric', month:'numeric', year:'numeric'}); } catch(e){ return iso || ''; } }
 function travelText(m){
   const v = m && m[state.campus]; if(!v) return '';
   return t(v[0] === 'walk' ? 'walk_min' : 'bus_min', {n: v[1]});
@@ -2290,17 +2323,20 @@ function screenDiscover(){
       '<section class="card"><div class="sec-head"><h3>' + esc(t('events')) + '</h3>' + (evs.length ? '<a class="link" href="' + EVENTS_URL + '" target="_blank" rel="noopener" data-act="ext" data-ext="kalender">' + esc(t('all_dates')) + '</a>' : '') + '</div>' + eventRows(evs) + '</section>' +
       (LIVE.fristen || LIVE.termine ? '<p class="src">' + icon('doc') + esc(t('live_src', {stand: standText()})) + '</p>' : '');
   } else {
-    const all = PLACES[cityName()] || [];
+    const all = placesFor(cityName());
     const cats = PLACE_CATS.filter(k => k === 'alle' || all.some(p => p.c === k));
     if(!cats.includes(state.cat)) state.cat = 'alle';
     const list = all.filter(p => state.cat === 'alle' || p.c === state.cat);
     const catIcon = {essen:'cutlery', kultur:'city', sport:'walk', ausgehen:'people'};
-    const city = cityName(), cev = cityEventList(city, 14).slice(0, 8);
+    const city = cityName(), cev = cityEventList(city, 14).slice(0, 12), near = CITY_NEAR[state.campus], nev = near ? cityEventList(near, 14).slice(0, 8) : [];
     body = '<section class="card"><div class="sec-head"><h3>' + esc(t('city_events', {city})) + '</h3>' + (cev.length ? '<a class="link" href="' + esc(CITY_CAL[city] || EVENTS_URL) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a>' : '') + '</div>' +
       cityEventRows(cev, city) + (LIVE.stadt ? '<p class="src">' + icon('doc') + esc(t('city_ev_src', {stand: standText()})) + '</p>' : '') + '</section>' +
+      (nev.length ? '<section class="card"><div class="sec-head"><h3>' + esc(t('city_events_near', {city: near})) + '</h3><a class="link" href="' + esc(CITY_CAL[near]) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadtkalender">' + esc(t('all_dates')) + '</a></div>' + cityEventRows(nev, near) + '</section>' : '') +
       '<div class="chips" aria-label="' + esc(t('category')) + '">' + cats.map(k => '<button class="chip" type="button" data-act="cat" data-cat="' + k + '" aria-pressed="' + (state.cat === k) + '">' + esc(t('cat_' + k)) + '</button>').join('') + '</div>' +
-      list.map(p => '<article class="card place"><span class="tico">' + icon(catIcon[p.c]) + '</span><div><b>' + esc(p.n) + '</b><p>' + esc(L(p.s)) + '</p><p>' + esc(travelText(p.m)) + '</p></div></article>').join('') +
-      '<p class="src">' + icon('doc') + esc(t('city_src', {city: cityName()})) + '</p>';
+      list.map(p => { const way = p.m ? travelText(p.m) : '', where = [p.a, way].filter(Boolean).join(' · ');
+        return '<article class="card place"><span class="tico">' + icon(catIcon[p.c]) + '</span><div><b>' + esc(p.n) + '</b><p>' + esc(L(p.s)) + '</p>' + (where ? '<p>' + esc(where) + '</p>' : '') +
+          (p.url ? '<a class="link place-link" href="' + esc(p.url) + '" target="_blank" rel="noopener" data-act="ext" data-ext="stadt-ort">' + esc(t('place_web')) + '</a>' : '') + '</div></article>'; }).join('') +
+      '<p class="src">' + icon('doc') + esc(LIVE_PLACES[city] ? t('city_src_live', {city, d: fmtDayShort(LIVE.orte)}) : t('city_src', {city})) + '</p>';
   }
   return '<div class="pad stack">' +
     screenHead(t('disc_title'), studi ? t('disc_studi') : t('disc_city', {city: cityName()})) +
@@ -2640,6 +2676,8 @@ function answer(q){
   if(has('WIFI')) return {topic:'IT', ok:true, msg: msg({text: T('wifi', lang), source: L(SRC.wifi, lang)})};
   /* "in the town" (not at the university): city events first */
   const cityQ = /\b(stadt|innenstadt|altstadt|city|town|downtown|ciudad|citta|ville|sehir\w*)\b/.test(n) || (/\bin (esslingen|goppingen|goeppingen)\b/.test(hay) && !/hochschule|campus|universit|\buni\b/.test(n));
+  /* "in Stuttgart": events from Stuttgart, if there are any */
+  if(has('EVENTS') && /\bstuttgart\b/.test(hay) && cityEventList('Stuttgart', 14).length) return eventsAnswer(Object.assign({}, c, {city: 'Stuttgart'}), lang, false, true);
   if(has('EVENTS') && !has('SPORT')) return eventsAnswer(c, lang, has('NIGHT'), cityQ);
   if(has('NIGHT')) return nightAnswer(c, lang);
   if(has('SPORT')) return {topic:'Hochschulsport', ok:true, msg: msg({text: T('sport', lang), source: 'hs-esslingen.de · Hochschulsport', action:{act:'route', room:'FL-02010', icon:'pin', label: t('show_route', null, lang)}})};
@@ -3248,7 +3286,7 @@ function geoStop(force){
 }
 function geoOk(p){
   const first = !GEO.pos;
-  GEO.pos = {lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy || 50, t: Date.now()}; GEO.granted = true;
+  GEO.pos = {lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy || 50, t: Date.now(), fix: p.timestamp || Date.now()}; GEO.granted = true;
   geoSetStatus('ok');
   if(first) track('standort_erhalten', {nach_ms: Math.round(performance.now() - GEO.startedAt), genauigkeit_m: Math.round(GEO.pos.acc)});
   geoTrack();
@@ -3273,7 +3311,8 @@ function geoTrack(){
   GEO.lastTrack = {t: now, ll: me};
   const tg = geoTarget(), cp = C();
   track('standort', {lat: +GEO.pos.lat.toFixed(4), lon: +GEO.pos.lon.toFixed(4), genauigkeit_m: Math.round(GEO.pos.acc),
-    ziel: state.room, entfernung_m: tg ? Math.round(haversine(me, tg)) : null, campus_m: Math.round(haversine(me, cp.center)), live_ansicht: state.tab === 'rooms' && state.view === 'live'});
+    ziel: state.room, entfernung_m: tg ? Math.round(haversine(me, tg)) : null, campus_m: Math.round(haversine(me, cp.center)), live_ansicht: state.tab === 'rooms' && state.view === 'live',
+    messzeit: new Date(GEO.pos.fix || GEO.pos.t).toISOString()});
   if(ST.rec && !ST.rec.standort_campus && haversine(me, cp.center) < 600) ST.rec.standort_campus = cp.id;
 }
 function geoArrival(){
@@ -3349,7 +3388,7 @@ function geoAction(a, el){
           eigene Sitzung mit derselben zufälligen Pilot-Nummer. Daraus berechnet die Admin-Seite die Nutzung in Woche 2.
    Jedes Ereignis hat einen Zeitstempel (zeitpunkt) und die Zeit seit Sitzungsbeginn (zeit_ms). Jede Ansicht endet mit
    ansicht_ende und der aktiven Verweildauer (ohne Zeit im Hintergrund). */
-const STUDY_VERSION = '2026-10-d';
+const STUDY_VERSION = '2026-10-e';
 const OUTBOX_KEY = 'campi-outbox-v2', STUDY_DONE_KEY = 'campi-studie-fertig-v1', PILOT_KEY = 'campi-pilot-v1', INSTALL_LATER_KEY = 'campi-install-spaeter', GUIDE_KEY = 'campi-app-anleitung-v1';
 const NEW_OPEN_AFTER_MS = 30 * 60 * 1000;
 const DEFAULT_QUESTIONS = [

@@ -14,7 +14,7 @@ export function ladeQuellen(){
   const q = JSON.parse(readFileSync(new URL('../quellen.json', import.meta.url), 'utf8'));
   const ok = x => x && typeof x === 'object' && typeof x.url === 'string' && /^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/[^\s"<>]*)?$/i.test(x.url);
   const hochschule = (Array.isArray(q.hochschule) ? q.hochschule : []).filter(ok);
-  const stadt = (Array.isArray(q.stadt) ? q.stadt : []).filter(x => ok(x) && ['Esslingen', 'Göppingen'].includes(x.stadt));
+  const stadt = (Array.isArray(q.stadt) ? q.stadt : []).filter(x => ok(x) && ['Esslingen', 'Göppingen', 'Stuttgart'].includes(x.stadt));
   return {hochschule, stadt};
 }
 /* "www.dieselstrasse.de" -> "dieselstrasse.de"; Unterseiten wie stadtbuecherei.esslingen.de bleiben, wie sie sind */

@@ -11,9 +11,11 @@ const SPRACHEN = ['de', 'en', 'es', 'it', 'fr', 'tr'];
 const TYPEN = ['vegan', 'vegetarisch', 'fleisch', 'fisch'];
 const ALLERGENE = ['Gluten', 'Milch', 'Ei', 'Senf', 'Sellerie', 'Soja', 'Sesam', 'Fisch', 'Krebstiere', 'Nuesse', 'Erdnuss', 'Sulfite', 'Lupine', 'Weichtiere'];
 const CAMPUS = ['SM', 'FL', 'GP'];
-const STAEDTE = ['Esslingen', 'Göppingen'];
+const STAEDTE = ['Esslingen', 'Göppingen', 'Stuttgart'];
+const GRENZE = {hochschule: 15, Esslingen: 18, 'Göppingen': 10, Stuttgart: 10};
+const KATEGORIEN = ['essen', 'kultur', 'sport', 'ausgehen'];
 let DOMAINS = ['hs-esslingen.de', 'studierendenwerk-stuttgart.de'];
-const OBERSTE = ['version', 'stand', 'quelle', 'status', 'mensa', 'fristen', 'termine', 'uebersetzungen', 'typen', 'fehlende_uebersetzungen', 'hinweis'];
+const OBERSTE = ['version', 'stand', 'quelle', 'status', 'mensa', 'fristen', 'termine', 'uebersetzungen', 'typen', 'fehlende_uebersetzungen', 'hinweis', 'stadtleben'];
 const ISO = /^\d{4}-\d{2}-\d{2}$/;
 const fehler = [];
 const f = (pfad, text) => { if(fehler.length < 60) fehler.push(`${pfad}: ${text}`); };
@@ -118,14 +120,14 @@ async function main(){
   if(d.termine !== undefined){
     if(!Array.isArray(d.termine)) f('termine', 'muss eine Liste sein');
     else {
-      if(d.termine.length > 30) f('termine', 'höchstens 30 Einträge');
-      const anzahl = {hochschule: 0, Esslingen: 0, Göppingen: 0};
+      if(d.termine.length > 60) f('termine', 'höchstens 60 Einträge');
+      const anzahl = {hochschule: 0, Esslingen: 0, Göppingen: 0, Stuttgart: 0};
       d.termine.forEach((x, i) => {
         const p = `termine[${i}]`;
         if(!x || typeof x !== 'object'){ f(p, 'muss ein Objekt sein'); return; }
         if(x.art !== undefined && !['hochschule', 'stadt'].includes(x.art)) f(`${p}.art`, 'muss hochschule oder stadt sein');
         if(x.art === 'stadt'){
-          if(!STAEDTE.includes(x.stadt)) f(`${p}.stadt`, 'muss Esslingen oder Göppingen sein'); else anzahl[x.stadt]++;
+          if(!STAEDTE.includes(x.stadt)) f(`${p}.stadt`, 'muss Esslingen, Göppingen oder Stuttgart sein'); else anzahl[x.stadt]++;
           if(x.campus !== undefined && x.campus !== null) f(`${p}.campus`, 'bei Veranstaltungen in der Stadt immer null');
           if(!x.url) f(`${p}.url`, 'fehlt (Link der Veranstaltung oder der Quellseite)');
         } else {
@@ -141,8 +143,32 @@ async function main(){
         mehrsprachig(`${p}.ort`, x.ort, 160, false);
         url(`${p}.url`, x.url);
       });
-      if(anzahl.hochschule > 12) f('termine', 'höchstens 12 Veranstaltungen der Hochschule');
-      STAEDTE.forEach(st => { if(anzahl[st] > 10) f('termine', `höchstens 10 Veranstaltungen in ${st}`); });
+      if(anzahl.hochschule > GRENZE.hochschule) f('termine', `höchstens ${GRENZE.hochschule} Veranstaltungen der Hochschule`);
+      STAEDTE.forEach(st => { if(anzahl[st] > GRENZE[st]) f('termine', `höchstens ${GRENZE[st]} Veranstaltungen in ${st}`); });
+    }
+  }
+
+  /* Stadtleben-Tipps (einmal pro Woche geprüft) */
+  if(d.stadtleben !== undefined){
+    const sl = d.stadtleben;
+    if(!sl || typeof sl !== 'object' || Array.isArray(sl)) f('stadtleben', 'muss ein Objekt sein');
+    else {
+      Object.keys(sl).forEach(k => { if(k !== 'geprueft' && !['Esslingen', 'Göppingen'].includes(k)) f(`stadtleben.${k}`, 'unbekanntes Feld (erlaubt: geprueft, Esslingen, Göppingen)'); });
+      if(sl.geprueft !== undefined && !istDatum(sl.geprueft)) f('stadtleben.geprueft', 'muss JJJJ-MM-TT sein');
+      ['Esslingen', 'Göppingen'].forEach(st => {
+        if(sl[st] === undefined) return;
+        if(!Array.isArray(sl[st])){ f(`stadtleben.${st}`, 'muss eine Liste sein'); return; }
+        if(sl[st].length > 24) f(`stadtleben.${st}`, 'höchstens 24 Einträge');
+        sl[st].forEach((o, i) => {
+          const p = `stadtleben.${st}[${i}]`;
+          if(!o || typeof o !== 'object'){ f(p, 'muss ein Objekt sein'); return; }
+          if(!KATEGORIEN.includes(o.kat)) f(`${p}.kat`, `muss ${KATEGORIEN.join(', ')} sein`);
+          text(`${p}.name`, o.name, 80, true);
+          mehrsprachig(`${p}.text`, o.text, 200, true);
+          text(`${p}.adresse`, o.adresse, 100, false);
+          url(`${p}.url`, o.url);
+        });
+      });
     }
   }
 
@@ -172,6 +198,6 @@ async function main(){
   }
   const n = Object.values(d.mensa || {}).reduce((s, m) => s + (m.tage || []).reduce((a, t) => a + t.gerichte.length, 0), 0);
   const tm = d.termine || [], zahl = fn => tm.filter(fn).length;
-  console.log(`OK · ${n} Gerichte, ${(d.fristen || []).length} Fristen, ${tm.length} Veranstaltungen (Hochschule ${zahl(x => x.art !== 'stadt')}, Esslingen ${zahl(x => x.art === 'stadt' && x.stadt === 'Esslingen')}, Göppingen ${zahl(x => x.art === 'stadt' && x.stadt === 'Göppingen')}), ${(d.fehlende_uebersetzungen || []).length} Texte ohne Übersetzung`);
+  console.log(`OK · ${n} Gerichte, ${(d.fristen || []).length} Fristen, ${tm.length} Veranstaltungen (Hochschule ${zahl(x => x.art !== 'stadt')}, Esslingen ${zahl(x => x.art === 'stadt' && x.stadt === 'Esslingen')}, Göppingen ${zahl(x => x.art === 'stadt' && x.stadt === 'Göppingen')}, Stuttgart ${zahl(x => x.art === 'stadt' && x.stadt === 'Stuttgart')}), Stadtleben ${d.stadtleben ? ((d.stadtleben.Esslingen || []).length + (d.stadtleben['Göppingen'] || []).length) + ' Tipps' : '–'}, ${(d.fehlende_uebersetzungen || []).length} Texte ohne Übersetzung`);
 }
 main();

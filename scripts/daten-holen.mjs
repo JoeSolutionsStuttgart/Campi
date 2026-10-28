@@ -185,6 +185,7 @@ async function main(){
     termine,
     uebersetzungen: alt.uebersetzungen && typeof alt.uebersetzungen === 'object' && !Array.isArray(alt.uebersetzungen) ? alt.uebersetzungen : {},
     typen: alt.typen && typeof alt.typen === 'object' && !Array.isArray(alt.typen) ? alt.typen : {},
+    ...(alt.stadtleben && typeof alt.stadtleben === 'object' && !Array.isArray(alt.stadtleben) ? {stadtleben: alt.stadtleben} : {}),
     fehlende_uebersetzungen: []
   };
   anwenden(neu);

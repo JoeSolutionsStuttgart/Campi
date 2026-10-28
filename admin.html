@@ -694,7 +694,7 @@ function viewData(v){
     '<button class="btn" type="button" data-a="xlsx-ext"' + (S.xlBusy ? ' disabled' : '') + '>' + icon('down2') + (S.xlBusy ? 'Excel-Datei wird erstellt …' : 'Excel: erweitert (mit IP und mehr)') + '</button></div>' +
     '<p class="note" style="margin-bottom:8px">Einzelne CSV-Dateien, mit Semikolon getrennt:</p>' +
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-2" type="button" data-a="csv-sess">' + icon('down2') + 'Teilnahmen mit Ergebnissen und Antworten</button>' +
-    '<button class="btn btn-2" type="button" data-a="csv-ev">' + icon('down2') + 'Alle Ereignisse</button><button class="btn btn-2" type="button" data-a="csv-ans">' + icon('down2') + 'Alle Antworten</button></div>');
+    '<button class="btn btn-2" type="button" data-a="csv-ev">' + icon('down2') + 'Alle Ereignisse</button><button class="btn btn-2" type="button" data-a="csv-ans">' + icon('down2') + 'Alle Antworten</button><button class="btn btn-2" type="button" data-a="csv-geo">' + icon('down2') + 'Standorte mit Zeitstempel</button></div>');
   html += viewDelete();
   html += '<section class="card" style="margin-top:16px"><div class="card-head"><div><h2>Teilnahmen</h2><p class="sub">' + v.sess.length + ' Teilnahmen' + (v.sess.length > 300 ? ', die neuesten 300' : '') + '. Einzelne Teilnahmen (z. B. eigene Probeläufe) löschst du hier, mit dem Lösch-Kennwort.</p></div></div>' +
     (rows.length ? '<div class="table-wrap"><table><thead><tr><th>Zeit</th><th>Art</th><th>IP-Adresse</th><th>Gerät</th><th>System · Browser</th><th>Sprache</th><th>Gruppe</th><th>Semester</th><th>Fertig</th><th class="num">Dauer</th><th class="num">A1</th><th class="num">Vertrauen</th><th class="num">Ereignisse</th><th></th></tr></thead><tbody>' +
@@ -951,6 +951,16 @@ function exportPilot(){
   download('campi-pilot-' + new Date().toISOString().slice(0, 10) + '.csv', csv(users.map(u => ({pilot_id: u.id, erstes_oeffnen: new Date(u.first).toISOString(), oeffnungen: u.opens.length, woche1: u.week[0], woche2: u.week[1], woche3: u.week[2],
     woche2_mind_3: u.week[1] >= 3 ? 'ja' : 'nein', woche2_abgeschlossen: u.w2done ? 'ja' : 'nein', installiert: u.installed ? 'ja' : 'nein', standort_freigabe: u.geo ? 'ja' : 'nein', geraet: u.meta.geraet, sprache_app: u.meta.sprache_app, campus: u.meta.standort})),
     ['pilot_id','erstes_oeffnen','oeffnungen','woche1','woche2','woche3','woche2_mind_3','woche2_abgeschlossen','installiert','standort_freigabe','geraet','sprache_app','campus']));
+}
+
+/* ---------- location measurements with time stamps (only after voluntary consent, rounded to about 10 m) ---------- */
+function exportGeo(v){
+  const sb = {}; v.sess.forEach(s => sb[s.id] = s);
+  const rows = v.ev.filter(e => e.typ === 'standort' && e.daten && typeof e.daten.lat === 'number' && sb[e.sitzung_id]).map(e => { const s = sb[e.sitzung_id], x = e.daten;
+    return {sitzung_id: e.sitzung_id, art: isPilot(s) ? 'pilot' : 'test', pilot_id: s.pilot_id || '', zeitpunkt_geraet: new Date(evTime(e, s)).toISOString(), messzeit_gps: x.messzeit || '', gespeichert: e.erstellt || '',
+      lat: x.lat, lon: x.lon, genauigkeit_m: x.genauigkeit_m, ziel: x.ziel || '', entfernung_ziel_m: x.entfernung_m ?? '', entfernung_campus_m: x.campus_m ?? '', live_karte: x.live_ansicht ? 'ja' : 'nein', seite: e.ansicht || '', ip: e.ip || ''}; })
+    .sort((a, b) => a.zeitpunkt_geraet.localeCompare(b.zeitpunkt_geraet));
+  download('campi-standorte-' + new Date().toISOString().slice(0, 10) + '.csv', csv(rows, ['sitzung_id','art','pilot_id','zeitpunkt_geraet','messzeit_gps','gespeichert','lat','lon','genauigkeit_m','ziel','entfernung_ziel_m','entfernung_campus_m','live_karte','seite','ip']));
 }
 
 /* ---------- persons: who clicked what and when, time per page ---------- */
@@ -1419,6 +1429,7 @@ function extClick(a, b){
     case 'pw-change': S.del.change = !S.del.change; S.del.fehler = ''; render(); { const i = $('pw-alt'); if(i) i.focus(); } return true;
     case 'person': S.person = id; S.tab = 'personen'; saveUI(); render(); window.scrollTo(0, 0); return true;
     case 'csv-person': exportPerson(view()); return true;
+    case 'csv-geo': exportGeo(view()); return true;
     case 'csv-matrix': exportMatrix(view()); return true;
     case 'csv-pilot': exportPilot(); return true;
     case 'xlsx-all': exportXlsx(false); return true;
@@ -1462,10 +1473,10 @@ const XLW = (() => {
   const serial = ms => (ms - new Date(ms).getTimezoneOffset() * 60000) / 864e5 + 25569;
 
   /* ---------- styles ---------- */
-  const STYLE = {base:0, head:1, title:2, desc:3, pct:4, dt:5, date:6, dec:7, int:8, kpi:9, kpiLabel:10, kpiPct:11, wrap:12, bold:13, section:14, kpiSec:15, sec:16, note:17, big:18};
+  const STYLE = {base:0, head:1, title:2, desc:3, pct:4, dt:5, date:6, dec:7, int:8, kpi:9, kpiLabel:10, kpiPct:11, wrap:12, bold:13, section:14, kpiSec:15, sec:16, note:17, big:18, coord:19};
   const STYLES_XML = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
-    '<numFmts count="4"><numFmt numFmtId="164" formatCode="dd.mm.yyyy hh:mm"/><numFmt numFmtId="165" formatCode="dd.mm.yyyy"/><numFmt numFmtId="166" formatCode="0.0"/><numFmt numFmtId="167" formatCode="0&quot; s&quot;"/></numFmts>' +
+    '<numFmts count="5"><numFmt numFmtId="168" formatCode="0.0000"/><numFmt numFmtId="164" formatCode="dd.mm.yyyy hh:mm:ss"/><numFmt numFmtId="165" formatCode="dd.mm.yyyy"/><numFmt numFmtId="166" formatCode="0.0"/><numFmt numFmtId="167" formatCode="0&quot; s&quot;"/></numFmts>' +
     '<fonts count="8">' +
       '<font><sz val="10"/><name val="Arial"/><family val="2"/></font>' +
       '<font><b/><sz val="10"/><name val="Arial"/><family val="2"/></font>' +
@@ -1483,7 +1494,7 @@ const XLW = (() => {
       '<border><left/><right/><top/><bottom style="thin"><color rgb="FF9AA3B5"/></bottom><diagonal/></border>' +
       '<border><left style="thin"><color rgb="FFDDE2EA"/></left><right style="thin"><color rgb="FFDDE2EA"/></right><top style="thin"><color rgb="FFDDE2EA"/></top><bottom style="thin"><color rgb="FFDDE2EA"/></bottom><diagonal/></border></borders>' +
     '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
-    '<cellXfs count="19">' +
+    '<cellXfs count="20">' +
       '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
       '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>' +
       '<xf numFmtId="0" fontId="2" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
@@ -1503,6 +1514,7 @@ const XLW = (() => {
       '<xf numFmtId="167" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
       '<xf numFmtId="0" fontId="7" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>' +
       '<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1"/>' +
+      '<xf numFmtId="168" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment vertical="top"/></xf>' +
     '</cellXfs><cellStyles count="1"><cellStyle name="Standard" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
 
   /* ---------- one worksheet ---------- */
@@ -2149,6 +2161,19 @@ async function xlBuild(v, ext){
     ['fcp', 'Erstes Bild (ms)', 9, 'int', 'Bei „Technik des Geräts“: Millisekunden bis zum ersten gezeichneten Bild.'], ['meldung', 'Fehlermeldung', 40, null, 'Bei Fehlern: die Meldung des Browsers.'],
     ['ip', 'IP-Adresse', 16, null, 'IP-Adresse beim Senden.']
   ], 'Nur erweiterter Export: technische Angaben und Ereignisse (Ladezeiten, Netz, Akku, Ausrichtung, Fehler).');
+  const SO = xTable('Standorte', [
+    ['sid', 'Sitzungs-ID', 37, null, 'Sitzung.'], ['art', 'Art', 7, null, 'Test oder Pilot.'], ['pilot', 'Pilot-ID', 37, null, 'Gerät in der Pilotphase (leer im App-Test).'],
+    ['zeit', 'Uhrzeit', 16, 'dt', 'Zeitstempel des Ereignisses auf dem Gerät, in der Uhrzeit dieses Computers.'],
+    ['mess', 'Messzeit GPS', 16, 'dt', 'Wann das Gerät die Position gemessen hat (ab Version 10; vorher leer).'],
+    ['server', 'Gespeichert', 16, 'dt', 'Wann die Datenbank die Messung gespeichert hat.'],
+    ['sek', 'Sek. seit Beginn', 10, 'dec', 'Sekunden seit Beginn der Sitzung.'],
+    ['lat', 'Breite', 10, 'coord', 'Geografische Breite, auf 4 Nachkommastellen gerundet (etwa 10 m).'], ['lon', 'Länge', 10, 'coord', 'Geografische Länge, gerundet.'],
+    ['gen', 'Genauigkeit (m)', 9, 'int', 'Vom Gerät gemeldete Genauigkeit in Metern: Der echte Ort liegt mit hoher Wahrscheinlichkeit in diesem Umkreis.'],
+    ['ziel', 'Ziel', 14, null, 'Raum, der in der App gerade als Ziel gewählt war.'], ['entf', 'Entfernung zum Ziel (m)', 10, 'int', 'Luftlinie zum Zielgebäude.'],
+    ['campus', 'Entfernung zur Campus-Mitte (m)', 11, 'int', 'Luftlinie zur Mitte des gewählten Campus.'], ['live', 'Live-Karte offen', 9, null, '„ja“, wenn gerade die Live-Karte angezeigt wurde.'],
+    ['seite', 'Seite', 20, null, 'Seite der App.'], ['karte', 'Karte', 10, null, 'Link zu dieser Stelle auf OpenStreetMap (Formel HYPERLINK).']
+  ], 'Jede gespeicherte Standortmessung mit Zeitstempel: nur nach freiwilliger Freigabe, gerundet auf etwa 10 m, höchstens alle 15 Sekunden (öfter nur bei mehr als 25 m Bewegung).');
+  if(ext) SO.push(['ip', 'IP-Adresse', 16, null, 'IP-Adresse beim Senden.']);
   const evs = v.ev.filter(e => e.sitzung_id in order && (ext || !EV_EXT.has(e.typ))).sort((a, b) => (order[a.sitzung_id] - order[b.sitzung_id]) || ((Number(a.zeit_ms) || 0) - (Number(b.zeit_ms) || 0)));
   const lastQ = {};
   evs.forEach(e => {
@@ -2172,6 +2197,12 @@ async function xlBuild(v, ext){
     if(ext && (e.typ === 'technik' || e.typ === 'akku' || e.typ === 'netz' || e.typ === 'ausrichtung' || e.typ === 'fehler'))
       TE.add({sid: e.sitzung_id, art, zeit: t, was: EV_LABEL[e.typ] || e.typ, details: xlShort(xlDetail(e) || x.meldung || '', 300), akku: e.typ === 'akku' ? xlNum(x.stand_prozent) : null, online: e.typ === 'netz' || e.typ === 'technik' ? (x.online === false ? 'nein' : 'ja') : null,
         netz: x.netz || null, fcp: e.typ === 'technik' ? xlNum(x.erstes_bild_ms) : null, meldung: e.typ === 'fehler' ? xlShort(x.meldung || '', 200) : null, ip: e.ip || null});
+    if(e.typ === 'standort' && typeof x.lat === 'number' && typeof x.lon === 'number'){
+      const osm = 'https://www.openstreetmap.org/?mlat=' + x.lat + '&mlon=' + x.lon + '#map=18/' + x.lat + '/' + x.lon;
+      SO.add({sid: e.sitzung_id, art, pilot: s && s.pilot_id, zeit: t, mess: x.messzeit && !isNaN(Date.parse(x.messzeit)) ? Date.parse(x.messzeit) : null, server: e.erstellt ? Date.parse(e.erstellt) : null,
+        sek: Math.round((Number(e.zeit_ms) || 0) / 100) / 10, lat: x.lat, lon: x.lon, gen: xlNum(x.genauigkeit_m), ziel: x.ziel ? (ESS.rooms[x.ziel] || x.ziel) : null, entf: xlNum(x.entfernung_m), campus: xlNum(x.campus_m),
+        live: x.live_ansicht === undefined ? null : xlJN(x.live_ansicht), seite: e.ansicht ? pageName(e.ansicht) : null, karte: {f: 'HYPERLINK(' + xlLit(osm) + ',"Karte")', v: 'Karte'}, ip: ext ? (e.ip || null) : undefined});
+    }
     if(e.typ === 'suche' && x.text){ const n = Number(x.treffer) || 0; R.add({sid: e.sitzung_id, art, zeit: t, begriff: xlShort(String(x.text).toLowerCase().trim(), 100), treffer: n, ohne: xlJN(!n)}); }
     if(e.typ === 'chat_frage'){ lastQ[e.sitzung_id] = C.add({sid: e.sitzung_id, art, zeit: t, frage: xlShort(x.text, 2000), eingabe: x.quelle}); }
     if(e.typ === 'chat_antwort' && lastQ[e.sitzung_id] !== undefined){
@@ -2601,7 +2632,7 @@ async function xlBuild(v, ext){
   ex('Hypothesen', 'Ziel', 'Mindestwert, ab dem die Hypothese als bestätigt bzw. das Test-Ziel als erreicht gilt.');
   ex('Hypothesen', 'Mindestens n', 'Unter dieser Anzahl ist das Ergebnis zu unsicher; der Status lautet dann „Zu wenig Daten“ (bei H2b „Pilot läuft“, solange noch Personen im Pilot sind).');
   hyps.forEach(h => ex('Hypothesen', h.kurz + ': ' + h.text, h.krit + ' Daten: ' + h.src + '.'));
-  [[T, 'Teilnahmen'], [FB, 'Fragebogen'], [A, 'Antworten'], [E, 'Ereignisse'], [SZ, 'Seitenzeiten'], [K, 'Klicks'], [R, 'Raumsuche'], [C, 'KI-Fragen'], [WB, 'Wege und Bereiche'], [PE, 'Personen'], [P, 'Pilot'], [PO, 'Pilot-Öffnungen']]
+  [[T, 'Teilnahmen'], [FB, 'Fragebogen'], [A, 'Antworten'], [E, 'Ereignisse'], [SZ, 'Seitenzeiten'], [K, 'Klicks'], [R, 'Raumsuche'], [C, 'KI-Fragen'], [WB, 'Wege und Bereiche'], [PE, 'Personen'], [P, 'Pilot'], [PO, 'Pilot-Öffnungen'], [SO, 'Standorte']]
     .concat(ext ? [[HM, 'Tipp-Heatmap'], [SC, 'Scrollen'], [EG, 'Eingaben'], [TE, 'Technik'], [IPS, 'IP-Adressen']] : []).forEach(([t, nm]) => {
     if(t === HM){ exSec('Blatt ' + nm); ex(nm, '', HM.rows[1][0].v); return; }
     exSec('Blatt ' + nm);
@@ -2616,7 +2647,7 @@ async function xlBuild(v, ext){
   exSec('Diagrammdaten');
   ex('Diagrammdaten', '', 'Die Tabellen hinter den Diagrammen. Jede Tabelle hat eine kurze Beschreibung. Du kannst sie für eigene Diagramme verwenden.');
 
-  const sheets = [DB, EX, H, T.sheet(XL_PAL[0]), FB, A.sheet(XL_PAL[3]), E.sheet(XL_PAL[4]), SZ.sheet(XL_PAL[4]), K.sheet(XL_PAL[4]), R.sheet(XL_PAL[4]), C.sheet(XL_PAL[4]), WB.sheet(XL_PAL[0]), PE.sheet(XL_PAL[4]), P.sheet(XL_PAL[6]), PO.sheet(XL_PAL[6])]
+  const sheets = [DB, EX, H, T.sheet(XL_PAL[0]), FB, A.sheet(XL_PAL[3]), E.sheet(XL_PAL[4]), SZ.sheet(XL_PAL[4]), K.sheet(XL_PAL[4]), R.sheet(XL_PAL[4]), C.sheet(XL_PAL[4]), WB.sheet(XL_PAL[0]), PE.sheet(XL_PAL[4]), P.sheet(XL_PAL[6]), PO.sheet(XL_PAL[6]), SO.sheet(XL_PAL[5])]
     .concat(ext ? [HM, SC.sheet(XL_PAL[7]), EG.sheet(XL_PAL[7]), TE.sheet(XL_PAL[7]), IPS.sheet(XL_PAL[7])] : [], [DD]);
   return XLW.build(sheets, {title: 'Campi Auswertung ' + (ext ? 'erweitert ' : '') + stamp});
 }
