@@ -625,14 +625,14 @@ a{color:inherit}
 .place-head{margin:6px 2px 0;font-size:16px}
 .sheet-dl a.btn{text-decoration:none}
 
-/* Version 12: small "Campi als App" hint on the start page */
-.app-info{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:14px;border:1px dashed var(--a-line);background:var(--a-surface);color:var(--a-fg);font:inherit;text-align:left;cursor:pointer}
-.app-info b{display:block;font-size:14px;font-weight:800}
-.app-info .tsub{display:block;font-size:12.5px;color:var(--a-muted)}
-.app-info > svg{margin-left:auto;flex:none;width:18px;height:18px;color:var(--a-muted)}
-.app-info-ico{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--a-primary-soft);color:var(--a-primary-on-soft);flex:none}
-.app-info-ico svg{width:17px;height:17px}
-.app-info:hover,.app-info:focus-visible{border-style:solid;border-color:var(--a-primary)}
+/* Version 12: small "Campi als App" hint on the start page and under the app name */
+.app-info{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;padding:5px 10px 5px 8px;border-radius:999px;border:1px solid var(--a-line);background:var(--a-surface);color:var(--a-fg);font:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.app-info svg{width:15px;height:15px;color:var(--a-primary);flex:none}
+.app-info svg:last-child{width:13px;height:13px;color:var(--a-muted)}
+.app-info:hover,.app-info:focus-visible{border-color:var(--a-primary)}
+.brand-app{display:inline-flex;align-items:center;gap:4px;align-self:flex-start;margin-top:3px;padding:2px 8px 2px 6px;border-radius:999px;border:1px solid var(--a-line);background:var(--a-surface);color:var(--a-primary);font:inherit;font-size:11px;font-weight:800;line-height:1.4;cursor:pointer;white-space:nowrap}
+.brand-app svg{width:12px;height:12px;flex:none}
+.brand-app:hover,.brand-app:focus-visible{border-color:var(--a-primary)}
 </style>
 </head>
 <body>
@@ -1297,12 +1297,12 @@ Object.keys(STR_DATA11).forEach(l => Object.assign(STR[l], STR_DATA11[l]));
 
 /* Version 12: Hinweis „Campi als App“ auf der Startseite und passende Beispielfrage */
 const STR_DATA12 = {
-  de: {app_info:'Campi als App', app_info_s:'So legst du Campi auf deinen Home-Bildschirm', ask_ex_app:'Wie nutze ich Campi als App?'},
-  en: {app_info:'Campi as an app', app_info_s:'How to put Campi on your home screen', ask_ex_app:'How do I use Campi as an app?'},
-  es: {app_info:'Campi como app', app_info_s:'Cómo poner Campi en tu pantalla de inicio', ask_ex_app:'¿Cómo uso Campi como app?'},
-  it: {app_info:'Campi come app', app_info_s:'Come mettere Campi nella schermata Home', ask_ex_app:'Come uso Campi come app?'},
-  fr: {app_info:'Campi comme app', app_info_s:'Ajouter Campi à ton écran d’accueil', ask_ex_app:'Comment utiliser Campi comme une app ?'},
-  tr: {app_info:'Uygulama olarak Campi', app_info_s:'Campi’yi ana ekranına nasıl eklersin', ask_ex_app:'Campi’yi uygulama olarak nasıl kullanırım?'}
+  de: {app_info_btn:'Als App nutzen', app_info:'Campi als App', app_info_s:'So legst du Campi auf deinen Home-Bildschirm', ask_ex_app:'Wie nutze ich Campi als App?'},
+  en: {app_info_btn:'Use as an app', app_info:'Campi as an app', app_info_s:'How to put Campi on your home screen', ask_ex_app:'How do I use Campi as an app?'},
+  es: {app_info_btn:'Usar como app', app_info:'Campi como app', app_info_s:'Cómo poner Campi en tu pantalla de inicio', ask_ex_app:'¿Cómo uso Campi como app?'},
+  it: {app_info_btn:'Usa come app', app_info:'Campi come app', app_info_s:'Come mettere Campi nella schermata Home', ask_ex_app:'Come uso Campi come app?'},
+  fr: {app_info_btn:'Utiliser comme app', app_info:'Campi comme app', app_info_s:'Ajouter Campi à ton écran d’accueil', ask_ex_app:'Comment utiliser Campi comme une app ?'},
+  tr: {app_info_btn:'Uygulama olarak kullan', app_info:'Uygulama olarak Campi', app_info_s:'Campi’yi ana ekranına nasıl eklersin', ask_ex_app:'Campi’yi uygulama olarak nasıl kullanırım?'}
 };
 Object.keys(STR_DATA12).forEach(l => { Object.assign(STR[l], STR_DATA12[l]); if(STR[l].ask_examples && STR[l].ask_examples.indexOf(STR_DATA12[l].ask_ex_app) < 0) STR[l].ask_examples += '|' + STR_DATA12[l].ask_ex_app; });
 
@@ -2081,7 +2081,7 @@ function logoHTML(){
   return '<span class="logo mono" aria-hidden="true">' + esc(initials(b.name)) + '</span>';
 }
 function renderAppbar(){
-  $('appbar').innerHTML = '<div class="brand" id="brand">' + logoHTML() + '<div class="brand-txt"><span class="brand-name">' + esc(state.b.name) + '</span><span class="brand-sub">' + esc(t('brand_sub')) + '</span></div></div>' +
+  $('appbar').innerHTML = '<div class="brand" id="brand">' + logoHTML() + '<div class="brand-txt"><span class="brand-name">' + esc(state.b.name) + '</span><span class="brand-sub">' + esc(t('brand_sub')) + '</span>' + (standalone() ? '' : '<button class="brand-app" type="button" data-act="guide" data-src="kopfzeile">' + icon('install') + '<span>' + esc(t('app_info_btn')) + '</span></button>') + '</div></div>' +
     '<button class="help-btn" type="button" data-act="tab" data-tab="help" aria-label="' + esc(t('help_btn')) + '"' + (state.tab === 'help' ? ' aria-current="page"' : '') + '>' + icon('help') + '</button>' +
     '<button class="lang-btn" type="button" data-act="sheet" data-sheet="lang" aria-label="' + esc(t('lang_btn')) + ': ' + esc(LANG_NAMES[LANG]) + '">' + icon('globe') + '<span>' + LANG.toUpperCase() + '</span></button>';
 }
@@ -2106,7 +2106,7 @@ setInterval(() => {
 /* small hint on the start page: how to use Campi like an app (hidden when it already runs from the home screen) */
 function appInfoHTML(){
   if(standalone()) return '';
-  return '<button class="app-info" type="button" data-act="guide" data-src="start-info"><span class="app-info-ico">' + icon('install') + '</span><span><b>' + esc(t('app_info')) + '</b><span class="tsub">' + esc(t('app_info_s')) + '</span></span>' + icon('arrow') + '</button>';
+  return '<button class="app-info" type="button" data-act="guide" data-src="start-info">' + icon('install') + '<span>' + esc(t('app_info')) + '</span>' + icon('arrow') + '</button>';
 }
 function greeting(){ const h = NOW.getHours(); return t(h < 11 ? 'greet_m' : (h < 18 ? 'greet_d' : 'greet_e')); }
 function tile(ic, title, sub, attrs){ return '<button class="tile" type="button" ' + attrs + '><span class="tico">' + icon(ic) + '</span><span><b>' + esc(title) + '</b><span class="tsub">' + esc(sub) + '</span></span></button>'; }
@@ -4664,7 +4664,7 @@ document.addEventListener('drop', e => { const d = e.target.closest && e.target.
 /* hidden way into the settings: hold the university name in the app bar for 1.5 seconds */
 let pressTimer = null;
 document.addEventListener('pointerdown', e => {
-  if(state.mode !== 'app' || ST.active || !e.target.closest('#brand')) return;
+  if(state.mode !== 'app' || ST.active || !e.target.closest('#brand') || e.target.closest('.brand-app')) return;
   clearTimeout(pressTimer);
   pressTimer = setTimeout(() => { pressTimer = null; openAdmin(); }, 1500);
 });
@@ -4695,7 +4695,7 @@ window.addEventListener('storage', e => {
     render();
   }
 });
-document.addEventListener('dblclick', e => { if(state.mode === 'app' && !ST.active && e.target.closest && e.target.closest('#brand')) openAdmin(); });
+document.addEventListener('dblclick', e => { if(state.mode === 'app' && !ST.active && e.target.closest && e.target.closest('#brand') && !e.target.closest('.brand-app')) openAdmin(); });
 
 /* ================= Boot ================= */
 function tick(){ const sb = $('sb-time'); if(sb){ const d = new Date(); sb.textContent = d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0'); } }
