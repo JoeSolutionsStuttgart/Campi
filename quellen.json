@@ -96,6 +96,24 @@
   },
   {
    "stadt": "Stuttgart",
+   "name": "Im Wizemann",
+   "url": "https://www.imwizemann.de/veranstaltungen",
+   "was": "Konzerte, Comedy, Partys (Hauptquelle Stuttgart)"
+  },
+  {
+   "stadt": "Stuttgart",
+   "name": "Stuttgigs Konzertkalender",
+   "url": "https://www.stuttgigs.de/",
+   "was": "Konzerte in ganz Stuttgart"
+  },
+  {
+   "stadt": "Stuttgart",
+   "name": "LKA Longhorn",
+   "url": "https://lka-longhorn.de/",
+   "was": "Konzerte und Partys"
+  },
+  {
+   "stadt": "Stuttgart",
    "name": "rausgegangen (Stuttgart)",
    "url": "https://rausgegangen.de/stuttgart/",
    "was": "Konzerte, Partys, Kultur in Stuttgart"

@@ -1,7 +1,7 @@
 {
  "version": 1,
- "stand": "2026-10-28T09:47:54+01:00",
- "quelle": "Speiseplan: Studierendenwerk Stuttgart über OpenMensa · Fristen: hs-esslingen.de · Veranstaltungen: Hochschule, Esslingen und Göppingen · gesammelt von Claude",
+ "stand": "2026-10-28T11:56:00+01:00",
+ "quelle": "Speiseplan: Studierendenwerk Stuttgart über OpenMensa · Fristen: hs-esslingen.de · Veranstaltungen: Hochschule, Esslingen, Göppingen und Stuttgart · gesammelt von Claude",
  "fristen": [
   {
    "bis": "2026-11-09",
@@ -23,7 +23,8 @@
     "it": "Iscrizione agli esami, semestre invernale 2026/27",
     "tr": "2026/27 kış dönemi sınav kaydı"
    },
-   "von": "2026-10-26"
+   "von": "2026-10-26",
+   "wichtig": true
   },
   {
    "bis": "2027-01-24",
@@ -45,7 +46,8 @@
     "it": "Rinnovo dell’iscrizione, semestre estivo 2027",
     "tr": "2027 yaz dönemi kayıt yenileme"
    },
-   "von": "2027-01-08"
+   "von": "2027-01-08",
+   "wichtig": true
   },
   {
    "hinweis": {
@@ -115,6 +117,30 @@
    },
    "url": "https://www.hs-esslingen.de/hochschule/aktuelles/termin/it-kolloquium",
    "zeit": "17:30"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-28",
+   "kat": "kultur",
+   "ort": {
+    "de": "Hanns-Martin-Schleyer-Halle, Stuttgart",
+    "en": "Hanns-Martin-Schleyer-Halle, Stuttgart",
+    "es": "Hanns-Martin-Schleyer-Halle, Stuttgart",
+    "fr": "Hanns-Martin-Schleyer-Halle, Stuttgart",
+    "it": "Hanns-Martin-Schleyer-Halle, Stuttgart",
+    "tr": "Hanns-Martin-Schleyer-Halle, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Felix Lobrecht (Comedy)",
+    "en": "Felix Lobrecht (comedy)",
+    "es": "Felix Lobrecht (comedia)",
+    "fr": "Felix Lobrecht (humour)",
+    "it": "Felix Lobrecht (comicità)",
+    "tr": "Felix Lobrecht (komedi)"
+   },
+   "url": "https://www.stuttgigs.de/konzerte/8691-felix-lobrecht-stuttgart"
   },
   {
    "art": "hochschule",
@@ -286,6 +312,31 @@
    "art": "stadt",
    "campus": null,
    "datum": "2026-10-31",
+   "kat": "ausgehen",
+   "ort": {
+    "de": "Im Wizemann, Stuttgart",
+    "en": "Im Wizemann, Stuttgart",
+    "es": "Im Wizemann, Stuttgart",
+    "fr": "Im Wizemann, Stuttgart",
+    "it": "Im Wizemann, Stuttgart",
+    "tr": "Im Wizemann, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Día de los Muertos Festival",
+    "en": "Día de los Muertos festival",
+    "es": "Festival del Día de los Muertos",
+    "fr": "Festival Día de los Muertos",
+    "it": "Festival del Día de los Muertos",
+    "tr": "Día de los Muertos Festivali"
+   },
+   "url": "https://www.imwizemann.de/veranstaltungen/2864-dia-de-los-muertos-festival-2026-2026-stuttgart",
+   "zeit": "17:30"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-31",
    "ort": {
     "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
     "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
@@ -329,6 +380,56 @@
    },
    "url": "https://www.wasgehtapp.de/termin_details.php?id=46521720&date=2026-10-31",
    "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-31",
+   "kat": "ausgehen",
+   "ort": {
+    "de": "Im Wizemann, Stuttgart",
+    "en": "Im Wizemann, Stuttgart",
+    "es": "Im Wizemann, Stuttgart",
+    "fr": "Im Wizemann, Stuttgart",
+    "it": "Im Wizemann, Stuttgart",
+    "tr": "Im Wizemann, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Bonaparte (Konzert)",
+    "en": "Bonaparte (concert)",
+    "es": "Bonaparte (concierto)",
+    "fr": "Bonaparte (concert)",
+    "it": "Bonaparte (concerto)",
+    "tr": "Bonaparte (konser)"
+   },
+   "url": "https://www.imwizemann.de/veranstaltungen/2402-bonaparte-2026-stuttgart",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-10-31",
+   "kat": "ausgehen",
+   "ort": {
+    "de": "LKA Longhorn, Stuttgart",
+    "en": "LKA Longhorn, Stuttgart",
+    "es": "LKA Longhorn, Stuttgart",
+    "fr": "LKA Longhorn, Stuttgart",
+    "it": "LKA Longhorn, Stuttgart",
+    "tr": "LKA Longhorn, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Halloween-Party",
+    "en": "Halloween party",
+    "es": "Fiesta de Halloween",
+    "fr": "Soirée Halloween",
+    "it": "Festa di Halloween",
+    "tr": "Cadılar Bayramı partisi"
+   },
+   "url": "https://lka-longhorn.de/events/halloween-party-2025-201/",
+   "zeit": "21:00"
   },
   {
    "art": "stadt",
@@ -382,6 +483,31 @@
    "art": "stadt",
    "campus": null,
    "datum": "2026-11-02",
+   "kat": "ausgehen",
+   "ort": {
+    "de": "Im Wizemann, Stuttgart",
+    "en": "Im Wizemann, Stuttgart",
+    "es": "Im Wizemann, Stuttgart",
+    "fr": "Im Wizemann, Stuttgart",
+    "it": "Im Wizemann, Stuttgart",
+    "tr": "Im Wizemann, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Cindy Gravity – Kulturwinter (Eintritt frei)",
+    "en": "Cindy Gravity – Kulturwinter (free entry)",
+    "es": "Cindy Gravity – Kulturwinter (entrada libre)",
+    "fr": "Cindy Gravity – Kulturwinter (entrée libre)",
+    "it": "Cindy Gravity – Kulturwinter (ingresso libero)",
+    "tr": "Cindy Gravity – Kulturwinter (giriş ücretsiz)"
+   },
+   "url": "https://www.imwizemann.de/veranstaltungen/2929-cindy-gravity-2026-stuttgart",
+   "zeit": "18:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-02",
    "ort": {
     "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
     "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
@@ -405,6 +531,31 @@
   {
    "art": "stadt",
    "campus": null,
+   "datum": "2026-11-02",
+   "kat": "ausgehen",
+   "ort": {
+    "de": "Im Wizemann, Stuttgart",
+    "en": "Im Wizemann, Stuttgart",
+    "es": "Im Wizemann, Stuttgart",
+    "fr": "Im Wizemann, Stuttgart",
+    "it": "Im Wizemann, Stuttgart",
+    "tr": "Im Wizemann, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "The Notwist (Konzert)",
+    "en": "The Notwist (concert)",
+    "es": "The Notwist (concierto)",
+    "fr": "The Notwist (concert)",
+    "it": "The Notwist (concerto)",
+    "tr": "The Notwist (konser)"
+   },
+   "url": "https://www.imwizemann.de/veranstaltungen/2602-the-notwist-2026-stuttgart",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
    "datum": "2026-11-04",
    "ort": {
     "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
@@ -424,6 +575,55 @@
     "tr": "To Athena (konser)"
    },
    "url": "https://www.wasgehtapp.de/termin_details.php?id=45381414&date=2026-11-04",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-04",
+   "kat": "ausgehen",
+   "ort": {
+    "de": "Theaterhaus, Stuttgart",
+    "en": "Theaterhaus, Stuttgart",
+    "es": "Theaterhaus, Stuttgart",
+    "fr": "Theaterhaus, Stuttgart",
+    "it": "Theaterhaus, Stuttgart",
+    "tr": "Theaterhaus, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Max Mutzke (Konzert)",
+    "en": "Max Mutzke (concert)",
+    "es": "Max Mutzke (concierto)",
+    "fr": "Max Mutzke (concert)",
+    "it": "Max Mutzke (concerto)",
+    "tr": "Max Mutzke (konser)"
+   },
+   "url": "https://www.stuttgigs.de/konzerte/8762-max-mutzke-stuttgart"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-05",
+   "kat": "ausgehen",
+   "ort": {
+    "de": "LKA Longhorn, Stuttgart",
+    "en": "LKA Longhorn, Stuttgart",
+    "es": "LKA Longhorn, Stuttgart",
+    "fr": "LKA Longhorn, Stuttgart",
+    "it": "LKA Longhorn, Stuttgart",
+    "tr": "LKA Longhorn, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "The Sisters of Mercy (Konzert)",
+    "en": "The Sisters of Mercy (concert)",
+    "es": "The Sisters of Mercy (concierto)",
+    "fr": "The Sisters of Mercy (concert)",
+    "it": "The Sisters of Mercy (concerto)",
+    "tr": "The Sisters of Mercy (konser)"
+   },
+   "url": "https://lka-longhorn.de/events/the-sisters-of-mercy-tour-2026/",
    "zeit": "20:00"
   },
   {
@@ -520,6 +720,31 @@
     "tr": "Aki Takase & Alexander von Schlippenbach (konser)"
    },
    "url": "https://www.wasgehtapp.de/termin_details.php?id=46154995&date=2026-11-06",
+   "zeit": "20:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-06",
+   "kat": "kultur",
+   "ort": {
+    "de": "Im Wizemann, Stuttgart",
+    "en": "Im Wizemann, Stuttgart",
+    "es": "Im Wizemann, Stuttgart",
+    "fr": "Im Wizemann, Stuttgart",
+    "it": "Im Wizemann, Stuttgart",
+    "tr": "Im Wizemann, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Benni Stark (Comedy)",
+    "en": "Benni Stark (comedy)",
+    "es": "Benni Stark (comedia)",
+    "fr": "Benni Stark (humour)",
+    "it": "Benni Stark (comicità)",
+    "tr": "Benni Stark (komedi)"
+   },
+   "url": "https://www.imwizemann.de/veranstaltungen/2483-benni-stark-2026-stuttgart",
    "zeit": "20:00"
   },
   {
@@ -670,6 +895,31 @@
    "art": "stadt",
    "campus": null,
    "datum": "2026-11-10",
+   "kat": "kultur",
+   "ort": {
+    "de": "Im Wizemann, Stuttgart",
+    "en": "Im Wizemann, Stuttgart",
+    "es": "Im Wizemann, Stuttgart",
+    "fr": "Im Wizemann, Stuttgart",
+    "it": "Im Wizemann, Stuttgart",
+    "tr": "Im Wizemann, Stuttgart"
+   },
+   "stadt": "Stuttgart",
+   "titel": {
+    "de": "Stuttgarter Comedy Clash (Halbfinale)",
+    "en": "Stuttgart Comedy Clash (semi-final)",
+    "es": "Stuttgart Comedy Clash (semifinal)",
+    "fr": "Stuttgart Comedy Clash (demi-finale)",
+    "it": "Stuttgart Comedy Clash (semifinale)",
+    "tr": "Stuttgart Comedy Clash (yarı final)"
+   },
+   "url": "https://www.imwizemann.de/veranstaltungen/2591-stuttgarter-comedy-clash-2026-stuttgart",
+   "zeit": "19:00"
+  },
+  {
+   "art": "stadt",
+   "campus": null,
+   "datum": "2026-11-10",
    "ort": {
     "de": "Dieselstrasse, Dieselstr. 26, Esslingen",
     "en": "Dieselstrasse, Dieselstr. 26, Esslingen",
@@ -714,6 +964,303 @@
    "zeit": "09:00"
   }
  ],
+ "stadtleben": {
+  "Esslingen": [
+   {
+    "adresse": "Wehrneckarstraße 13, Esslingen",
+    "kat": "essen",
+    "name": "Hygge – feel good café und bistro",
+    "text": {
+     "de": "Vegetarische und vegane Gerichte, oft glutenfrei – Bowls, Waffeln und Smoothies, nah am Campus Stadtmitte.",
+     "en": "Vegetarian and vegan dishes, often gluten-free – bowls, waffles and smoothies, close to the city-centre campus.",
+     "es": "Platos vegetarianos y veganos, a menudo sin gluten: bowls, gofres y smoothies, cerca del campus del centro.",
+     "fr": "Plats végétariens et végans, souvent sans gluten : bowls, gaufres et smoothies, près du campus du centre.",
+     "it": "Piatti vegetariani e vegani, spesso senza glutine: bowl, waffle e smoothie, vicino al campus in centro.",
+     "tr": "Vejetaryen ve vegan yemekler, çoğu glütensiz: bowl, waffle ve smoothie, şehir merkezi kampüsüne yakın."
+    }
+   },
+   {
+    "adresse": "Unterer Metzgerbach 9, Esslingen",
+    "kat": "essen",
+    "name": "Café Findelkind",
+    "text": {
+     "de": "Gemütliches Altstadt-Café mit belgischen Waffeln, Bowls, Bagels und Panini.",
+     "en": "Cosy old-town café with Belgian waffles, bowls, bagels and panini.",
+     "es": "Acogedor café del casco antiguo con gofres belgas, bowls, bagels y paninis.",
+     "fr": "Café cosy de la vieille ville avec gaufres belges, bowls, bagels et paninis.",
+     "it": "Accogliente caffè del centro storico con waffle belgi, bowl, bagel e panini.",
+     "tr": "Eski şehirde gofret, bowl, bagel ve panini sunan sıcak bir kafe."
+    }
+   },
+   {
+    "adresse": "Unterer Metzgerbach 18, Esslingen",
+    "kat": "essen",
+    "name": "Kano's Breakfast",
+    "text": {
+     "de": "Türkisches Frühstück in der Altstadt, auch mit veganer Platte – gut zum Teilen.",
+     "en": "Turkish breakfast in the old town, including a vegan platter – great for sharing.",
+     "es": "Desayuno turco en el casco antiguo, también con plato vegano; ideal para compartir.",
+     "fr": "Petit-déjeuner turc dans la vieille ville, avec aussi un plateau végan – idéal à partager.",
+     "it": "Colazione turca nel centro storico, anche con piatto vegano: ottima da condividere.",
+     "tr": "Eski şehirde Türk kahvaltısı, vegan tabak da var – paylaşmak için ideal."
+    }
+   },
+   {
+    "adresse": "Unterer Metzgerbach 13, Esslingen",
+    "kat": "essen",
+    "name": "MO:KA Café",
+    "text": {
+     "de": "Café mit regionalen Zutaten: Stullen, Bowls, Pancakes und Waffeln in der Altstadt.",
+     "en": "Café using regional ingredients: sandwiches, bowls, pancakes and waffles in the old town.",
+     "es": "Café con ingredientes regionales: bocadillos, bowls, tortitas y gofres en el casco antiguo.",
+     "fr": "Café aux produits régionaux : tartines, bowls, pancakes et gaufres dans la vieille ville.",
+     "it": "Caffè con ingredienti locali: panini, bowl, pancake e waffle nel centro storico.",
+     "tr": "Yöresel malzemeli kafe: sandviç, bowl, pankek ve waffle, eski şehirde."
+    }
+   },
+   {
+    "adresse": "Rathausplatz 8, Esslingen",
+    "kat": "essen",
+    "name": "Nali – Coffee und Eatery",
+    "text": {
+     "de": "Frühstück bis 14 Uhr direkt am Rathausplatz, z. B. Shakshuka oder Eggs Benedict.",
+     "en": "Breakfast until 2 pm right on Rathausplatz, e.g. shakshuka or eggs Benedict.",
+     "es": "Desayuno hasta las 14 h en la Rathausplatz, p. ej. shakshuka o huevos Benedict.",
+     "fr": "Petit-déjeuner jusqu’à 14 h sur la Rathausplatz, p. ex. shakshuka ou œufs Bénédicte.",
+     "it": "Colazione fino alle 14 in Rathausplatz, ad es. shakshuka o uova alla Benedict.",
+     "tr": "Rathausplatz’ta saat 14’e kadar kahvaltı, örneğin şakşuka veya Benedict yumurta."
+    }
+   },
+   {
+    "kat": "kultur",
+    "name": "Esslinger Burg",
+    "text": {
+     "de": "Burganlage über der Stadt mit Weinbergen und weitem Blick über Altstadt und Neckartal.",
+     "en": "Castle above the town with vineyards and wide views over the old town and Neckar valley.",
+     "es": "Castillo sobre la ciudad con viñedos y amplias vistas del casco antiguo y el valle del Neckar.",
+     "fr": "Château dominant la ville, avec vignes et large vue sur la vieille ville et la vallée du Neckar.",
+     "it": "Castello sopra la città con vigneti e ampia vista sul centro storico e sulla valle del Neckar.",
+     "tr": "Şehre tepeden bakan, bağlarla çevrili, eski şehir ve Neckar vadisi manzaralı kale."
+    }
+   },
+   {
+    "adresse": "Rathausplatz, Esslingen",
+    "kat": "kultur",
+    "name": "Altes Rathaus",
+    "text": {
+     "de": "Wahrzeichen der Altstadt mit Fachwerk und Renaissance-Fassade samt Glockenspiel.",
+     "en": "Old-town landmark with half-timbering and a Renaissance façade with carillon.",
+     "es": "Símbolo del casco antiguo con entramado de madera y fachada renacentista con carillón.",
+     "fr": "Emblème de la vieille ville, à colombages, avec façade Renaissance et carillon.",
+     "it": "Simbolo del centro storico con struttura a graticcio e facciata rinascimentale con carillon.",
+     "tr": "Ahşap iskeletli yapısı ve çan saatli Rönesans cephesiyle eski şehrin simgesi."
+    }
+   },
+   {
+    "adresse": "Maille 4–9, Esslingen",
+    "kat": "kultur",
+    "name": "Kommunales Kino Esslingen",
+    "text": {
+     "de": "Programmkino in der Maille mit Filmreihen, Originalfassungen und eigener Gastronomie „Lux“.",
+     "en": "Arthouse cinema in the Maille with film series, original-language screenings and its own café-bar “Lux”.",
+     "es": "Cine de autor en la Maille con ciclos, versiones originales y su propio bar «Lux».",
+     "fr": "Cinéma art et essai dans la Maille avec cycles, VO et son bar « Lux ».",
+     "it": "Cinema d’essai nella Maille con rassegne, film in lingua originale e il proprio bar «Lux».",
+     "tr": "Maille’de film dizileri, orijinal dilde gösterimler ve kendi kafesi „Lux“ olan sanat sineması."
+    }
+   },
+   {
+    "adresse": "Mühlstraße 6, Esslingen",
+    "kat": "sport",
+    "name": "Merkel’sches Schwimmbad",
+    "text": {
+     "de": "Jugendstil-Hallenbad, nach Sanierung seit September 2025 wieder geöffnet – Schwimmen in historischem Ambiente.",
+     "en": "Art Nouveau indoor pool, reopened in September 2025 after renovation – swimming in a historic setting.",
+     "es": "Piscina cubierta modernista, reabierta en septiembre de 2025 tras su reforma: nadar en un entorno histórico.",
+     "fr": "Piscine couverte Art nouveau, rouverte en septembre 2025 après rénovation – nager dans un cadre historique.",
+     "it": "Piscina coperta liberty, riaperta a settembre 2025 dopo il restauro: nuotare in un ambiente storico.",
+     "tr": "Yenilemenin ardından Eylül 2025’te yeniden açılan Art Nouveau kapalı havuzu – tarihi ortamda yüzme."
+    }
+   },
+   {
+    "kat": "sport",
+    "name": "Maille-Park",
+    "text": {
+     "de": "Grüne Neckarinsel mitten in der Stadt – zum Joggen, Entspannen und Treffen zwischen den Vorlesungen.",
+     "en": "Green Neckar island in the city centre – for jogging, relaxing and meeting up between lectures.",
+     "es": "Isla verde del Neckar en pleno centro: para correr, relajarse y quedar entre clases.",
+     "fr": "Île verte sur le Neckar en centre-ville – pour courir, se détendre et se retrouver entre les cours.",
+     "it": "Isola verde sul Neckar in centro: per correre, rilassarsi e incontrarsi tra una lezione e l’altra.",
+     "tr": "Şehrin ortasında yeşil Neckar adası – koşmak, dinlenmek ve dersler arasında buluşmak için."
+    }
+   },
+   {
+    "adresse": "Dieselstraße 26, Esslingen",
+    "kat": "ausgehen",
+    "name": "Kulturzentrum Dieselstraße",
+    "text": {
+     "de": "Soziokulturelles Zentrum mit Konzerten, Poetry Slam, Kabarett und Partys zu fairen Preisen.",
+     "en": "Community arts centre with concerts, poetry slams, cabaret and parties at fair prices.",
+     "es": "Centro sociocultural con conciertos, poetry slam, cabaret y fiestas a precios justos.",
+     "fr": "Centre socioculturel avec concerts, slam, cabaret et soirées à prix raisonnables.",
+     "it": "Centro socioculturale con concerti, poetry slam, cabaret e feste a prezzi onesti.",
+     "tr": "Uygun fiyatlı konserler, şiir slam’i, kabare ve partilerle sosyokültürel merkez."
+    }
+   },
+   {
+    "kat": "ausgehen",
+    "name": "Altstadt rund um den Marktplatz",
+    "text": {
+     "de": "Fachwerkgassen mit Cafés, Kneipen und Bars – abends der Treffpunkt in Campusnähe.",
+     "en": "Half-timbered lanes with cafés, pubs and bars – the evening meeting spot near campus.",
+     "es": "Callejuelas con entramado, cafés, tabernas y bares: el punto de encuentro nocturno cerca del campus.",
+     "fr": "Ruelles à colombages avec cafés, pubs et bars – le lieu de rendez-vous du soir près du campus.",
+     "it": "Vicoli a graticcio con caffè, pub e bar: il ritrovo serale vicino al campus.",
+     "tr": "Kafeler, birahaneler ve barlarla dolu ahşap evli sokaklar – kampüse yakın akşam buluşma noktası."
+    }
+   }
+  ],
+  "Göppingen": [
+   {
+    "adresse": "Schützenstraße 24, Göppingen",
+    "kat": "essen",
+    "name": "Café am Kornhausplatz",
+    "text": {
+     "de": "Café der Lebenshilfe mit regionalen, saisonalen Speisen; Frühstück täglich bis mittags.",
+     "en": "Café run by Lebenshilfe with regional, seasonal food; breakfast daily until noon.",
+     "es": "Café de Lebenshilfe con comida regional y de temporada; desayuno a diario hasta mediodía.",
+     "fr": "Café de la Lebenshilfe aux plats régionaux et de saison ; petit-déjeuner tous les jours jusqu’à midi.",
+     "it": "Caffè della Lebenshilfe con cibo locale e di stagione; colazione ogni giorno fino a mezzogiorno.",
+     "tr": "Lebenshilfe’nin işlettiği, yöresel ve mevsimlik yemekler sunan kafe; her gün öğlene kadar kahvaltı."
+    }
+   },
+   {
+    "adresse": "Stuttgarter Straße 3, Göppingen",
+    "kat": "essen",
+    "name": "Beli's Café",
+    "text": {
+     "de": "Moderner Brunch-Spot mit Sandwiches, Pancakes, Waffeln und Bowls in der Innenstadt.",
+     "en": "Modern brunch spot with sandwiches, pancakes, waffles and bowls in the town centre.",
+     "es": "Local de brunch moderno con sándwiches, tortitas, gofres y bowls en el centro.",
+     "fr": "Brunch moderne avec sandwichs, pancakes, gaufres et bowls en centre-ville.",
+     "it": "Locale da brunch moderno con sandwich, pancake, waffle e bowl in centro.",
+     "tr": "Şehir merkezinde sandviç, pankek, waffle ve bowl sunan modern brunch mekânı."
+    }
+   },
+   {
+    "adresse": "Lange Straße 26, Göppingen",
+    "kat": "essen",
+    "name": "Conditorei-Café Berner",
+    "text": {
+     "de": "Traditionscafé mit eigener Konditorei, Frühstück und täglichem Mittagstisch.",
+     "en": "Traditional café with its own patisserie, breakfast and a daily lunch menu.",
+     "es": "Café tradicional con pastelería propia, desayunos y menú del día.",
+     "fr": "Café traditionnel avec pâtisserie maison, petit-déjeuner et plat du jour.",
+     "it": "Caffè storico con pasticceria propria, colazione e menu del giorno.",
+     "tr": "Kendi pastanesi, kahvaltısı ve günlük öğle menüsü olan köklü kafe."
+    }
+   },
+   {
+    "adresse": "Bahnhofsplatz 3, Göppingen",
+    "kat": "essen",
+    "name": "Gutmann Wiener Kaffeehaus",
+    "text": {
+     "de": "Kaffeehaus im Wiener Stil am Bahnhof mit großer Frühstückskarte zum Kombinieren.",
+     "en": "Viennese-style coffee house by the station with a large mix-and-match breakfast menu.",
+     "es": "Café de estilo vienés junto a la estación con amplia carta de desayunos combinables.",
+     "fr": "Café viennois près de la gare avec une grande carte de petit-déjeuner à composer.",
+     "it": "Caffè in stile viennese vicino alla stazione con ampia colazione componibile.",
+     "tr": "İstasyonun yanında, kombinlenebilir geniş kahvaltı menülü Viyana usulü kahvehane."
+    }
+   },
+   {
+    "adresse": "Blumenstraße 80, Göppingen",
+    "kat": "essen",
+    "name": "Bistro am See",
+    "text": {
+     "de": "Bistro am Barbarossasee mit hausgemachten Gerichten – schön für eine Pause im Grünen.",
+     "en": "Bistro at Barbarossasee lake with homemade food – nice for a break in the green.",
+     "es": "Bistró junto al lago Barbarossasee con comida casera: ideal para una pausa al aire libre.",
+     "fr": "Bistrot au bord du lac Barbarossasee, cuisine maison – idéal pour une pause au vert.",
+     "it": "Bistrot sul lago Barbarossasee con piatti fatti in casa: bello per una pausa nel verde.",
+     "tr": "Barbarossasee kenarında ev yapımı yemekler sunan bistro – yeşillikte mola için ideal."
+    }
+   },
+   {
+    "kat": "kultur",
+    "name": "Märklineum",
+    "text": {
+     "de": "Erlebniswelt der Modelleisenbahn-Marke Märklin mit großer Anlage und Firmengeschichte.",
+     "en": "Visitor world of the model-railway brand Märklin with a large layout and company history.",
+     "es": "Mundo del fabricante de trenes en miniatura Märklin, con gran maqueta e historia de la empresa.",
+     "fr": "Univers de la marque de trains miniatures Märklin, avec grand réseau et histoire de l’entreprise.",
+     "it": "Mondo del marchio di treni in miniatura Märklin, con grande plastico e storia aziendale.",
+     "tr": "Büyük maket düzeni ve şirket tarihiyle model tren markası Märklin’in deneyim dünyası."
+    }
+   },
+   {
+    "kat": "kultur",
+    "name": "Hohenstaufen",
+    "text": {
+     "de": "Kaiserberg mit Burgruine der Staufer – Wanderziel mit Rundumblick über das Filstal.",
+     "en": "Imperial mountain with the Staufer castle ruins – a hike with panoramic views of the Fils valley.",
+     "es": "Monte imperial con las ruinas del castillo Staufer: excursión con vistas al valle del Fils.",
+     "fr": "Mont impérial avec les ruines du château des Staufen – randonnée avec vue sur la vallée de la Fils.",
+     "it": "Monte imperiale con le rovine del castello degli Staufer: escursione con vista sulla valle del Fils.",
+     "tr": "Staufer kale kalıntılarıyla imparatorluk dağı – Fils vadisine panoramik manzaralı yürüyüş."
+    }
+   },
+   {
+    "kat": "sport",
+    "name": "Barbarossa-Thermen",
+    "text": {
+     "de": "Freizeit- und Thermalbad in Göppingen – zum Schwimmen und Entspannen nach dem Lernen.",
+     "en": "Leisure and thermal baths in Göppingen – for swimming and relaxing after studying.",
+     "es": "Baños termales y de ocio en Göppingen: para nadar y relajarse después de estudiar.",
+     "fr": "Bains thermaux et de loisirs à Göppingen – pour nager et se détendre après les cours.",
+     "it": "Terme e piscina in Göppingen: per nuotare e rilassarsi dopo lo studio.",
+     "tr": "Göppingen’de eğlence ve termal havuz – ders sonrası yüzmek ve dinlenmek için."
+    }
+   },
+   {
+    "kat": "sport",
+    "name": "EWS Arena",
+    "text": {
+     "de": "Heimspielstätte des Handball-Bundesligisten FRISCH AUF! Göppingen – Stimmung pur.",
+     "en": "Home arena of Bundesliga handball club FRISCH AUF! Göppingen – great atmosphere.",
+     "es": "Pabellón del club de balonmano de la Bundesliga FRISCH AUF! Göppingen: ambiente garantizado.",
+     "fr": "Salle du club de handball de Bundesliga FRISCH AUF! Göppingen – ambiance garantie.",
+     "it": "Palazzetto della squadra di pallamano di Bundesliga FRISCH AUF! Göppingen: tifo assicurato.",
+     "tr": "Bundesliga hentbol takımı FRISCH AUF! Göppingen’in iç saha salonu – coşkulu atmosfer."
+    }
+   },
+   {
+    "kat": "ausgehen",
+    "name": "Stadthalle Göppingen",
+    "text": {
+     "de": "Veranstaltungshaus für Konzerte, Comedy und Theater mitten in der Stadt.",
+     "en": "Venue for concerts, comedy and theatre in the town centre.",
+     "es": "Sala de eventos para conciertos, comedia y teatro en pleno centro.",
+     "fr": "Salle de spectacles pour concerts, humour et théâtre en centre-ville.",
+     "it": "Sala per concerti, comicità e teatro nel cuore della città.",
+     "tr": "Şehir merkezinde konser, komedi ve tiyatro salonu."
+    }
+   },
+   {
+    "kat": "ausgehen",
+    "name": "Innenstadt rund um den Marktplatz",
+    "text": {
+     "de": "Kompakte Innenstadt mit Cafés, Bars und Restaurants – gut zu Fuß erreichbar.",
+     "en": "Compact town centre with cafés, bars and restaurants – easy to explore on foot.",
+     "es": "Centro compacto con cafés, bares y restaurantes, fácil de recorrer a pie.",
+     "fr": "Centre-ville compact avec cafés, bars et restaurants – facile à parcourir à pied.",
+     "it": "Centro compatto con caffè, bar e ristoranti, facile da girare a piedi.",
+     "tr": "Kafe, bar ve restoranlarla dolu, yürüyerek gezilebilen kompakt şehir merkezi."
+    }
+   }
+  ],
+  "geprueft": "2026-10-28"
+ },
  "mensa": {
   "SM": {
    "openmensa_id": 396,
