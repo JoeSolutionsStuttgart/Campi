@@ -646,6 +646,18 @@ a{color:inherit}
 .upd-bar{position:absolute;left:12px;right:12px;bottom:84px;z-index:40;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:14px;border:0;background:var(--a-primary);color:var(--a-on-primary);font:inherit;font-size:14px;text-align:left;box-shadow:0 8px 24px rgba(0,0,0,.2);cursor:pointer}
 .upd-bar svg{width:18px;height:18px;flex:none}
 .upd-bar b{margin-left:auto;text-decoration:underline}
+
+/* v14: upload status */
+.sync-box{margin:14px 0 4px;padding:12px 14px;border-radius:14px;background:var(--surface-2, rgba(0,0,0,.04));text-align:left;font-size:14px;line-height:1.45}
+.sync-box b{display:flex;align-items:center;gap:6px;font-size:14px}
+.sync-box b .ic{width:16px;height:16px}
+.sync-box p{margin:4px 0 8px}
+.sync-ok b .ic{color:var(--ok, #1a7f45)}
+.sync-wait b .ic{color:var(--primary)}
+.sync-box .btn-sm{min-height:36px;padding:6px 12px;font-size:13px}
+.sync-note{font-size:12.5px;opacity:.75;margin:6px 0 0}
+.sheet .sync-box{margin:4px 0 8px}
+.sync-box button:disabled{opacity:.5;cursor:default}
 </style>
 </head>
 <body>
@@ -1329,6 +1341,41 @@ const STR_DATA13 = {
   tr: {ptr_pull:'Yenilemek için çek', ptr_release:'Yenilemek için bırak', ptr_loading:'Yenileniyor …', upd_bar:'Campi’nin yeni sürümü', upd_go:'Güncelle'}
 };
 Object.keys(STR_DATA13).forEach(l => Object.assign(STR[l], STR_DATA13[l]));
+
+/* Version 14: upload in the background, local copy */
+const STR_DATA14 = {
+  de: {sy_auto:'Hochgeladene Einträge werden automatisch vom Gerät entfernt, es ist nichts mehr zu löschen.', sy_title:'Daten auf diesem Gerät', sy_wait:'{n} Einträge sind auf diesem Gerät gespeichert und werden im Hintergrund hochgeladen.', sy_wait1:'1 Eintrag ist auf diesem Gerät gespeichert und wird im Hintergrund hochgeladen.',
+    sy_offline:'Gerade ohne Internet. Das Hochladen geht von selbst weiter, sobald du wieder online bist.', sy_slow:'Die Verbindung ist langsam, deshalb wird seltener und in kleinen Paketen hochgeladen.',
+    sy_done:'Alles ist hochgeladen.', sy_now:'Jetzt hochladen', sy_busy:'Wird hochgeladen …', sy_clear:'Lokale Daten löschen', sy_cleared:'Alles ist hochgeladen und die Kopie auf diesem Gerät ist gelöscht.',
+    sy_note:'Gelöscht wird nur die Kopie auf diesem Gerät, nicht die hochgeladenen Daten.', sy_pilot:'Deine Teilnahme an der Pilotphase läuft dabei weiter.', pi_data:'Meine Daten auf diesem Gerät',
+    th_queued:'Deine Antworten sind auf diesem Gerät gespeichert und werden im Hintergrund hochgeladen.'},
+  en: {sy_auto:'Uploaded entries are removed from the device automatically, there is nothing left to delete.', sy_title:'Data on this device', sy_wait:'{n} entries are saved on this device and are being uploaded in the background.', sy_wait1:'1 entry is saved on this device and is being uploaded in the background.',
+    sy_offline:'No internet right now. The upload continues by itself once you are back online.', sy_slow:'The connection is slow, so data is uploaded less often and in small packages.',
+    sy_done:'Everything is uploaded.', sy_now:'Upload now', sy_busy:'Uploading …', sy_clear:'Delete local data', sy_cleared:'Everything is uploaded and the copy on this device has been deleted.',
+    sy_note:'Only the copy on this device is deleted, not the uploaded data.', sy_pilot:'Your participation in the pilot phase continues.', pi_data:'My data on this device',
+    th_queued:'Your answers are saved on this device and are being uploaded in the background.'},
+  es: {sy_auto:'Los registros subidos se eliminan del dispositivo automáticamente, no queda nada por borrar.', sy_title:'Datos en este dispositivo', sy_wait:'{n} registros están guardados en este dispositivo y se suben en segundo plano.', sy_wait1:'1 registro está guardado en este dispositivo y se sube en segundo plano.',
+    sy_offline:'Ahora no hay internet. La subida continúa sola cuando vuelvas a estar en línea.', sy_slow:'La conexión es lenta, por eso se sube con menos frecuencia y en paquetes pequeños.',
+    sy_done:'Todo está subido.', sy_now:'Subir ahora', sy_busy:'Subiendo …', sy_clear:'Borrar datos locales', sy_cleared:'Todo está subido y la copia de este dispositivo se ha borrado.',
+    sy_note:'Solo se borra la copia de este dispositivo, no los datos subidos.', sy_pilot:'Tu participación en la fase piloto continúa.', pi_data:'Mis datos en este dispositivo',
+    th_queued:'Tus respuestas están guardadas en este dispositivo y se suben en segundo plano.'},
+  it: {sy_auto:'Le voci caricate vengono rimosse automaticamente dal dispositivo, non c’è più niente da eliminare.', sy_title:'Dati su questo dispositivo', sy_wait:'{n} voci sono salvate su questo dispositivo e vengono caricate in background.', sy_wait1:'1 voce è salvata su questo dispositivo e viene caricata in background.',
+    sy_offline:'Al momento non c’è internet. Il caricamento riprende da solo appena torni online.', sy_slow:'La connessione è lenta, quindi i dati vengono caricati meno spesso e in piccoli pacchetti.',
+    sy_done:'È stato caricato tutto.', sy_now:'Carica ora', sy_busy:'Caricamento …', sy_clear:'Elimina dati locali', sy_cleared:'È stato caricato tutto e la copia su questo dispositivo è stata eliminata.',
+    sy_note:'Viene eliminata solo la copia su questo dispositivo, non i dati caricati.', sy_pilot:'La tua partecipazione alla fase pilota continua.', pi_data:'I miei dati su questo dispositivo',
+    th_queued:'Le tue risposte sono salvate su questo dispositivo e vengono caricate in background.'},
+  fr: {sy_auto:'Les entrées envoyées sont retirées automatiquement de l’appareil, il n’y a plus rien à supprimer.', sy_title:'Données sur cet appareil', sy_wait:'{n} entrées sont enregistrées sur cet appareil et sont envoyées en arrière-plan.', sy_wait1:'1 entrée est enregistrée sur cet appareil et est envoyée en arrière-plan.',
+    sy_offline:'Pas d’internet pour le moment. L’envoi reprend tout seul dès que tu es de nouveau en ligne.', sy_slow:'La connexion est lente, l’envoi se fait donc moins souvent et par petits paquets.',
+    sy_done:'Tout est envoyé.', sy_now:'Envoyer maintenant', sy_busy:'Envoi …', sy_clear:'Supprimer les données locales', sy_cleared:'Tout est envoyé et la copie sur cet appareil a été supprimée.',
+    sy_note:'Seule la copie sur cet appareil est supprimée, pas les données envoyées.', sy_pilot:'Ta participation à la phase pilote continue.', pi_data:'Mes données sur cet appareil',
+    th_queued:'Tes réponses sont enregistrées sur cet appareil et sont envoyées en arrière-plan.'},
+  tr: {sy_auto:'Yüklenen kayıtlar cihazdan otomatik olarak kaldırılır, silinecek bir şey kalmadı.', sy_title:'Bu cihazdaki veriler', sy_wait:'{n} kayıt bu cihazda kayıtlı ve arka planda yükleniyor.', sy_wait1:'1 kayıt bu cihazda kayıtlı ve arka planda yükleniyor.',
+    sy_offline:'Şu anda internet yok. Tekrar çevrimiçi olduğunda yükleme kendiliğinden devam eder.', sy_slow:'Bağlantı yavaş, bu yüzden daha seyrek ve küçük paketler halinde yükleniyor.',
+    sy_done:'Her şey yüklendi.', sy_now:'Şimdi yükle', sy_busy:'Yükleniyor …', sy_clear:'Yerel verileri sil', sy_cleared:'Her şey yüklendi ve bu cihazdaki kopya silindi.',
+    sy_note:'Yalnızca bu cihazdaki kopya silinir, yüklenen veriler silinmez.', sy_pilot:'Pilot aşamasına katılımın devam ediyor.', pi_data:'Bu cihazdaki verilerim',
+    th_queued:'Yanıtların bu cihazda kayıtlı ve arka planda yükleniyor.'}
+};
+Object.keys(STR_DATA14).forEach(l => Object.assign(STR[l], STR_DATA14[l]));
 
 
 /* ================= Campus-Daten: Hochschule Esslingen =================
@@ -2076,7 +2123,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261028-205009';
+const CAMPI_BUILD = '20261030-144647';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -2444,6 +2491,7 @@ function screenDiscover(){
 /* ---------- sheets (language, campus) ---------- */
 function sheetHTML(){
   if(state.sheet === 'frist') return deadlineSheetHTML();
+  if(state.sheet === 'daten') return '<div class="sheet-back" data-act="sheet-close"></div><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h"><div class="sheet-head"><h2 id="sheet-h">' + esc(t('pi_data')) + '</h2><button class="mo-close" type="button" data-act="sheet-close" aria-label="' + esc(t('close')) + '">' + icon('close') + '</button></div>' + syncBoxHTML() + '<p class="sync-note">' + esc(t('sy_pilot')) + '</p></div>';
   if(state.sheet === 'lang'){
     return '<div class="sheet-back" data-act="sheet-close"></div><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-h"><div class="sheet-head"><h2 id="sheet-h">' + esc(t('lang_title')) + '</h2><button class="mo-close" type="button" data-act="sheet-close" aria-label="' + esc(t('close')) + '">' + icon('close') + '</button></div><div class="sheet-list">' +
       LANGS.map(l => '<button class="sheet-opt" type="button" data-act="lang" data-lang="' + l + '" lang="' + l + '" aria-pressed="' + (l === LANG) + '"><span class="code">' + l.toUpperCase() + '</span><span>' + esc(LANG_NAMES[l]) + '</span>' + (l === LANG ? icon('check') : '') + '</button>').join('') + '</div></div>';
@@ -3597,7 +3645,8 @@ function geoAction(a, el){
           eigene Sitzung mit derselben zufälligen Pilot-Nummer. Daraus berechnet die Admin-Seite die Nutzung in Woche 2.
    Jedes Ereignis hat einen Zeitstempel (zeitpunkt) und die Zeit seit Sitzungsbeginn (zeit_ms). Jede Ansicht endet mit
    ansicht_ende und der aktiven Verweildauer (ohne Zeit im Hintergrund). */
-const STUDY_VERSION = '2026-10-f';
+const STUDY_VERSION = '2026-10-g';
+const QCACHE_KEY = 'campi-fragen-cache-v1';
 const OUTBOX_KEY = 'campi-outbox-v2', STUDY_DONE_KEY = 'campi-studie-fertig-v1', PILOT_KEY = 'campi-pilot-v1', INSTALL_LATER_KEY = 'campi-install-spaeter', GUIDE_KEY = 'campi-app-anleitung-v1';
 const NEW_OPEN_AFTER_MS = 30 * 60 * 1000;
 const DEFAULT_QUESTIONS = [
@@ -3652,13 +3701,22 @@ const CFG = (() => {
 const REMOTE = !!(CFG.url && CFG.key);
 const SB = {
   headers(){ const h = {'apikey': CFG.key, 'Content-Type': 'application/json'}; if(/^eyJ/.test(CFG.key)) h.Authorization = 'Bearer ' + CFG.key; return h; },
-  async rpc(fn, body, keepalive){
-    const r = await fetch(CFG.url + '/rest/v1/rpc/' + fn, {method:'POST', headers: this.headers(), body: JSON.stringify(body), keepalive: !!keepalive});
-    if(!r.ok){ const err = new Error('HTTP ' + r.status); err.status = r.status; throw err; }
-    return r.json().catch(() => null);
+  /* every request has a time limit, so a bad connection never blocks the queue (keepalive requests on closing have none) */
+  timed(ms){ if(!ms || typeof AbortController !== 'function') return {signal: undefined, done(){}}; const c = new AbortController(), tm = setTimeout(() => c.abort(), ms); return {signal: c.signal, done(){ clearTimeout(tm); }}; },
+  async rpc(fn, body, keepalive, ms){
+    const tm = this.timed(keepalive ? 0 : (ms || 15000));
+    try {
+      const r = await fetch(CFG.url + '/rest/v1/rpc/' + fn, {method:'POST', headers: this.headers(), body: JSON.stringify(body), keepalive: !!keepalive, signal: tm.signal});
+      if(!r.ok){ const err = new Error('HTTP ' + r.status); err.status = r.status; throw err; }
+      return await r.json().catch(() => null);
+    } finally { tm.done(); }
   },
-  async get(path){
-    const r = await fetch(CFG.url + '/rest/v1/' + path, {headers: this.headers()});
+  async get(path, ms){
+    const tm = this.timed(ms || 8000);
+    try { return await this.get0(path, tm.signal); } finally { tm.done(); }
+  },
+  async get0(path, signal){
+    const r = await fetch(CFG.url + '/rest/v1/' + path, {headers: this.headers(), signal});
     if(!r.ok){ const err = new Error('HTTP ' + r.status); err.status = r.status; throw err; }
     return r.json();
   }
@@ -3680,19 +3738,36 @@ let persistTimer = null;
 function persistOutbox(now){
   clearTimeout(persistTimer);
   const write = () => { OB.ereignisse = OB.ereignisse.slice(-4000); OB.gesendet = OB.gesendet.slice(-200); lsSet(OUTBOX_KEY, JSON.stringify(OB)); };
-  if(now) write(); else persistTimer = setTimeout(write, 400);
+  if(now) write(); else persistTimer = setTimeout(() => { if(window.requestIdleCallback) requestIdleCallback(write, {timeout: 1500}); else write(); }, 800);
 }
-function enqueue(table, row){ if(ST.preview) return; OB[table].push(row); persistOutbox(); scheduleFlush(); }
+function enqueue(table, row){ if(ST.preview) return; OB[table].push(row); persistOutbox(); scheduleFlush(); syncUISoon(); }
 function pendingCount(){ return OB.sitzungen.length + OB.ereignisse.length + OB.ergebnisse.length + OB.antworten.length; }
-let flushing = null, flushTimer = null;
-function scheduleFlush(ms){ if(!REMOTE) return; clearTimeout(flushTimer); flushTimer = setTimeout(() => { flush(); }, ms == null ? 2500 : ms); }
+let flushing = null, flushTimer = null, flushDue = 0;
+/* connection quality: offline, data saver or 2G, a recent failure or a slow last upload count as a bad connection.
+   Then the app uploads less often and in small packages, so the app itself stays fast. */
+const NET = {fails: 0, lastMs: 0, okAt: 0};
+let syncBusyUI = false, syncCleared = false, syncUITimer = null;
+function netOffline(){ return navigator.onLine === false; }
+function netSlow(){
+  const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  return netOffline() || !!(c && (c.saveData || /(^|-)2g$/.test(c.effectiveType || ''))) || NET.fails > 0 || NET.lastMs > 4000;
+}
+function scheduleFlush(ms){
+  if(!REMOTE) return;
+  const wait = ms == null ? (netSlow() ? 20000 : 2500) : ms, due = Date.now() + wait;
+  if(flushTimer && flushDue <= due) return;          /* a sooner upload is already planned: keep it (new events no longer push it back) */
+  clearTimeout(flushTimer); flushDue = due;
+  flushTimer = setTimeout(() => { flushTimer = null; flushDue = 0; flush(); }, wait);
+}
 function flush(keepalive){
   if(!REMOTE || !pendingCount()) return Promise.resolve(!pendingCount());
   if(flushing) return flushing;
+  if(netOffline() && !keepalive){ syncUI(); return Promise.resolve(false); }   /* the 'online' event starts it again */
+  const slow = netSlow(), t0 = performance.now();
   const sess = OB.sitzungen.slice(0, 5);
   const allowed = new Set(OB.gesendet.concat(sess.map(s => s.id)));
   const pick = (arr, n, key) => { const out = []; for(const it of arr){ if(out.length >= n) break; if(allowed.has(it[key])) out.push(it); } return out; };
-  const batch = {sitzungen: sess, ereignisse: pick(OB.ereignisse, keepalive ? 60 : 250, 'sitzung_id'), ergebnisse: pick(OB.ergebnisse, 5, 'sitzung_id'), antworten: pick(OB.antworten, 100, 'sitzung_id')};
+  const batch = {sitzungen: sess, ereignisse: pick(OB.ereignisse, keepalive ? 60 : slow ? 60 : 250, 'sitzung_id'), ergebnisse: pick(OB.ergebnisse, 5, 'sitzung_id'), antworten: pick(OB.antworten, 100, 'sitzung_id')};
   const n = batch.sitzungen.length + batch.ereignisse.length + batch.ergebnisse.length + batch.antworten.length;
   if(!n) return Promise.resolve(false);
   const drop = () => {
@@ -3700,10 +3775,20 @@ function flush(keepalive){
     sess.forEach(s => { if(!OB.gesendet.includes(s.id)) OB.gesendet.push(s.id); });
     persistOutbox(true);
   };
-  flushing = SB.rpc('test_speichern', {daten: batch}, keepalive)
-    .then(() => { drop(); return true; })
-    .catch(e => { if(e && e.status === 400) drop(); return false; })
-    .then(ok => { flushing = null; if(ok && pendingCount() && !keepalive) return flush(); return ok && !pendingCount(); });
+  syncUI(true);
+  flushing = SB.rpc('test_speichern', {daten: batch}, keepalive, slow ? 30000 : 15000)
+    .then(() => { drop(); NET.fails = 0; NET.lastMs = performance.now() - t0; NET.okAt = Date.now(); return true; })
+    .catch(e => {
+      if(e && e.status === 400){ drop(); return false; }
+      if(!keepalive){ NET.fails++; scheduleFlush(Math.min(60000, 5000 * Math.pow(2, NET.fails - 1))); }   /* retry later: 5, 10, 20, 40, 60 s */
+      return false;
+    })
+    .then(ok => {
+      flushing = null;
+      if(ok && pendingCount() && !keepalive){ if(netSlow()) scheduleFlush(3000); else return flush(); }
+      syncUI();
+      return ok && !pendingCount();
+    });
   return flushing;
 }
 
@@ -3883,17 +3968,19 @@ function validQuestion(q){
   return q && typeof q.frage === 'string' && ['einfach','mehrfach','skala','text'].includes(q.typ) &&
     (q.typ === 'skala' || q.typ === 'text' || (Array.isArray(q.optionen) && q.optionen.length > 0));
 }
-async function loadQuestions(){
+/* loaded in the background when the test starts; the last copy is kept on the device for a bad connection */
+let qsLoading = null;
+function loadQuestions(){ if(!qsLoading) qsLoading = loadQuestions0().finally(() => { qsLoading = null; }); return qsLoading; }
+async function loadQuestions0(){
   if(!REMOTE){ ST.qs = DEFAULT_QUESTIONS; ST.qsSource = 'standard'; return; }
-  try {
-    const rows = await SB.get('fragen?select=id,position,typ,frage,hinweis,optionen,skala_min,skala_max,pflicht,schluessel,uebersetzungen&aktiv=is.true&order=position.asc,erstellt.asc');
-    ST.qs = (Array.isArray(rows) ? rows : []).filter(validQuestion); ST.qsSource = 'datenbank';
-  } catch(e){
-    try {
-      const rows = await SB.get('fragen?select=id,position,typ,frage,hinweis,optionen,skala_min,skala_max,pflicht,schluessel&aktiv=is.true&order=position.asc,erstellt.asc');
-      ST.qs = (Array.isArray(rows) ? rows : []).filter(validQuestion); ST.qsSource = 'datenbank';
-    } catch(e2){ ST.qs = DEFAULT_QUESTIONS; ST.qsSource = 'standard'; }
+  const ms = netSlow() ? 6000 : 10000, sel = 'id,position,typ,frage,hinweis,optionen,skala_min,skala_max,pflicht,schluessel';
+  const got = rows => { ST.qs = (Array.isArray(rows) ? rows : []).filter(validQuestion); ST.qsSource = 'datenbank'; lsSet(QCACHE_KEY, JSON.stringify({zeit: new Date().toISOString(), fragen: ST.qs})); };
+  try { got(await SB.get('fragen?select=' + sel + ',uebersetzungen&aktiv=is.true&order=position.asc,erstellt.asc', ms)); return; }
+  catch(e){
+    if(e && e.status){ try { got(await SB.get('fragen?select=' + sel + '&aktiv=is.true&order=position.asc,erstellt.asc', ms)); return; } catch(e2){} }
   }
+  try { const c = JSON.parse(lsGet(QCACHE_KEY) || 'null'); if(c && Array.isArray(c.fragen) && c.fragen.length){ ST.qs = c.fragen.filter(validQuestion); ST.qsSource = 'zwischenspeicher'; return; } } catch(e){}
+  ST.qs = DEFAULT_QUESTIONS; ST.qsSource = 'standard';
 }
 function qText(q){
   const tr = (q.uebersetzungen && typeof q.uebersetzungen === 'object' && q.uebersetzungen[LANG]) || {};
@@ -3939,7 +4026,8 @@ async function finishStudy(){
   if(!ST.preview) lsSet(STUDY_DONE_KEY, new Date().toISOString());
   setStep('sending');
   let ok = false;
-  if(REMOTE && !ST.preview){ ok = await flush(); if(!ok){ await new Promise(res => setTimeout(res, 1500)); ok = await flush(); } }
+  /* at most 1.5 s: on a bad connection the answers stay on the device and go up in the background */
+  if(REMOTE && !ST.preview) ok = await Promise.race([flush(), new Promise(res => setTimeout(() => res(false), 1500))]);
   ST.sent = ST.preview ? 'preview' : (REMOTE ? (ok ? 'ok' : 'queued') : 'local');
   setStep('thanks');
   ST.screenKey = ''; beginScreen('danach');
@@ -4011,6 +4099,7 @@ function pilotFootHTML(){
   const info = pilotInfo();
   if(!info || info.ended || ST.mode !== 'pilot') return '';
   return (standalone() ? '' : '<button class="guide-link" type="button" data-act="guide" data-src="fusszeile">' + icon('install') + '<span>' + esc(t('g_link')) + '</span>' + icon('arrow') + '</button>') +
+    (REMOTE ? '<button class="guide-link" type="button" data-act="sync-sheet">' + icon(pendingCount() ? 'upload' : 'check') + '<span>' + esc(t('pi_data')) + '</span>' + icon('arrow') + '</button>' : '') +
     '<p class="pilot-foot"><span class="pilot-badge">' + esc(t('pilot_badge')) + '</span><button class="link" type="button" data-act="pilot-end">' + esc(t('pilot_end')) + '</button></p>';
 }
 
@@ -4111,7 +4200,7 @@ function studyAdminHTML(){
   if(CFG.problem === 'secret') return '<section class="card-p"><h2>App-Test: Achtung</h2><p class="hint" style="color:var(--danger);font-weight:700">In config.js steht ein geheimer Supabase-Schlüssel. Er wird nicht benutzt. Ersetze ihn durch den publishable oder anon key und erzeuge den geheimen Schlüssel in Supabase neu.</p></section>';
   if(REMOTE){
     const n = pendingCount();
-    return '<section class="card-p"><h2>App-Test und Pilotphase</h2><p class="hint">Die Daten gehen an deine Supabase-Datenbank. Auswertung, Interviews, Pilot-Nutzung und Fragenkatalog findest du auf der Admin-Seite.' + (n ? ' Auf diesem Gerät warten noch ' + n + ' Einträge auf das Senden.' : '') + '</p>' +
+    return '<section class="card-p"><h2>App-Test und Pilotphase</h2><p class="hint">Die Daten gehen an deine Supabase-Datenbank. Auswertung, Interviews, Pilot-Nutzung und Fragenkatalog findest du auf der Admin-Seite.</p>' + syncBoxHTML() +
       '<div class="st-admin-actions"><a class="btn-p" href="admin.html">' + icon('chart') + 'Zur Admin-Seite</a><a class="btn-ghost" href="#vorschau">Test als Vorschau ansehen</a><a class="btn-ghost" href="#app-tipp">Tipp zum Home-Bildschirm ansehen</a><a class="btn-ghost" href="#hilfe">Hilfe & Tipps ansehen</a></div></section>';
   }
   const n = OB.sitzungen.length;
@@ -4214,7 +4303,7 @@ function studyOverlayHTML(){
     case 'sending': return stScreen('<h1 id="st-h">' + esc(t('moment')) + '</h1><p>' + esc(t('saving')) + '</p>');
     case 'thanks': {
       const msg = {ok: t('th_ok'), queued: t('th_queued'), local: t('th_local'), preview: t('th_preview')}[ST.sent] || '';
-      return stScreen('<span class="st-done-ico">' + icon('check') + '</span><h1 id="st-h">' + esc(t('thanks')) + '</h1><p>' + esc(msg + ' ' + t('th_more')) + '</p>' +
+      return stScreen('<span class="st-done-ico">' + icon('check') + '</span><h1 id="st-h">' + esc(t('thanks')) + '</h1><p>' + esc(msg + ' ' + t('th_more')) + '</p>' + (REMOTE && !ST.preview ? syncBoxHTML() : '') +
         '<button class="st-btn" type="button" data-st="close">' + esc(t('th_close')) + '</button>' +
         '<button class="st-link" type="button" data-st="restart">' + esc(t('th_restart')) + '</button>');
     }
@@ -4584,6 +4673,34 @@ try { if(navigator.connection && navigator.connection.addEventListener) navigato
 try { if(screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', () => track('ausrichtung', {typ: screen.orientation.type, breite: window.innerWidth, hoehe: window.innerHeight})); else window.addEventListener('orientationchange', () => track('ausrichtung', {typ: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait'})); } catch(e){}
 window.addEventListener('unhandledrejection', e => { track('fehler', {meldung: String((e.reason && (e.reason.message || e.reason)) || 'Promise').slice(0, 160), art: 'promise'}); });
 
+/* ---------- upload status and deleting the local copy ----------
+   Everything is saved on the device first and uploaded in the background. Uploaded entries leave the queue by themselves;
+   once nothing is waiting, the rest of the local copy (list of uploaded sessions, cached questions) can be deleted. */
+function localCopySize(){ return OB.gesendet.filter(id => id !== ST.sid).length + (lsGet(QCACHE_KEY) ? 1 : 0); }
+function syncBoxHTML(){
+  if(!REMOTE) return '';
+  const n = pendingCount();
+  let msg, cls;
+  if(n){ msg = t(n === 1 ? 'sy_wait1' : 'sy_wait', {n}) + (netOffline() ? ' ' + t('sy_offline') : netSlow() ? ' ' + t('sy_slow') : ''); cls = 'sync-wait'; }
+  else { msg = syncCleared ? t('sy_cleared') : t('sy_done'); cls = 'sync-ok'; }
+  const btn = n ? '<button class="btn btn-soft btn-sm" type="button" data-act="sync-now"' + (syncBusyUI || netOffline() ? ' disabled' : '') + '>' + esc(t(syncBusyUI ? 'sy_busy' : 'sy_now')) + '</button>'
+    : (localCopySize() ? '<button class="btn btn-soft btn-sm" type="button" data-act="sync-clear">' + icon('close') + esc(t('sy_clear')) + '</button><p class="sync-note">' + esc(t('sy_note')) + '</p>' : syncCleared ? '' : '<p class="sync-note">' + esc(t('sy_auto')) + '</p>');
+  return '<div class="sync-box ' + cls + '" id="sync-box" aria-live="polite"><b>' + icon(n ? 'upload' : 'check') + esc(t('sy_title')) + '</b><p>' + esc(msg) + '</p>' + btn + '</div>';
+}
+function syncUI(busy){
+  syncBusyUI = !!busy;
+  document.querySelectorAll('#sync-box').forEach(b => { b.outerHTML = syncBoxHTML(); });
+}
+function syncUISoon(){ if(syncUITimer || !document.getElementById('sync-box')) return; syncUITimer = setTimeout(() => { syncUITimer = null; if(!flushing) syncUI(); }, 700); }
+function clearLocalCopy(){
+  if(pendingCount()) return false;                      /* never delete anything that is not uploaded yet */
+  OB.gesendet = ST.sid && ST.tracking ? OB.gesendet.filter(id => id === ST.sid) : [];
+  persistOutbox(true); lsDel(QCACHE_KEY); syncCleared = true; syncUI();
+  return true;
+}
+window.addEventListener('online', () => { NET.fails = 0; syncUI(); if(pendingCount()) scheduleFlush(500); });
+window.addEventListener('offline', () => syncUI());
+
 
 /* ================= Version 13: Neu laden durch Herunterziehen, Hinweis auf neue Version =================
    - Auf dem Handy (auch als App vom Home-Bildschirm, wo der Browser kein eigenes „Ziehen zum Aktualisieren“ hat):
@@ -4725,6 +4842,9 @@ document.addEventListener('click', e => {
     case 'install': doInstall(); break;
     case 'install-later': lsSet(INSTALL_LATER_KEY, String(Date.now())); track('installation', {aktion:'spaeter'}); renderScreen(true); break;
     case 'pilot-end': endPilot(); break;
+    case 'sync-now': NET.fails = 0; flush(); break;
+    case 'sync-clear': clearLocalCopy(); break;
+    case 'sync-sheet': syncCleared = false; openSheet('daten'); break;
     case 'to-app': openApp(); break;
     case 'admin-tab': state.adminTab = el.dataset.t; render(); break;
     case 'admin-view': state.adminView = el.dataset.v; { const g = document.querySelector('.admin-grid'); if(g) g.dataset.view = state.adminView; document.querySelectorAll('[data-act="admin-view"]').forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.v === state.adminView))); } break;
