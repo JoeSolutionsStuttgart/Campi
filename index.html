@@ -1533,7 +1533,7 @@ const CAMPUS = {
     cafes:[],
     next:{time:'10:00', room:'SM-01105', course:X('Technische Mechanik 1','Engineering Mechanics 1','Mecánica técnica 1','Meccanica tecnica 1','Mécanique technique 1','Teknik Mekanik 1')},
     change:{course:X('Mathematik 1','Mathematics 1','Matemáticas 1','Matematica 1','Mathématiques 1','Matematik 1'), now:'SM-08101', was:'SM-01105'},
-    quick:['SM-01105','SM-08101','SM-MENSA','SM-SSV','SM-PA','SM-IC'], t1:'SM-09203', ex:'S 01.105'
+    quick:['SM-BIB','SM-MENSA','SM-SSV','SM-PA','SM-RZ','SM-IC','SM-ASTA'], t1:'SM-09203', ex:'S 01.105'
   },
   FL: {
     id:'FL', letter:'F', city:'Esslingen', zoom:17, plan:FL_PLAN,
@@ -1560,7 +1560,7 @@ const CAMPUS = {
     cafes:[],
     next:{time:'10:00', room:'FL-01203', course:X('Grundlagen der Informatik','Introduction to Computer Science','Fundamentos de informática','Fondamenti di informatica','Introduction à l’informatique','Bilgisayar Bilimine Giriş')},
     change:{course:X('Statistik','Statistics','Estadística','Statistica','Statistiques','İstatistik'), now:'FL-01112', was:'FL-01004'},
-    quick:['FL-01203','FL-01112','FL-BIB','FL-MENSA','FL-02102','FL-IT'], t1:'FL-02115', ex:'F 01.203'
+    quick:['FL-BIB','FL-MENSA','FL-IT','FL-02010'], t1:'FL-02115', ex:'F 01.203'
   },
   GP: {
     id:'GP', letter:'G', city:'Göppingen', zoom:17,
@@ -1587,7 +1587,7 @@ const CAMPUS = {
       url:'https://www.studierendenwerk-stuttgart.de/en/food/canteens-and-cafeterias/cafeteria-goeppingen'}],
     next:{time:'10:00', room:'GP-05012', course:X('Grundlagen der Mechatronik','Fundamentals of Mechatronics','Fundamentos de mecatrónica','Fondamenti di meccatronica','Fondamentaux de la mécatronique','Mekatroniğin Temelleri')},
     change:{course:X('Elektrotechnik 1','Electrical Engineering 1','Electrotecnia 1','Elettrotecnica 1','Électrotechnique 1','Elektroteknik 1'), now:'GP-02012', was:'GP-05012'},
-    quick:['GP-05012','GP-02012','GP-BIB','GP-CAF','GP-SSV','GP-ASTA'], t1:'GP-02105', ex:'G 02.105'
+    quick:['GP-BIB','GP-CAF','GP-SSV','GP-RZ','GP-AULA','GP-ASTA','GP-CAFE'], t1:'GP-02105', ex:'G 02.105'
   }
 };
 CAMPUS.GP.starts.G4.ll = CAMPUS.GP.buildings['4'].ll;
@@ -1614,7 +1614,7 @@ const ROOM_LIST = [
     al:['studienberatung','study advice','advisory','orientacion','orientamento','conseil aux etudes','danismanlik']},
   {id:'SM-CC', c:'SM', code:'17.110', b:'17', f:1, name:X('Career Centre','Career Centre','Career Centre (empleo)','Career Centre (carriera)','Career Centre (carrière)','Kariyer Merkezi'), al:['career','karriere','empleo','carriera','carriere','kariyer']},
   {id:'SM-MENSA', c:'SM', code:null, b:'16', f:0, oh:'Mo-Fr 07:00-14:45', name:X('Mensa Stadtmitte','Mensa (canteen) Stadtmitte','Comedor (Mensa) Stadtmitte','Mensa Stadtmitte','Mensa Stadtmitte (restaurant universitaire)','Stadtmitte yemekhanesi'), mensa:true},
-  {id:'SM-RZ', c:'SM', code:'07.010', b:'7', f:0, hint:'entrance', oh:'Mo-Fr 09:00-16:00', name:X('IT-Service im Rechenzentrum','IT service desk (IT centre)','Servicio informático (centro de informática)','Servizio IT (centro di calcolo)','Service informatique (centre informatique)','BT destek masası (bilgi işlem merkezi)'),
+  {id:'SM-RZ', c:'SM', code:'07.010', b:'7', f:0, hint:'entrance', oh:'Mo-Fr 09:00-16:00', chip:X('IT-Service','IT service desk','Servicio informático','Servizio IT','Service informatique','BT destek masası'), name:X('IT-Service im Rechenzentrum','IT service desk (IT centre)','Servicio informático (centro de informática)','Servizio IT (centro di calcolo)','Service informatique (centre informatique)','BT destek masası (bilgi işlem merkezi)'),
     al:['it-service','it service','rechenzentrum','helpdesk','it centre','informatica','centro di calcolo','informatique','bilgi islem']},
   {id:'SM-ASTA', c:'SM', code:'08.005', b:'8', f:0, name:X('AStA (Studierendenvertretung)','AStA (student union)','AStA (representación estudiantil)','AStA (rappresentanza studentesca)','AStA (association étudiante)','AStA (öğrenci birliği)'), al:['asta','studierendenvertretung','student union','representacion estudiantil','rappresentanza','association etudiante','ogrenci birligi']},
   {id:'SM-BIB', c:'SM', code:'05.007', b:'5', f:0, oh:'Mo-Fr 13:15-13:45', name:X('Bibliothek (Abholstelle)','Library (pick-up point)','Biblioteca (punto de recogida)','Biblioteca (punto di ritiro)','Bibliothèque (point de retrait)','Kütüphane (teslim noktası)'), lib:true},
@@ -1653,7 +1653,7 @@ ROOM_LIST.forEach(r => {
 /* text helpers for rooms and buildings */
 function campusOf(id){ return CAMPUS[(ROOMS[id] && ROOMS[id].c) || 'SM']; }
 function roomName(r, lang){ return r.name ? L(r.name, lang) : L(KIND[r.kind], lang) + ' ' + r.code; }
-function roomChip(r, lang){ if(r.mensa) return r.id === 'GP-CAF' ? t('cafeteria', null, lang) : t('tab_mensa', null, lang); return r.name ? L(r.name, lang).replace(/\s*\(.*\)$/, '') : r.code; }
+function roomChip(r, lang){ if(r.mensa) return r.id === 'GP-CAF' ? t('cafeteria', null, lang) : t('tab_mensa', null, lang); if(r.chip) return L(r.chip, lang); return r.name ? L(r.name, lang).replace(/\s*\(.*\)$/, '') : r.code; }
 function buildingOf(r){ return CAMPUS[r.c].buildings[r.b]; }
 function buildingLabel(r, lang){
   const c = CAMPUS[r.c];
@@ -2123,7 +2123,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261030-144647';
+const CAMPI_BUILD = '20261030-150136';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -4683,7 +4683,7 @@ function syncBoxHTML(){
   let msg, cls;
   if(n){ msg = t(n === 1 ? 'sy_wait1' : 'sy_wait', {n}) + (netOffline() ? ' ' + t('sy_offline') : netSlow() ? ' ' + t('sy_slow') : ''); cls = 'sync-wait'; }
   else { msg = syncCleared ? t('sy_cleared') : t('sy_done'); cls = 'sync-ok'; }
-  const btn = n ? '<button class="btn btn-soft btn-sm" type="button" data-act="sync-now"' + (syncBusyUI || netOffline() ? ' disabled' : '') + '>' + esc(t(syncBusyUI ? 'sy_busy' : 'sy_now')) + '</button>'
+  const btn = n ? ''
     : (localCopySize() ? '<button class="btn btn-soft btn-sm" type="button" data-act="sync-clear">' + icon('close') + esc(t('sy_clear')) + '</button><p class="sync-note">' + esc(t('sy_note')) + '</p>' : syncCleared ? '' : '<p class="sync-note">' + esc(t('sy_auto')) + '</p>');
   return '<div class="sync-box ' + cls + '" id="sync-box" aria-live="polite"><b>' + icon(n ? 'upload' : 'check') + esc(t('sy_title')) + '</b><p>' + esc(msg) + '</p>' + btn + '</div>';
 }
@@ -4842,7 +4842,6 @@ document.addEventListener('click', e => {
     case 'install': doInstall(); break;
     case 'install-later': lsSet(INSTALL_LATER_KEY, String(Date.now())); track('installation', {aktion:'spaeter'}); renderScreen(true); break;
     case 'pilot-end': endPilot(); break;
-    case 'sync-now': NET.fails = 0; flush(); break;
     case 'sync-clear': clearLocalCopy(); break;
     case 'sync-sheet': syncCleared = false; openSheet('daten'); break;
     case 'to-app': openApp(); break;
