@@ -680,6 +680,7 @@ a{color:inherit}
 .gm-park{background:#1f5fbf}
 .seg.tr-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .tr-modes button{padding:6px 4px;font-size:13.5px;white-space:nowrap}
+.tr-stop{display:flex;flex-direction:column;gap:2px}.tr-stop span{font-size:12.5px;opacity:.75}
 </style>
 </head>
 <body>
@@ -1578,6 +1579,12 @@ const STR_DATA15 = {
 };
 Object.keys(STR_DATA15).forEach(l => Object.assign(STR[l], STR_DATA15[l]));
 
+/* Version 16: questions at different points in time */
+const STR_DATA16 = {"de": {"q_between": "Kurz zwischendurch", "q_pilot_end": "Pilotphase beenden", "q_pilot_title": "Zum Abschluss noch deine Meinung", "q_skip": "Ohne Antworten beenden"}, "en": {"q_between": "A quick question in between", "q_pilot_end": "Ending the pilot phase", "q_pilot_title": "One last thing: your opinion", "q_skip": "End without answering"}, "es": {"q_between": "Una pregunta rápida", "q_pilot_end": "Terminar la fase piloto", "q_pilot_title": "Para terminar, tu opinión", "q_skip": "Terminar sin responder"}, "it": {"q_between": "Una domanda veloce", "q_pilot_end": "Terminare la fase pilota", "q_pilot_title": "Per finire, la tua opinione", "q_skip": "Termina senza rispondere"}, "fr": {"q_between": "Petite question en passant", "q_pilot_end": "Terminer la phase pilote", "q_pilot_title": "Pour finir, ton avis", "q_skip": "Terminer sans répondre"}, "tr": {"q_between": "Arada kısa bir soru", "q_pilot_end": "Pilot aşamasını bitir", "q_pilot_title": "Son olarak görüşün", "q_skip": "Yanıtlamadan bitir"}};
+Object.keys(STR_DATA16).forEach(l => Object.assign(STR[l], STR_DATA16[l]));
+
+Object.keys(STR).forEach(l => { STR[l].tr_lines = ({"de": "Linien {l}", "en": "Lines {l}", "es": "Líneas {l}", "it": "Linee {l}", "fr": "Lignes {l}", "tr": "Hatlar {l}"})[l] || 'Linien {l}'; });
+
 
 /* ================= Campus-Daten: Hochschule Esslingen =================
    Drei Standorte: Esslingen Stadtmitte, Esslingen Flandernstraße, Göppingen.
@@ -1724,11 +1731,11 @@ const CAMPUS = {
       '19':{addr:'Kiesstraße 6', ll:offLL(SM_BASE, 120, 30)}
     },
     starts:{
-      BF:{ll:[48.73861, 9.30000], chip:X('Bahnhof','Station','Estación','Stazione','Gare','İstasyon'), name:X('Bahnhof Esslingen','Esslingen station','la estación de Esslingen','stazione di Esslingen','la gare d’Esslingen','Esslingen istasyonu')},
+      BF:{ll:[48.73872, 9.30121], chip:X('Bahnhof','Station','Estación','Stazione','Gare','İstasyon'), name:X('Bahnhof Esslingen','Esslingen station','la estación de Esslingen','stazione di Esslingen','la gare d’Esslingen','Esslingen istasyonu')},
       G1:{ll:SM_BASE, chip:X('Gebäude 1','Building 1','Edificio 1','Edificio 1','Bâtiment 1','1 numaralı bina'), name:X('Haupteingang Gebäude 1, Kanalstraße 33','the main entrance of building 1, Kanalstraße 33','la entrada principal del edificio 1, Kanalstraße 33','ingresso principale dell’edificio 1, Kanalstraße 33','l’entrée principale du bâtiment 1, Kanalstraße 33','1 numaralı binanın ana girişi, Kanalstraße 33')}
     },
     defStart:'BF',
-    transit:X('Vom Bahnhof Esslingen sind es rund 10 Minuten zu Fuß. In der Nähe halten die Buslinien 101, 106 und 113.','From Esslingen station it is about a 10-minute walk. Bus lines 101, 106 and 113 stop nearby.','Desde la estación de Esslingen son unos 10 minutos a pie. Cerca paran las líneas de autobús 101, 106 y 113.','Dalla stazione di Esslingen sono circa 10 minuti a piedi. Nelle vicinanze fermano gli autobus 101, 106 e 113.','Depuis la gare d’Esslingen, comptez environ 10 minutes à pied. Les bus 101, 106 et 113 s’arrêtent à proximité.','Esslingen istasyonundan yürüyerek yaklaşık 10 dakika. Yakınlarda 101, 106 ve 113 numaralı otobüsler durur.'),
+    transit:X('Die Haltestelle „Hochschule“ (Bus 108, 110, 111, 122) liegt direkt am Campus, die Haltestelle „Maille“ (viele Stadtbuslinien) wenige Minuten entfernt. Vom Bahnhof Esslingen (S1, RE, MEX) sind es rund 10 Minuten zu Fuß.','The “Hochschule” stop (bus 108, 110, 111, 122) is right at the campus, the “Maille” stop (many city bus lines) a few minutes away. From Esslingen station (S1, RE, MEX) it is about a 10-minute walk.','La parada «Hochschule» (autobús 108, 110, 111, 122) está junto al campus y la parada «Maille» (muchas líneas urbanas), a pocos minutos. Desde la estación de Esslingen (S1, RE, MEX) son unos 10 minutos a pie.','La fermata «Hochschule» (autobus 108, 110, 111, 122) è proprio al campus, la fermata «Maille» (molte linee urbane) a pochi minuti. Dalla stazione di Esslingen (S1, RE, MEX) sono circa 10 minuti a piedi.','L’arrêt « Hochschule » (bus 108, 110, 111, 122) est juste à côté du campus, l’arrêt « Maille » (nombreuses lignes urbaines) à quelques minutes. Depuis la gare d’Esslingen (S1, RE, MEX), il faut environ 10 minutes à pied.','„Hochschule“ durağı (108, 110, 111, 122 otobüsü) kampüsün hemen yanında, „Maille“ durağı (birçok şehir otobüsü hattı) birkaç dakika uzaklıkta. Esslingen istasyonundan (S1, RE, MEX) yürüyerek yaklaşık 10 dakika.'),
     mensa:{name:'Mensa Esslingen Stadtmitte', b:'16', addr:'Kanalstraße 27', open:'Mo-Fr 07:00-14:45', serve:'Mo-Th 11:15-14:15; Fr 11:15-14:00', closed:'23.12.–31.12.2026', menu:menuFor(0),
       url:'https://www.studierendenwerk-stuttgart.de/en/food/canteens-and-cafeterias/mensa-esslingen-kanalstrasse'},
     cafes:[],
@@ -1749,13 +1756,13 @@ const CAMPUS = {
       J:{group:'3', at:[320,429], ent:['eJl','eJb','eJr'], what:X('Mensa Flandernstraße','Mensa (canteen) Flandernstraße','Comedor (Mensa) Flandernstraße','Mensa Flandernstraße','Restaurant universitaire (Mensa) Flandernstraße','Flandernstraße yemekhanesi (Mensa)')}
     },
     starts:{
-      B105:{node:'B105', chip:X('Bus 105','Bus 105','Bus 105','Bus 105','Bus 105','105 otobüsü'), name:X('Haltestelle Hochschulzentrum (Bus 105)','the Hochschulzentrum stop (bus 105)','la parada Hochschulzentrum (autobús 105)','fermata Hochschulzentrum (autobus 105)','l’arrêt Hochschulzentrum (bus 105)','Hochschulzentrum durağı (105 otobüsü)')},
-      B111N:{node:'B111N', chip:X('Bus 111 Nord','Bus 111 north','Bus 111 norte','Bus 111 nord','Bus 111 nord','111 otobüsü kuzey'), name:X('Bushaltestelle der Linie 111 (Nord)','the bus 111 stop (north)','la parada del autobús 111 (norte)','fermata dell’autobus 111 (nord)','l’arrêt du bus 111 (nord)','111 otobüsünün durağı (kuzey)')},
-      B111S:{node:'B111S', chip:X('Bus 111 Süd','Bus 111 south','Bus 111 sur','Bus 111 sud','Bus 111 sud','111 otobüsü güney'), name:X('Bushaltestelle der Linie 111 (Süd)','the bus 111 stop (south)','la parada del autobús 111 (sur)','fermata dell’autobus 111 (sud)','l’arrêt du bus 111 (sud)','111 otobüsünün durağı (güney)')},
+      B105:{node:'B105', chip:X('Hochschulzentrum','Hochschulzentrum','Hochschulzentrum','Hochschulzentrum','Hochschulzentrum','Hochschulzentrum'), name:X('Haltestelle Hochschulzentrum (Bus 105)','the Hochschulzentrum stop (bus 105)','la parada Hochschulzentrum (autobús 105)','fermata Hochschulzentrum (autobus 105)','l’arrêt Hochschulzentrum (bus 105)','Hochschulzentrum durağı (105 otobüsü)')},
+      B111N:{node:'B111N', chip:X('Eugen-Bolz-Str.','Eugen-Bolz-Str.','Eugen-Bolz-Str.','Eugen-Bolz-Str.','Eugen-Bolz-Str.','Eugen-Bolz-Str.'), name:X('Haltestelle St. Bernhardt Eugen-Bolz-Straße (Bus 111, 132)','the St. Bernhardt Eugen-Bolz-Straße stop (bus 111, 132)','la parada St. Bernhardt Eugen-Bolz-Straße (autobús 111, 132)','fermata St. Bernhardt Eugen-Bolz-Straße (autobus 111, 132)','l’arrêt St. Bernhardt Eugen-Bolz-Straße (bus 111, 132)','St. Bernhardt Eugen-Bolz-Straße durağı (111, 132 otobüsü)')},
+      B111S:{node:'B111S', chip:X('Flandernstr.','Flandernstr.','Flandernstr.','Flandernstr.','Flandernstr.','Flandernstr.'), name:X('Haltestelle St. Bernhardt Flandernstraße (Bus 111, 132, X20)','the St. Bernhardt Flandernstraße stop (bus 111, 132, X20)','la parada St. Bernhardt Flandernstraße (autobús 111, 132, X20)','fermata St. Bernhardt Flandernstraße (autobus 111, 132, X20)','l’arrêt St. Bernhardt Flandernstraße (bus 111, 132, X20)','St. Bernhardt Flandernstraße durağı (111, 132, X20 otobüsü)')},
       PH:{node:'PH', chip:X('Parkhaus','Car park','Aparcamiento','Parcheggio','Parking','Otopark'), name:X('Parkhaus an der Westseite','the car park on the west side','el aparcamiento del lado oeste','parcheggio sul lato ovest','le parking côté ouest','batı taraftaki otopark')}
     },
     defStart:'B105',
-    transit:X('Mit dem Bus 105 bis „Hochschulzentrum“ oder mit dem Bus 111 bis „Sankt Bernhardt Flandernstraße“ bzw. „Sankt Bernhardt E.-Bolz-Straße“. Die Gebäude sind Mo–Fr 6:30–19:00 Uhr geöffnet.','Take bus 105 to “Hochschulzentrum” or bus 111 to “Sankt Bernhardt Flandernstraße” or “Sankt Bernhardt E.-Bolz-Straße”. The buildings are open Mon–Fri 6:30–19:00.','Toma el autobús 105 hasta «Hochschulzentrum» o el 111 hasta «Sankt Bernhardt Flandernstraße» o «Sankt Bernhardt E.-Bolz-Straße». Los edificios abren de lunes a viernes de 6:30 a 19:00.','Prendi l’autobus 105 fino a «Hochschulzentrum» o il 111 fino a «Sankt Bernhardt Flandernstraße» o «Sankt Bernhardt E.-Bolz-Straße». Gli edifici sono aperti lun–ven 6:30–19:00.','Prends le bus 105 jusqu’à « Hochschulzentrum » ou le bus 111 jusqu’à « Sankt Bernhardt Flandernstraße » ou « Sankt Bernhardt E.-Bolz-Straße ». Les bâtiments sont ouverts du lundi au vendredi de 6h30 à 19h00.','105 numaralı otobüsle “Hochschulzentrum” durağına ya da 111 numaralı otobüsle “Sankt Bernhardt Flandernstraße” veya “Sankt Bernhardt E.-Bolz-Straße” durağına git. Binalar Pzt–Cum 06:30–19:00 arası açık.'),
+    transit:X('Mit dem Bus 105 ab Bahnhof Esslingen (Bussteig 1) bis „Hochschulzentrum“ direkt vor Gebäude 1, oder mit dem Bus 111 (ZOB, Bussteig 5/6) bis „St. Bernhardt Flandernstraße“ bzw. „Eugen-Bolz-Straße“. Beide fahren alle 15 Minuten.','Take bus 105 from Esslingen station (platform 1) to “Hochschulzentrum” right in front of building 1, or bus 111 (ZOB, platform 5/6) to “St. Bernhardt Flandernstraße” or “Eugen-Bolz-Straße”. Both run every 15 minutes.','Toma el autobús 105 desde la estación de Esslingen (andén 1) hasta «Hochschulzentrum», justo delante del edificio 1, o el autobús 111 (ZOB, andén 5/6) hasta «St. Bernhardt Flandernstraße» o «Eugen-Bolz-Straße». Ambos pasan cada 15 minutos.','Prendi l’autobus 105 dalla stazione di Esslingen (banchina 1) fino a «Hochschulzentrum», proprio davanti all’edificio 1, oppure l’autobus 111 (ZOB, banchina 5/6) fino a «St. Bernhardt Flandernstraße» o «Eugen-Bolz-Straße». Entrambi passano ogni 15 minuti.','Prends le bus 105 depuis la gare d’Esslingen (quai 1) jusqu’à « Hochschulzentrum », juste devant le bâtiment 1, ou le bus 111 (ZOB, quai 5/6) jusqu’à « St. Bernhardt Flandernstraße » ou « Eugen-Bolz-Straße ». Les deux passent toutes les 15 minutes.','Esslingen istasyonundan (1. peron) 105 otobüsüyle 1 numaralı binanın hemen önündeki „Hochschulzentrum“ durağına ya da 111 otobüsüyle (ZOB, 5/6. peron) „St. Bernhardt Flandernstraße“ veya „Eugen-Bolz-Straße“ durağına git. İkisi de 15 dakikada bir geçer.'),
     mensa:{name:'Mensa Esslingen Flandernstraße', b:'J', addr:'Flandernstraße 107', open:'Mo-Fr 07:00-14:30', serve:'Mo-Fr 11:15-14:15', closed:'14.12.–31.12.2026', menu:menuFor(2),
       url:'https://studierendenwerk-stuttgart.de/en/food/canteens-and-cafeterias/mensa-esslingen-flandernstrasse'},
     cafes:[],
@@ -1777,10 +1784,11 @@ const CAMPUS = {
     },
     starts:{
       G1:{ll:GP_BASE, chip:X('Gebäude 1','Building 1','Edificio 1','Edificio 1','Bâtiment 1','1 numaralı bina'), name:X('Haupteingang Gebäude 1','the main entrance of building 1','la entrada principal del edificio 1','ingresso principale dell’edificio 1','l’entrée principale du bâtiment 1','1 numaralı binanın ana girişi')},
+      BF:{ll:[48.70011, 9.65247], chip:X('Bahnhof','Station','Estación','Stazione','Gare','İstasyon'), name:X('Bahnhof Göppingen','Göppingen station','la estación de Göppingen','stazione di Göppingen','la gare de Göppingen','Göppingen istasyonu')},
       G4:{ll:null, chip:X('Bibliothek','Library','Biblioteca','Biblioteca','Bibliothèque','Kütüphane'), name:X('Gebäude 4 (Bibliothek)','building 4 (library)','el edificio 4 (biblioteca)','edificio 4 (biblioteca)','le bâtiment 4 (bibliothèque)','4 numaralı bina (kütüphane)')}
     },
     defStart:'G1',
-    transit:X('Vom Bahnhof Göppingen fahren die Buslinien 31, 32 und 33 zum Campus.','Bus lines 31, 32 and 33 run from Göppingen station to the campus.','Desde la estación de Göppingen, las líneas de autobús 31, 32 y 33 van al campus.','Dalla stazione di Göppingen gli autobus 31, 32 e 33 portano al campus.','Depuis la gare de Göppingen, les bus 31, 32 et 33 desservent le campus.','Göppingen istasyonundan kampüse 31, 32 ve 33 numaralı otobüsler gider.'),
+    transit:X('Vom Bahnhof Göppingen sind es rund 7 Minuten zu Fuß. Mit dem Bus: Linie 940 ab ZOB (Bussteig C) bis zur Haltestelle „Hochschule“, das ist die zweite Haltestelle.','Göppingen station is about a 7-minute walk away. By bus: line 940 from the ZOB (platform C) to the “Hochschule” stop, the second stop.','La estación de Göppingen está a unos 7 minutos a pie. En autobús: línea 940 desde el ZOB (andén C) hasta la parada «Hochschule», la segunda parada.','La stazione di Göppingen è a circa 7 minuti a piedi. In autobus: linea 940 dallo ZOB (banchina C) fino alla fermata «Hochschule», la seconda fermata.','La gare de Göppingen est à environ 7 minutes à pied. En bus : ligne 940 depuis le ZOB (quai C) jusqu’à l’arrêt « Hochschule », le deuxième arrêt.','Göppingen istasyonu yürüyerek yaklaşık 7 dakika. Otobüsle: ZOB’dan (C peronu) 940 hattıyla ikinci durak olan „Hochschule“ durağına.'),
     mensa:null,
     mensaNote:X('Die Mensa Göppingen mit warmen Hauptgerichten ist seit Oktober 2026 dauerhaft geschlossen. Die Cafeteria bleibt geöffnet.','Mensa Göppingen, which served hot main meals, closed permanently in October 2026. The cafeteria stays open.','El comedor (Mensa) de Göppingen con platos calientes cerró definitivamente en octubre de 2026. La cafetería sigue abierta.','La mensa di Göppingen con piatti caldi è chiusa definitivamente da ottobre 2026. La caffetteria resta aperta.','La Mensa de Göppingen, qui servait des plats chauds, a fermé définitivement en octobre 2026. La cafétéria reste ouverte.','Sıcak ana yemek sunan Göppingen yemekhanesi (Mensa) Ekim 2026’dan beri kalıcı olarak kapalı. Kafeterya açık kalıyor.'),
     cafes:[{name:'Cafeteria Göppingen', room:'GP-CAF', open:'Mo-Th 07:30-15:00; Fr 07:30-14:00', serve:'Mo-Fr 12:00-14:00', closed:'23.12.–31.12.2026', places:30,
@@ -2326,7 +2334,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261031-131030';
+const CAMPI_BUILD = '20261031-222240';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -3806,7 +3814,19 @@ function geoAction(a, el){
    Berechnete Routen werden auf dem Gerät zwischengespeichert (höchstens 25). */
 const ROUTER = {walk: 'https://routing.openstreetmap.de/routed-foot/route/v1/driving/', car: 'https://routing.openstreetmap.de/routed-car/route/v1/driving/'};
 const RT_CACHE_KEY = 'campi-routen-v1', WALK_MAX_M = 8000;
-const TRANSIT_STOPS = {SM: ['BF'], FL: ['B105', 'B111N', 'B111S'], GP: []};
+/* stops near each campus: lines from the VVS stop directory (Oct 2026), positions from OpenStreetMap
+   (Stadtmitte, Göppingen) and from the campus site plan (Flandernstraße) */
+const STOPS = {
+  SM: [{id: 'HS', ll: [48.73925, 9.31058], n: 'Hochschule', lines: '108 · 110 · 111 · 122'},
+       {id: 'MA', ll: [48.73806, 9.30899], n: 'Maille', lines: '102 · 103 · 108 · 110 · 111 · 113 · 118 · 119 · 120 · 130 · 131'},
+       {id: 'ZOB', ll: [48.73872, 9.30121], n: 'Esslingen Bahnhof / ZOB', lines: 'S1 · RE5 · MEX12 · MEX16 · MEX18 · 101–140'}],
+  FL: [{id: 'B105', node: 'B105', n: 'Hochschulzentrum', lines: '105'},
+       {id: 'B111S', node: 'B111S', n: 'St. Bernhardt Flandernstraße', lines: '111 · 132 · X20'},
+       {id: 'B111N', node: 'B111N', n: 'St. Bernhardt Eugen-Bolz-Straße', lines: '111 · 132'}],
+  GP: [{id: 'ZOB', ll: [48.70149, 9.65060], n: 'Göppingen ZOB', lines: '940 (C) · 901–997'},
+       {id: 'BF', ll: [48.70011, 9.65247], n: 'Göppingen Bahnhof', lines: 'RE · MEX'}]
+};
+function stopLL(c, s){ return s.ll || (c.plan && s.node ? flPlanLL(c.plan.nodes[s.node]) : null); }
 const PARKING = {FL: 'PH'};
 const RT = {mem: {}, pending: {}, failed: {}};
 (() => { try { const o = JSON.parse(lsGet(RT_CACHE_KEY) || 'null'); if(o && typeof o === 'object') RT.mem = o; } catch(e){} })();
@@ -3905,17 +3925,18 @@ function liveBlockHTML(r){
       if(from){ const res = rtGet('walk', from, goal); if(res.pts) segs.push({pts: res.pts, kind: 'walk'}); sum = sumLine(res, 'tr_sum_walk', t('step_start', {s: L(c.starts[sid].name)})); }
     }
   } else if(mode === 'transit'){
-    const stops = TRANSIT_STOPS[r.c] || [];
+    const stops = STOPS[r.c] || [];
     ent = entranceFor(r, null); goal = goalLL(r, ent);
-    if(stops.length){
-      const sid = stops.includes(state.stop) ? state.stop : stops[0];
-      rows = chipRow(t('tr_stop'), stops.map(k => ({act: 'stop', id: k, on: sid === k, l: L(c.starts[k].chip)})));
-      if(c.plan){ ent = routeTo(r.id, sid, state.bf).entrance; goal = goalLL(r, ent); }
-      from = startLL(c, sid); extraMk = {ll: from, cls: 'gm-stop', txt: 'H'};
+    const st = stops.find(x => x.id === state.stop) || stops[0];
+    if(st){
+      rows = '<div class="route-opts"><span class="ro-label">' + esc(t('tr_stop')) + '</span><div class="chips">' + stops.map(x => '<button class="chip chip-sm" type="button" data-act="stop" data-start="' + x.id + '" aria-pressed="' + (x === st) + '">' + esc(x.n) + '</button>').join('') + '</div></div>';
+      from = stopLL(c, st);
+      if(c.plan && st.node){ ent = routeTo(r.id, st.node, state.bf).entrance; goal = goalLL(r, ent); }
+      extraMk = {ll: from, cls: 'gm-stop', txt: 'H'};
       const res = rtGet('walk', from, goal); if(res.pts) segs.push({pts: res.pts, kind: 'walk'});
-      sum = sumLine(res, 'tr_stop_walk', L(c.starts[sid].name));
+      sum = sumLine(res, 'tr_stop_walk', st.n);
     } else rows = '<p class="tr-note">' + esc(t('tr_no_stop')) + '</p>';
-    card = '<div class="tr-card">' + icon('bus') + '<div><p>' + esc(L(c.transit)) + '</p><a class="btn btn-soft btn-sm" href="' + esc(mapsLink('transit', goal)) + '" target="_blank" rel="noopener" data-act="ext" data-ext="route-oepnv">' + icon('ext') + esc(t('tr_transit_go')) + '</a></div></div>';
+    card = '<div class="tr-card">' + icon('bus') + '<div>' + (st ? '<p class="tr-stop"><b>' + esc(st.n) + '</b><span>' + esc(t('tr_lines', {l: st.lines})) + '</span></p>' : '') + '<p>' + esc(L(c.transit)) + '</p><a class="btn btn-soft btn-sm" href="' + esc(mapsLink('transit', goal)) + '" target="_blank" rel="noopener" data-act="ext" data-ext="route-oepnv">' + icon('ext') + esc(t('tr_transit_go')) + '</a></div></div>';
   } else {
     const pk = PARKING[r.c], pkLL = pk ? startLL(c, pk) : null;
     ent = entranceFor(r, null); goal = goalLL(r, ent);
@@ -4292,7 +4313,7 @@ function studyOnSearch(text){
 function finishTask1(found){
   Object.assign(ST.rec, {a1_ergebnis: found ? 'gefunden' : 'aufgegeben', a1_sekunden: secs(), a1_tipps: ST.taps, a1_weg: ST.ways.join(', ')});
   track('aufgabe', {nr:1, phase:'ende', ergebnis: ST.rec.a1_ergebnis, sekunden: ST.rec.a1_sekunden, tipps: ST.taps, ziel: ST.t1room});
-  setStep(found ? 't1-done' : 't2-brief');
+  if(found) setStep('t1-done'); else askPhase('nach_a1', () => setStep('t2-brief'));
 }
 
 /* questionnaire from the database, shown in the app language; answers are stored with the German wording */
@@ -4307,9 +4328,9 @@ async function loadQuestions0(){
   if(!REMOTE){ ST.qs = DEFAULT_QUESTIONS; ST.qsSource = 'standard'; return; }
   const ms = netSlow() ? 6000 : 10000, sel = 'id,position,typ,frage,hinweis,optionen,skala_min,skala_max,pflicht,schluessel';
   const got = rows => { ST.qs = (Array.isArray(rows) ? rows : []).filter(validQuestion); ST.qsSource = 'datenbank'; lsSet(QCACHE_KEY, JSON.stringify({zeit: new Date().toISOString(), fragen: ST.qs})); };
-  try { got(await SB.get('fragen?select=' + sel + ',uebersetzungen&aktiv=is.true&order=position.asc,erstellt.asc', ms)); return; }
-  catch(e){
-    if(e && e.status){ try { got(await SB.get('fragen?select=' + sel + '&aktiv=is.true&order=position.asc,erstellt.asc', ms)); return; } catch(e2){} }
+  for(const extra of [',uebersetzungen,zeitpunkt', ',uebersetzungen', '']){
+    try { got(await SB.get('fragen?select=' + sel + extra + '&aktiv=is.true&order=position.asc,erstellt.asc', ms)); return; }
+    catch(e){ if(!(e && e.status)) break; }          /* 400: column not there yet (older supabase-setup.sql), try with fewer columns */
   }
   try { const c = JSON.parse(lsGet(QCACHE_KEY) || 'null'); if(c && Array.isArray(c.fragen) && c.fragen.length){ ST.qs = c.fragen.filter(validQuestion); ST.qsSource = 'zwischenspeicher'; return; } } catch(e){}
   ST.qs = DEFAULT_QUESTIONS; ST.qsSource = 'standard';
@@ -4320,15 +4341,42 @@ function qText(q){
   return {frage: (LANG !== 'de' && tr.frage) || q.frage, hinweis: (LANG !== 'de' && tr.hinweis) || q.hinweis || '', opts,
     lo: (LANG !== 'de' && tr.skala_min) || q.skala_min || t('scale_lo'), hi: (LANG !== 'de' && tr.skala_max) || q.skala_max || t('scale_hi'), uebersetzt: LANG !== 'de' && !!tr.frage};
 }
-const Q_PER_PAGE = 5;
-function qPages(){ const qs = ST.qs || []; const pages = []; for(let i = 0; i < qs.length; i += Q_PER_PAGE) pages.push(qs.slice(i, i + Q_PER_PAGE).map((q, j) => ({q, idx: i + j}))); return pages; }
-async function startQuestionnaire(){
+/* Version 16: every question has a point in time (set on the admin page):
+   vorher = before task 1, nach_a1 / nach_a2 = after task 1 / 2, ende = after task 3 (default),
+   schluss = very last page, pilot_ende = when someone ends the pilot phase */
+const Q_PER_PAGE = 5, Q_TIMES = ['vorher', 'nach_a1', 'nach_a2', 'ende', 'schluss', 'pilot_ende'];
+function qTime(q){ return Q_TIMES.includes(q && q.zeitpunkt) ? q.zeitpunkt : 'ende'; }
+function phaseItems(phase){
+  const all = (ST.qs || []).map((q, idx) => ({q, idx}));
+  if(phase === 'ende') return [all.filter(it => qTime(it.q) === 'ende'), all.filter(it => qTime(it.q) === 'schluss')];
+  return [all.filter(it => qTime(it.q) === phase)];
+}
+function qPages(){
+  const pages = [];
+  phaseItems(ST.qPhase || 'ende').forEach(group => { for(let i = 0; i < group.length; i += Q_PER_PAGE) pages.push(group.slice(i, i + Q_PER_PAGE)); });
+  return pages;
+}
+/* shows the questions of one point in time, then continues with next() */
+async function askPhase(phase, next){
   if(!ST.qs){ setStep('laden'); await loadQuestions(); }
-  ST.qPage = 0; ST.qStart = performance.now();
-  if(!ST.qs.length) return finishStudy();
-  track('fragebogen', {phase:'start', fragen: ST.qs.length, quelle: ST.qsSource, sprache: LANG});
+  ST.qPhase = phase; ST.qNext = next; ST.qPage = 0;
+  const n = qPages().reduce((s, p) => s + p.length, 0);
+  if(!n) return next();
+  track('fragebogen', {phase:'start', zeitpunkt: phase, fragen: n, quelle: ST.qsSource, sprache: LANG});
   setStep('fragen');
 }
+/* answers go into the queue right after each point in time, so they are kept even if the test is not finished */
+function saveAnswers(){
+  if(ST.preview) return;
+  ST.saved = ST.saved || {};
+  (ST.qs || []).forEach((q, i) => {
+    const v = ST.answers[i];
+    if(ST.saved[i] || v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
+    ST.saved[i] = true;
+    enqueue('antworten', {id: uuid(), sitzung_id: ST.sid, frage_id: q.id || null, frage: q.frage.slice(0, 300), typ: q.typ, wert: v});
+  });
+}
+function startQuestionnaire(){ ST.qStart = performance.now(); return askPhase('ende', finishStudy); }
 function questionHTML(item){
   const q = item.q, name = 'q' + item.idx, x = qText(q);
   let inner = '';
@@ -4349,11 +4397,7 @@ async function finishStudy(){
     a2_vertrauen: r.a2_vertrauen ?? null, a2_lieber: r.a2_lieber || null, a3_sekunden: r.a3_sekunden ?? null, a3_bereiche: r.a3_bereiche || [],
     dauer_sekunden: dur, fragebogen_sekunden: ST.qStart ? Math.round((performance.now() - ST.qStart) / 100) / 10 : null};
   enqueue('ergebnisse', result);
-  (ST.qs || []).forEach((q, i) => {
-    const v = ST.answers[i];
-    if(v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
-    enqueue('antworten', {id: uuid(), sitzung_id: ST.sid, frage_id: q.id || null, frage: q.frage.slice(0, 300), typ: q.typ, wert: v});
-  });
+  saveAnswers();
   track('abgeschlossen', {dauer_sekunden: dur});
   if(!ST.preview) lsSet(STUDY_DONE_KEY, new Date().toISOString());
   setStep('sending');
@@ -4404,7 +4448,17 @@ function pilotFromUrl(){
     return true;
   } catch(e){ return false; }
 }
-function endPilot(){
+async function endPilot(){
+  const info = pilotInfo(); if(!info) return;
+  if(REMOTE && ST.mode === 'pilot' && !ST.active && !ST.pilotAsked){
+    ST.pilotAsked = true; ST.active = true; ST.answers = {}; ST.saved = {}; ST.qs = null;
+    renderStudy();
+    await askPhase('pilot_ende', () => { ST.active = false; ST.step = ''; renderStudy(); endPilot0(); });
+    return;
+  }
+  endPilot0();
+}
+function endPilot0(){
   const info = pilotInfo(); if(!info) return;
   track('pilot_beendet', {tage_seit_beitritt: Math.floor((Date.now() - Date.parse(info.seit)) / 864e5)});
   endScreen('ende'); persistOutbox(true); flush(true);
@@ -4628,8 +4682,10 @@ function studyOverlayHTML(){
     case 't3-brief': return stBrief(3, t('t3_title'), t('t3_text'), t('t3_note'));
     case 'fragen': {
       const pages = qPages(), page = pages[ST.qPage] || [], last = ST.qPage >= pages.length - 1;
-      return stScreen(stProgress(4) + '<p class="st-kicker">' + esc(t('almost')) + (pages.length > 1 ? ' · ' + esc(t('page_of', {n: ST.qPage + 1, m: pages.length})) : '') + '</p><h1 id="st-h">' + esc(t('opinion')) + '</h1>' +
-        stForm('fragen', page.map(questionHTML).join(''), last ? t('submit') : t('next')));
+      const ph = ST.qPhase || 'ende', prog = {vorher: 1, nach_a1: 2, nach_a2: 3, ende: 4}[ph];
+      return stScreen((ST.mode === 'pilot' ? '' : stProgress(prog || 4)) + '<p class="st-kicker">' + esc(t(ph === 'ende' ? 'almost' : ph === 'pilot_ende' ? 'q_pilot_end' : 'q_between')) + (pages.length > 1 ? ' · ' + esc(t('page_of', {n: ST.qPage + 1, m: pages.length})) : '') + '</p><h1 id="st-h">' + esc(t(ph === 'pilot_ende' ? 'q_pilot_title' : 'opinion')) + '</h1>' +
+        stForm('fragen', page.map(questionHTML).join(''), last ? t('submit') : t('next')) +
+        (ph === 'pilot_ende' ? '<button class="st-link" type="button" data-st="q-skip">' + esc(t('q_skip')) + '</button>' : ''));
     }
     case 'laden': return stScreen('<h1 id="st-h">' + esc(t('moment')) + '</h1><p>' + esc(t('loading_q')) + '</p>');
     case 'sending': return stScreen('<h1 id="st-h">' + esc(t('moment')) + '</h1><p>' + esc(t('saving')) + '</p>');
@@ -4757,8 +4813,9 @@ function onConsent(d){
     ST.screenKey = ''; studyAfterScreen();
   }
   if(ST.geoOk){ GEO.keep = true; geoStart('einwilligung'); }
+  ST.answers = {}; ST.saved = {};
   loadQuestions();
-  setStep('t1-brief');
+  askPhase('vorher', () => setStep('t1-brief'));
 }
 document.addEventListener('submit', e => {
   const f = e.target.closest && e.target.closest('[data-st-form]'); if(!f) return;
@@ -4774,11 +4831,11 @@ document.addEventListener('submit', e => {
   } else if(k === 't1'){
     const d = requireFields(f, ['a1_verstaendlich']); if(!d) return;
     ST.rec.a1_verstaendlich = +d.a1_verstaendlich;
-    setStep('t2-brief');
+    askPhase('nach_a1', () => setStep('t2-brief'));
   } else if(k === 't2'){
     const d = requireFields(f, ['a2_vertrauen','a2_lieber']); if(!d) return;
     Object.assign(ST.rec, {a2_vertrauen: +d.a2_vertrauen, a2_lieber: d.a2_lieber});
-    setStep('t3-brief');
+    askPhase('nach_a2', () => setStep('t3-brief'));
   } else if(k === 'fragen'){
     const page = qPages()[ST.qPage] || [];
     const d = requireFields(f, page.filter(it => it.q.pflicht).map(it => 'q' + it.idx)); if(!d) return;
@@ -4790,8 +4847,8 @@ document.addEventListener('submit', e => {
       else if(it.q.typ === 'text'){ const s = String(raw).trim().slice(0, 1000); if(s) ST.answers[it.idx] = s; }
       else ST.answers[it.idx] = String(raw);
     });
-    if(ST.qPage < qPages().length - 1){ ST.qPage++; track('fragebogen', {phase:'seite', seite: ST.qPage + 1}); renderStudy(); }
-    else finishStudy();
+    if(ST.qPage < qPages().length - 1){ ST.qPage++; track('fragebogen', {phase:'seite', zeitpunkt: ST.qPhase, seite: ST.qPage + 1}); renderStudy(); }
+    else { const next = ST.qNext || finishStudy; ST.qNext = null; if(ST.qPhase !== 'ende') saveAnswers(); next(); }
   }
 });
 document.addEventListener('change', e => {
@@ -4865,6 +4922,7 @@ document.addEventListener('click', e => {
   switch(b.dataset.st){
     case 'skip': endStudy(); break;
     case 'pilot-skip': ST.active = false; ST.step = ''; ST.mode = ''; renderStudy(); break;
+    case 'q-skip': if(ST.step === 'fragen' && ST.qPhase === 'pilot_ende'){ track('fragebogen', {phase:'uebersprungen', zeitpunkt: ST.qPhase}); saveAnswers(); const n = ST.qNext; ST.qNext = null; if(n) n(); } break;
     case 'close': track('danach', {}); endStudy(); break;
     case 'restart': startStudy(ST.preview); break;
     case 'begin': { const next = {'t1-brief':'t1', 't2-brief':'t2', 't3-brief':'t3'}[ST.step]; if(next){ const snap = takeBrief(); setStep(next); briefToBar(snap); } break; }
@@ -4875,7 +4933,7 @@ document.addEventListener('click', e => {
       if(ST.step === 't2'){
         Object.assign(ST.rec, {a2_ergebnis:'aufgegeben', a2_sekunden: secs(), a2_fragen: ST.questions});
         track('aufgabe', {nr:2, phase:'ende', ergebnis:'aufgegeben', sekunden: ST.rec.a2_sekunden});
-        setStep('t3-brief');
+        askPhase('nach_a2', () => setStep('t3-brief'));
       } break;
     case 'done3':
       if(ST.step === 't3'){
