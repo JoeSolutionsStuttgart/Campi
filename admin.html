@@ -770,7 +770,7 @@ function sessionStarts(d){
 function evTime(e, s){ return e.zeitpunkt ? Date.parse(e.zeitpunkt) : (s ? s._start + (Number(e.zeit_ms) || 0) : Date.parse(e.erstellt)); }
 
 /* page names */
-const PAGE_BASE = {start:'Start', 'raeume-plan':'Räume · Plan', 'raeume-live':'Räume · Live-Karte', raeume:'Räume', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', hilfe:'Hilfe & Tipps', einstellungen:'Einstellungen'};
+const PAGE_BASE = {start:'Start', 'raeume-plan':'Räume · Plan (bis Version 14)', 'raeume-live':'Räume · Live-Karte (bis Version 14)', 'raeume-walk':'Räume · Karte zu Fuß', 'raeume-transit':'Räume · Karte Bus & Bahn', 'raeume-car':'Räume · Karte Auto', raeume:'Räume', chat:'Frag Campi', mensa:'Mensa', 'entdecken-studi':'Studileben', 'entdecken-stadt':'Stadtleben', hilfe:'Hilfe & Tipps', einstellungen:'Einstellungen'};
 const PAGE_SUFFIX = {karte:'Lageplan groß', sprache:'Sprachwahl', standort:'Standortwahl', name:'Namen eintragen', 'app-anleitung':'Anleitung Home-Bildschirm'};
 function pageName(k){
   if(!k) return '–';
@@ -967,7 +967,7 @@ function exportGeo(v){
 const EV_LABEL = {ansicht:'Seite geöffnet', ansicht_ende:'Seite verlassen', klick:'Klick', leer_klick:'Klick ins Leere', frust_klick:'Frust-Klick', suche:'Suche', chat_frage:'Frage an Campi', chat_antwort:'Antwort von Campi',
   aufgabe:'Aufgabe', schritt:'Schritt', sprache:'Sprache gewechselt', standort_gewechselt:'Campus gewechselt', standort:'Echter Standort', standort_status:'Standortfreigabe', standort_anfrage:'Standort angefragt', standort_erhalten:'Standort erhalten', standort_fehler:'Standort-Fehler', standort_neustart:'Standort neu gestartet',
   ziel_erreicht:'Ziel erreicht', verlassen:'App verlassen', zurueck:'Zurück in der App', app_geoeffnet:'App geöffnet', installation:'Installation', karte:'Karte', raum_gewaehlt:'Raum gewählt', einwilligung:'Einwilligung',
-  fragebogen:'Fragebogen', abgeschlossen:'Test abgeschlossen', abbruch:'Abbruch', fehler:'Fehler', fenster:'Fenstergröße', pilot_beigetreten:'Pilot beigetreten', pilot_beendet:'Pilot beendet', live_automatisch:'Live-Karte automatisch', danach:'Danach frei umgesehen',
+  fragebogen:'Fragebogen', abgeschlossen:'Test abgeschlossen', abbruch:'Abbruch', fehler:'Fehler', fenster:'Fenstergröße', pilot_beigetreten:'Pilot beigetreten', pilot_beendet:'Pilot beendet', live_automatisch:'Live-Karte automatisch', route:'Route berechnet', danach:'Danach frei umgesehen',
   scrollen:'Gescrollt', eingabe:'Eingabe', technik:'Technik des Geräts', akku:'Akku', netz:'Netzverbindung', ausrichtung:'Bildschirm gedreht', frist_hinweis:'Fristen-Hinweis', neu_geladen:'Neu geladen', neue_version:'Neue Version geladen'};
 /* neu in Version 9 (erweiterte Erhebung): nur im erweiterten Excel-Export ausgewertet */
 const EV_EXT = new Set(['scrollen', 'eingabe', 'technik', 'akku', 'netz', 'ausrichtung']);
@@ -1077,7 +1077,7 @@ function viewBehaviorExtra(v){
   const switched = new Set(ev.filter(e => e.typ === 'sprache').map(e => e.sitzung_id)).size;
   const geoSess = v.sess.filter(s => s.standort_freigabe).length;
   const statusBy = countBy(ev.filter(e => e.typ === 'standort_status'), e => ({ok:'erlaubt', denied:'abgelehnt', na:'nicht verfügbar', error:'Fehler', wait:'angefragt', off:'ausgeschaltet'})[(e.daten || {}).status] || (e.daten || {}).status);
-  const live = new Set(ev.filter(e => e.typ === 'ansicht' && /raeume-live/.test((e.daten || {}).ansicht || '')).map(e => e.sitzung_id)).size;
+  const live = new Set(ev.filter(e => e.typ === 'ansicht' && /raeume-(live|walk|transit|car)/.test((e.daten || {}).ansicht || '')).map(e => e.sitzung_id)).size;
   const arrived = ev.filter(e => e.typ === 'ziel_erreicht');
   const pos = ev.filter(e => e.typ === 'standort');
   const nearCampus = new Set(pos.filter(e => Number((e.daten || {}).campus_m) < 600).map(e => e.sitzung_id)).size;
@@ -1086,7 +1086,7 @@ function viewBehaviorExtra(v){
     card('Sprache der Chat-Fragen', answers.length + ' Antworten · Campi antwortet in der erkannten Sprache', bars(topItems(countBy(answers, e => LANG_NAME[e.daten.sprache] || e.daten.sprache)), {total: answers.length})) +
     card('Campus', 'Angegeben oder beim Öffnen gewählt', bars(topItems(countBy(v.sess, s => CAMPUS_NAME[s.standort] || s.standort || 'unbekannt')), {total: n})) +
   '</div><div class="grid g2">' +
-    card('Echter Standort', 'Freiwillige Freigabe und Nutzung der Live-Karte', '<div class="mini"><div><b>' + pctTxt(pct(geoSess, n)) + '</b><span>haben den Standort freigegeben</span></div><div><b>' + pctTxt(pct(live, n)) + '</b><span>haben die Live-Karte geöffnet</span></div><div><b>' + nearCampus + '</b><span>Sitzungen auf einem Campus</span></div><div><b>' + arrived.length + '</b><span>Ziele vor Ort erreicht</span></div></div>' +
+    card('Echter Standort', 'Freiwillige Freigabe und Nutzung der Karte', '<div class="mini"><div><b>' + pctTxt(pct(geoSess, n)) + '</b><span>haben den Standort freigegeben</span></div><div><b>' + pctTxt(pct(live, n)) + '</b><span>haben die Karte geöffnet</span></div><div><b>' + nearCampus + '</b><span>Sitzungen auf einem Campus</span></div><div><b>' + arrived.length + '</b><span>Ziele vor Ort erreicht</span></div></div>' +
       bars(topItems(statusBy), {empty:'Noch keine Standortabfragen.'})) +
     card('Ziel vor Ort erreicht', 'Wer mit eingeschaltetem Standort am Gebäude ankam', arrived.length ? '<div class="list">' + arrived.slice(-40).reverse().map(e => '<div class="list-row"><span class="lt">' + esc(ESS.rooms[(e.daten || {}).raum] || (e.daten || {}).raum) + '</span><span class="lm">' + esc(when(e.zeitpunkt || e.erstellt)) + '</span></div>').join('') + '</div>' : empty('Noch niemand mit Standort am Ziel angekommen.')) +
   '</div>';
@@ -1883,7 +1883,8 @@ const XL_EV_EXPL = {
   fenster: 'Technisch: Die Fenstergröße hat sich geändert.',
   pilot_beigetreten: 'Gerät ist der Pilotphase beigetreten.',
   pilot_beendet: 'Teilnahme an der Pilotphase beendet.',
-  live_automatisch: 'Die Live-Karte wurde automatisch geöffnet, weil der Standort freigegeben war.',
+  live_automatisch: 'Die Live-Karte wurde automatisch geöffnet, weil der Standort freigegeben war (bis Version 14).',
+  route: 'Eine Route wurde berechnet (art: zu Fuß oder Auto, ergebnis: ok oder fehler, meter, ms = Ladezeit).',
   danach: 'Nach dem App-Test hat sich die Person freiwillig weiter umgesehen.',
   scrollen: 'Nur erweiterter Export: eine Scroll-Bewegung mit Start- und Endposition, Strecke, Richtung, Dauer und erreichter Tiefe.',
   eingabe: 'Nur erweiterter Export: Tippverhalten in einem Eingabefeld vom Antippen bis zum Absenden oder Verlassen: Dauer, Tasten, Korrekturen, Einfügen, Ergebnis; bei abgebrochenen Fragen der Text.',
@@ -2175,7 +2176,7 @@ async function xlBuild(v, ext){
     ['lat', 'Breite', 10, 'coord', 'Geografische Breite, auf 4 Nachkommastellen gerundet (etwa 10 m).'], ['lon', 'Länge', 10, 'coord', 'Geografische Länge, gerundet.'],
     ['gen', 'Genauigkeit (m)', 9, 'int', 'Vom Gerät gemeldete Genauigkeit in Metern: Der echte Ort liegt mit hoher Wahrscheinlichkeit in diesem Umkreis.'],
     ['ziel', 'Ziel', 14, null, 'Raum, der in der App gerade als Ziel gewählt war.'], ['entf', 'Entfernung zum Ziel (m)', 10, 'int', 'Luftlinie zum Zielgebäude.'],
-    ['campus', 'Entfernung zur Campus-Mitte (m)', 11, 'int', 'Luftlinie zur Mitte des gewählten Campus.'], ['live', 'Live-Karte offen', 9, null, '„ja“, wenn gerade die Live-Karte angezeigt wurde.'],
+    ['campus', 'Entfernung zur Campus-Mitte (m)', 11, 'int', 'Luftlinie zur Mitte des gewählten Campus.'], ['live', 'Karte offen', 9, null, '„ja“, wenn gerade die Karte unter „Raum finden“ angezeigt wurde.'],
     ['seite', 'Seite', 20, null, 'Seite der App.'], ['karte', 'Karte', 10, null, 'Link zu dieser Stelle auf OpenStreetMap (Formel HYPERLINK).']
   ], 'Jede gespeicherte Standortmessung mit Zeitstempel: nur nach freiwilliger Freigabe, gerundet auf etwa 10 m, höchstens alle 15 Sekunden (öfter nur bei mehr als 25 m Bewegung).');
   if(ext) SO.push(['ip', 'IP-Adresse', 16, null, 'IP-Adresse beim Senden.']);

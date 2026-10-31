@@ -658,6 +658,28 @@ a{color:inherit}
 .sync-note{font-size:12.5px;opacity:.75;margin:6px 0 0}
 .sheet .sync-box{margin:4px 0 8px}
 .sync-box button:disabled{opacity:.5;cursor:default}
+
+/* v15: one map, real routes */
+.tr-modes{margin:12px 0 4px}
+.tr-modes button .ic{width:16px;height:16px}
+.tr-sum{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;font-size:14px;line-height:1.4}
+.tr-sum .ic{width:18px;height:18px;flex:none;margin-top:1px;color:var(--a-accent)}
+.tr-sum small{display:block;opacity:.7;font-size:12.5px}
+.tr-wait{opacity:.8}.tr-bad .ic{color:var(--danger, #b3261e)}.tr-ok .ic{color:var(--ok, #1a7f45)}
+.tr-note{font-size:13.5px;line-height:1.45;margin:8px 0 0;opacity:.85}
+.tr-card{display:flex;gap:10px;align-items:flex-start;margin:12px 0 0;padding:12px;border-radius:12px;background:var(--a-soft, rgba(0,0,0,.04));font-size:13.5px;line-height:1.45}
+.tr-card > .ic{width:20px;height:20px;flex:none;color:var(--a-primary)}
+.tr-card p{margin:0 0 8px}
+.tr-inside-h{font-size:15px;margin:16px 0 0}
+.gm-route-case{fill:none;stroke:#fff;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
+.gm-route{fill:none;stroke:var(--a-accent);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.gm-route-walk{stroke-dasharray:.1 8.5;stroke-width:6}
+.gm-route-car{stroke:var(--a-primary)}
+.gm-pin{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:700 12px/1 system-ui,sans-serif;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);z-index:3}
+.gm-stop{background:#0a7d3e;border-radius:50%;border:2px solid #f5c400;color:#f5c400}
+.gm-park{background:#1f5fbf}
+.seg.tr-modes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.tr-modes button{padding:6px 4px;font-size:13.5px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -1377,6 +1399,185 @@ const STR_DATA14 = {
 };
 Object.keys(STR_DATA14).forEach(l => Object.assign(STR[l], STR_DATA14[l]));
 
+/* Version 15: one map with real routes, directions inside the building */
+const STR_DATA15 = {
+ "de": {
+  "tr_how": "Wie kommst du hin?",
+  "tr_walk": "Zu Fuß",
+  "tr_transit": "Bus & Bahn",
+  "tr_car": "Auto",
+  "tr_me": "Mein Standort",
+  "tr_stop": "Haltestelle",
+  "tr_loading": "Route wird berechnet …",
+  "tr_fail": "Die Route konnte gerade nicht berechnet werden. Öffne sie in deiner Karten-App.",
+  "tr_sum_walk": "{d} · {min} Min. zu Fuß",
+  "tr_sum_car": "{d} · etwa {min} Min. mit dem Auto",
+  "tr_stop_walk": "Von der Haltestelle: {d} · {min} Min. zu Fuß",
+  "tr_park_walk": "Vom Parkhaus: {d} · {min} Min. zu Fuß",
+  "tr_transit_go": "Verbindung suchen",
+  "tr_car_go": "Navigation starten",
+  "tr_car_nopos": "Für die Autoroute brauchen wir deinen Standort. Du kannst die Navigation auch direkt in deiner Karten-App starten.",
+  "tr_no_stop": "Für diesen Campus sind keine Haltestellen hinterlegt.",
+  "tr_far": "Du bist {d} entfernt. Zu Fuß ist das zu weit, nimm lieber Bus & Bahn oder das Auto.",
+  "tr_inside": "Auf dem Campus und im Gebäude",
+  "tr_src": "Routen: OpenStreetMap-Mitwirkende, Routing von FOSSGIS",
+  "in_main": "Geh durch den Haupteingang in {b} ({a}).",
+  "in_enter": "Geh durch den {e} hinein.",
+  "in_eg": "Du bleibst im Erdgeschoss.",
+  "by_lift": "mit dem Aufzug",
+  "by_stairs": "über die Treppe",
+  "in_find": "{n} liegt {h}.",
+  "in_signs": "Folge der Beschilderung bis {n}.",
+  "live_here": "Du bist am Ziel: {b}"
+ },
+ "en": {
+  "tr_how": "How do you get there?",
+  "tr_walk": "On foot",
+  "tr_transit": "Bus & train",
+  "tr_car": "Car",
+  "tr_me": "My location",
+  "tr_stop": "Stop",
+  "tr_loading": "Calculating route …",
+  "tr_fail": "The route could not be calculated right now. Open it in your maps app.",
+  "tr_sum_walk": "{d} · {min} min on foot",
+  "tr_sum_car": "{d} · about {min} min by car",
+  "tr_stop_walk": "From the stop: {d} · {min} min on foot",
+  "tr_park_walk": "From the car park: {d} · {min} min on foot",
+  "tr_transit_go": "Find a connection",
+  "tr_car_go": "Start navigation",
+  "tr_car_nopos": "The car route needs your location. You can also start navigation directly in your maps app.",
+  "tr_no_stop": "No stops are stored for this campus.",
+  "tr_far": "You are {d} away. That is too far to walk, better take the bus and train or the car.",
+  "tr_inside": "On campus and inside the building",
+  "tr_src": "Routes: OpenStreetMap contributors, routing by FOSSGIS",
+  "in_main": "Enter {b} through the main entrance ({a}).",
+  "in_enter": "Go in through the {e}.",
+  "in_eg": "Stay on the ground floor.",
+  "by_lift": "by lift",
+  "by_stairs": "by the stairs",
+  "in_find": "{n} is {h}.",
+  "in_signs": "Follow the signs to {n}.",
+  "live_here": "You have arrived: {b}"
+ },
+ "es": {
+  "tr_how": "¿Cómo llegas?",
+  "tr_walk": "A pie",
+  "tr_transit": "Bus y tren",
+  "tr_car": "Coche",
+  "tr_me": "Mi ubicación",
+  "tr_stop": "Parada",
+  "tr_loading": "Calculando la ruta …",
+  "tr_fail": "Ahora no se pudo calcular la ruta. Ábrela en tu app de mapas.",
+  "tr_sum_walk": "{d} · {min} min a pie",
+  "tr_sum_car": "{d} · unos {min} min en coche",
+  "tr_stop_walk": "Desde la parada: {d} · {min} min a pie",
+  "tr_park_walk": "Desde el aparcamiento: {d} · {min} min a pie",
+  "tr_transit_go": "Buscar conexión",
+  "tr_car_go": "Iniciar navegación",
+  "tr_car_nopos": "Para la ruta en coche necesitamos tu ubicación. También puedes iniciar la navegación directamente en tu app de mapas.",
+  "tr_no_stop": "No hay paradas guardadas para este campus.",
+  "tr_far": "Estás a {d}. Es demasiado lejos para ir a pie; mejor toma el bus y el tren o el coche.",
+  "tr_inside": "En el campus y dentro del edificio",
+  "tr_src": "Rutas: colaboradores de OpenStreetMap, enrutamiento de FOSSGIS",
+  "in_main": "Entra en el {b} por la entrada principal ({a}).",
+  "in_enter": "Entra por la {e}.",
+  "in_eg": "Quédate en la planta baja.",
+  "by_lift": "en ascensor",
+  "by_stairs": "por la escalera",
+  "in_find": "{n} está {h}.",
+  "in_signs": "Sigue las indicaciones hasta {n}.",
+  "live_here": "Has llegado: {b}"
+ },
+ "it": {
+  "tr_how": "Come ci arrivi?",
+  "tr_walk": "A piedi",
+  "tr_transit": "Bus e treno",
+  "tr_car": "Auto",
+  "tr_me": "La mia posizione",
+  "tr_stop": "Fermata",
+  "tr_loading": "Calcolo del percorso …",
+  "tr_fail": "Al momento non è stato possibile calcolare il percorso. Aprilo nella tua app di mappe.",
+  "tr_sum_walk": "{d} · {min} min a piedi",
+  "tr_sum_car": "{d} · circa {min} min in auto",
+  "tr_stop_walk": "Dalla fermata: {d} · {min} min a piedi",
+  "tr_park_walk": "Dal parcheggio: {d} · {min} min a piedi",
+  "tr_transit_go": "Cerca collegamento",
+  "tr_car_go": "Avvia navigazione",
+  "tr_car_nopos": "Per il percorso in auto serve la tua posizione. Puoi anche avviare la navigazione direttamente nella tua app di mappe.",
+  "tr_no_stop": "Per questo campus non sono salvate fermate.",
+  "tr_far": "Sei a {d}. A piedi è troppo lontano, meglio prendere bus e treno o l’auto.",
+  "tr_inside": "Nel campus e nell’edificio",
+  "tr_src": "Percorsi: contributori di OpenStreetMap, routing di FOSSGIS",
+  "in_main": "Entra nell’{b} dall’ingresso principale ({a}).",
+  "in_enter": "Entra dall’{e}.",
+  "in_eg": "Resta al piano terra.",
+  "by_lift": "con l’ascensore",
+  "by_stairs": "per le scale",
+  "in_find": "{n} si trova {h}.",
+  "in_signs": "Segui le indicazioni fino a {n}.",
+  "live_here": "Sei arrivato: {b}"
+ },
+ "fr": {
+  "tr_how": "Comment y aller ?",
+  "tr_walk": "À pied",
+  "tr_transit": "Bus et train",
+  "tr_car": "Voiture",
+  "tr_me": "Ma position",
+  "tr_stop": "Arrêt",
+  "tr_loading": "Calcul de l’itinéraire …",
+  "tr_fail": "L’itinéraire n’a pas pu être calculé pour le moment. Ouvre-le dans ton appli de cartes.",
+  "tr_sum_walk": "{d} · {min} min à pied",
+  "tr_sum_car": "{d} · environ {min} min en voiture",
+  "tr_stop_walk": "Depuis l’arrêt : {d} · {min} min à pied",
+  "tr_park_walk": "Depuis le parking : {d} · {min} min à pied",
+  "tr_transit_go": "Chercher un trajet",
+  "tr_car_go": "Lancer la navigation",
+  "tr_car_nopos": "Pour l’itinéraire en voiture, il nous faut ta position. Tu peux aussi lancer la navigation directement dans ton appli de cartes.",
+  "tr_no_stop": "Aucun arrêt n’est enregistré pour ce campus.",
+  "tr_far": "Tu es à {d}. C’est trop loin à pied, prends plutôt le bus et le train ou la voiture.",
+  "tr_inside": "Sur le campus et dans le bâtiment",
+  "tr_src": "Itinéraires : contributeurs OpenStreetMap, calcul par FOSSGIS",
+  "in_main": "Entre dans le {b} par l’entrée principale ({a}).",
+  "in_enter": "Entre par l’{e}.",
+  "in_eg": "Reste au rez-de-chaussée.",
+  "by_lift": "en ascenseur",
+  "by_stairs": "par l’escalier",
+  "in_find": "{n} se trouve {h}.",
+  "in_signs": "Suis les panneaux jusqu’à {n}.",
+  "live_here": "Tu es arrivé : {b}"
+ },
+ "tr": {
+  "tr_how": "Nasıl gidersin?",
+  "tr_walk": "Yürüyerek",
+  "tr_transit": "Otobüs ve tren",
+  "tr_car": "Araba",
+  "tr_me": "Konumum",
+  "tr_stop": "Durak",
+  "tr_loading": "Rota hesaplanıyor …",
+  "tr_fail": "Rota şu anda hesaplanamadı. Harita uygulamanda aç.",
+  "tr_sum_walk": "{d} · yürüyerek {min} dk",
+  "tr_sum_car": "{d} · arabayla yaklaşık {min} dk",
+  "tr_stop_walk": "Duraktan: {d} · yürüyerek {min} dk",
+  "tr_park_walk": "Otoparktan: {d} · yürüyerek {min} dk",
+  "tr_transit_go": "Bağlantı ara",
+  "tr_car_go": "Navigasyonu başlat",
+  "tr_car_nopos": "Araba rotası için konumuna ihtiyacımız var. Navigasyonu doğrudan harita uygulamanda da başlatabilirsin.",
+  "tr_no_stop": "Bu kampüs için kayıtlı durak yok.",
+  "tr_far": "{d} uzaktasın. Yürümek için çok uzak, otobüs ve tren ya da araba daha iyi.",
+  "tr_inside": "Kampüste ve binanın içinde",
+  "tr_src": "Rotalar: OpenStreetMap katkıcıları, FOSSGIS rotalama",
+  "in_main": "{b} binasına ana girişten gir ({a}).",
+  "in_enter": "{e} git ve içeri gir.",
+  "in_eg": "Zemin katta kal.",
+  "by_lift": "asansörle",
+  "by_stairs": "merdivenle",
+  "in_find": "{n}: {h}.",
+  "in_signs": "{n} için tabelaları takip et.",
+  "live_here": "Hedefe vardın: {b}"
+ }
+};
+Object.keys(STR_DATA15).forEach(l => Object.assign(STR[l], STR_DATA15[l]));
+
 
 /* ================= Campus-Daten: Hochschule Esslingen =================
    Drei Standorte: Esslingen Stadtmitte, Esslingen Flandernstraße, Göppingen.
@@ -2027,7 +2228,9 @@ const I = {
   dots:'<circle cx="12" cy="5.5" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="18.5" r="1.4" fill="currentColor"/>',
   laptop:'<rect x="5" y="5.5" width="14" height="10" rx="1.5"/><path d="M3 18.5h18"/>',
   star:'<path d="m12 4 2.4 5 5.4.7-4 3.8 1 5.4L12 16.3 7.2 18.9l1-5.4-4-3.8 5.4-.7z"/>',
-  nav:'<path d="M12 3.5 19 20l-7-3.5L5 20z"/>'
+  nav:'<path d="M12 3.5 19 20l-7-3.5L5 20z"/>',
+  bus:'<rect x="5" y="3.5" width="14" height="14" rx="3"/><path d="M5 11h14M8 17.5V20M16 17.5V20"/><circle cx="8.5" cy="14.3" r=".9"/><circle cx="15.5" cy="14.3" r=".9"/>',
+  car:'<path d="M4.5 16.5v-4l2-5h11l2 5v4z"/><path d="M4.5 12.5h15M7 16.5V19M17 16.5V19"/><circle cx="8" cy="14.5" r=".9"/><circle cx="16" cy="14.5" r=".9"/>'
 };
 function icon(n, cls){ return '<svg class="ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + I[n] + '</svg>'; }
 function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -2104,7 +2307,7 @@ const state = {
   b: SHARED,
   draft: readDraft() || SHARED,
   campus: HOME_CAMPUS,
-  tab: 'start', room: CAMPUS[HOME_CAMPUS].next.room, roomQuery: '', start: CAMPUS[HOME_CAMPUS].defStart, bf: false, view: 'plan',
+  tab: 'start', room: CAMPUS[HOME_CAMPUS].next.room, roomQuery: '', start: CAMPUS[HOME_CAMPUS].defStart, bf: false, view: 'plan', travel: 'walk', stop: null, startPicked: false,
   day: TODAY_IDX, filters: {vegan:false, veggie:false, nogluten:false},
   discover: 'studi', cat: 'alle',
   chat: [], typing: false, sheet: null,
@@ -2117,13 +2320,13 @@ function C(){ return CAMPUS[state.campus]; }
 function cityName(){ return C().city; }
 function setRoom(id){
   const r = ROOMS[id]; if(!r) return;
-  if(r.c !== state.campus){ state.campus = r.c; state.start = CAMPUS[r.c].defStart; }
+  if(r.c !== state.campus){ state.campus = r.c; state.start = CAMPUS[r.c].defStart; state.stop = null; state.startPicked = false; }
   state.room = id;
 }
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261030-150136';
+const CAMPI_BUILD = '20261031-131030';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -2322,24 +2525,8 @@ function startChips(){
 }
 function screenRooms(){
   const r = ROOMS[state.room], c = CAMPUS[r.c];
-  if(!c.starts[state.start]) state.start = c.defStart;
-  const rt = routeTo(state.room, state.start, state.bf), live = state.view === 'live';
-  let body = '';
-  if(live){
-    body = liveBlockHTML(r);
-  } else if(rt.plan){
-    body = startChips() +
-      '<div class="route-opts"><span class="ro-label">' + esc(t('way')) + '</span><div class="chips"><button class="chip chip-sm" type="button" data-act="bf" aria-pressed="' + state.bf + '">' + icon('access') + esc(t('accessible')) + '</button></div></div>' +
-      '<div class="map-wrap">' + planSVG(state.room, rt, false) + '<button class="map-zoom" type="button" data-act="map-zoom" aria-label="' + esc(t('map_zoom')) + '">' + icon('expand') + '</button></div>' +
-      '<ol class="steps"><li>' + esc(t('step_start', {s: L(c.starts[state.start].name)})) + '</li><li>' + esc(t('step_walk', {m: rt.meters, e: entranceName(c.plan.entrances[rt.entrance])})) + '</li><li>' + esc(roomInside(r)) + '</li></ol>' +
-      (state.bf ? '<p class="note-line">' + icon('access') + '<span>' + esc(t('bf_note')) + '</span></p>' : '');
-  } else {
-    const st = c.starts[state.start];
-    body = startChips() +
-      geoMapHTML({target: buildingOf(r).ll, label: r.b, from: st.ll, live: false}) +
-      '<ol class="steps"><li>' + esc(t('step_start', {s: L(st.name)})) + '</li><li>' + esc(t('step_walk_air', {m: rt.air, b: r.b})) + '</li><li>' + esc(roomInside(r)) + '</li></ol>' +
-      (buildingOf(r).est ? '<p class="note-line">' + icon('info') + '<span>' + esc(t('pos_approx')) + '</span></p>' : '');
-  }
+  if(!c.starts[state.start] && state.start !== 'ME') state.start = c.defStart;
+  const body = liveBlockHTML(r);
   const hours = roomHours(r);
   return '<div class="pad stack">' +
     screenHead(t('rooms_title'), t('rooms_sub')) +
@@ -2347,8 +2534,7 @@ function screenRooms(){
     '<div id="room-results">' + roomResults(state.roomQuery) + '</div>' +
     '<div class="chips" aria-label="' + esc(t('quick_select')) + '">' + c.quick.map(id => '<button class="chip" type="button" data-act="room" data-room="' + id + '" aria-pressed="' + (id === state.room) + '">' + esc(roomChip(ROOMS[id])) + '</button>').join('') + '</div>' +
     '<section class="card"><div class="room-top"><div><div class="label">' + esc((r.code ? r.code + ' · ' : '') + buildingLabel(r)) + '</div><h2>' + esc(roomName(r)) + '</h2><p class="sub">' + esc(floorLabel(r.f) + (r.hint ? ', ' + L(HINT[r.hint]) : '')) + '</p><p class="sub addr">' + esc(buildingAddr(r) + ' · ' + L(c.short)) + '</p></div>' +
-        (live ? '' : '<span class="pill">' + icon('walk') + rt.minutes + ' ' + esc(t('min')) + '</span>') + '</div>' +
-      '<div class="seg seg-sm" role="tablist" aria-label="' + esc(t('map_title')) + '"><button type="button" role="tab" data-act="view" data-view="plan" aria-selected="' + !live + '">' + icon('map') + esc(t('view_plan')) + '</button><button type="button" role="tab" data-act="view" data-view="live" aria-selected="' + live + '">' + icon('locate') + esc(t('view_live')) + '</button></div>' +
+        '</div>' +
       body +
       (hours ? '<p class="note-line">' + icon('calendar') + '<span>' + esc(t('open_hours', {h: hours})) + '</span></p>' : '') +
     '</section>' +
@@ -2907,7 +3093,7 @@ function renderScreen(keepScroll){
   const sc = $('screen'); if(!sc) return;
   studySampleScroll();
   const top = keepScroll ? sc.scrollTop : 0;
-  if(!(state.tab === 'rooms' && state.view === 'live')) geoStop();
+  if(state.tab !== 'rooms') geoStop();
   const html = ({start:screenStart, rooms:screenRooms, chat:screenChat, mensa:screenMensa, discover:screenDiscover, help:screenHelp}[state.tab] || screenStart)();
   sc.classList.toggle('is-chat', state.tab === 'chat');
   sc.innerHTML = html;
@@ -3423,15 +3609,17 @@ function dirName(b, lang){ return tl('dirs', lang)[Math.round(b / 45) % 8]; }
 
 /* map html: tiles, buildings, optional start and line, own position */
 function geoMapHTML(opts){
-  const key = state.room + '|' + (opts.live ? 'live' : 'plan:' + state.start);
+  const key = state.room + '|' + (opts.key || (opts.live ? 'live' : 'plan:' + state.start));
+  const segPts = (opts.segs || []).reduce((a, s) => a.concat(s.pts), []);
   if(key !== GEO.key){
     GEO.key = key; GEO.follow = true; GEO.pan = [0, 0];
-    const pts = [opts.target].concat(opts.from ? [opts.from] : []);
-    GEO.z = opts.from ? fitZoom(pts) : (CAMPUS[ROOMS[state.room].c].zoom || 17);
-    GEO.center = midLL(pts);
+    const pts = [opts.target].concat(opts.from ? [opts.from] : [], opts.extraMk && opts.extraMk.ll ? [opts.extraMk.ll] : [], segPts);
+    const ext = [Math.min(...pts.map(p => p[0])), Math.max(...pts.map(p => p[0])), Math.min(...pts.map(p => p[1])), Math.max(...pts.map(p => p[1]))];
+    GEO.z = pts.length > 1 ? Math.min(18, fitZoom(pts)) : (CAMPUS[ROOMS[state.room].c].zoom || 17);
+    GEO.center = pts.length > 1 ? [(ext[0] + ext[1]) / 2, (ext[2] + ext[3]) / 2] : opts.target;
   }
   GEO.opts = opts;
-  if(opts.live && GEO.follow && GEO.pos) fitToMe();
+  if(opts.live && GEO.follow && GEO.pos && !segPts.length) fitToMe();
   return '<div class="gmap" id="gmap" role="img" aria-label="' + esc(t('map_title')) + '"><div class="gm-view" id="gm-view">' + gmapInner(opts) + '</div>' +
     '<div class="gm-ctrl"><button type="button" data-act="geo-zoom" data-d="1" aria-label="' + esc(t('zoom_in')) + '">' + icon('plus') + '</button><button type="button" data-act="geo-zoom" data-d="-1" aria-label="' + esc(t('zoom_out')) + '">' + icon('minus') + '</button>' +
       (opts.live ? '<button type="button" data-act="geo-me" aria-label="' + esc(t('live_me')) + '">' + icon('locate') + '</button>' : '') + '</div>' +
@@ -3456,8 +3644,12 @@ function gmapInner(o){
     h += '<img class="gm-tile" alt="" draggable="false" src="https://tile.openstreetmap.org/' + z + '/' + xx + '/' + y + '.png" ' + pos([Math.round(x * TILE - c[0]), Math.round(y * TILE - c[1])]) + '>';
   }
   const cp = CAMPUS[ROOMS[state.room].c];
-  const line = o.from ? [o.from, o.target] : (o.live && GEO.pos ? [[GEO.pos.lat, GEO.pos.lon], o.target] : null);
-  if(line){ const a = at(line[0]), b = at(line[1]); h += '<svg class="gm-svg" width="1" height="1" style="left:50%;top:50%"><line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '"/></svg>'; }
+  /* routes follow paths and roads; there is no straight line any more */
+  if(o.segs && o.segs.length){
+    h += '<svg class="gm-svg" width="1" height="1" style="left:50%;top:50%">' + o.segs.map(sg => { const d = sg.pts.map(p => at(p).join(',')).join(' ');
+      return '<polyline class="gm-route-case" points="' + d + '"/><polyline class="gm-route gm-route-' + sg.kind + '" points="' + d + '"/>'; }).join('') + '</svg>';
+  }
+  if(o.extraMk && o.extraMk.ll) h += '<span class="gm-pin ' + o.extraMk.cls + '" ' + pos(at(o.extraMk.ll)) + '>' + esc(o.extraMk.txt) + '</span>';
   Object.keys(cp.buildings).forEach(k => {
     const b = cp.buildings[k]; if(!b.ll || k === o.label || z < 17) return;
     h += '<span class="gm-mk" ' + pos(at(b.ll)) + '>' + esc(k) + '</span>';
@@ -3472,34 +3664,8 @@ function gmapInner(o){
 }
 function gmapRender(){ const v = $('gm-view'); if(v && GEO.opts) v.innerHTML = gmapInner(GEO.opts); }
 
-/* live block on the rooms screen */
-function liveBlockHTML(r){
-  const target = buildingOf(r).ll, c = CAMPUS[r.c];
-  let status = '', steps = '';
-  if(GEO.status === 'off') status = '<p class="live-hint">' + icon('locate') + '<span>' + esc(t('live_hint')) + '</span></p><button class="btn btn-primary btn-block" type="button" data-act="geo-start">' + icon('locate') + esc(t('live_use')) + '</button>';
-  else if(GEO.status === 'wait') status = '<p class="live-hint live-wait" role="status">' + icon('locate') + '<span>' + esc(t('live_wait')) + '</span></p>';
-  else if(GEO.status === 'denied') status = '<p class="live-hint live-bad" role="status">' + icon('info') + '<span>' + esc(t('live_denied')) + '</span></p>';
-  else if(GEO.status === 'na' || GEO.status === 'error') status = '<p class="live-hint live-bad" role="status">' + icon('info') + '<span>' + esc(t('live_na')) + '</span></p>';
-  if(GEO.status === 'ok' && GEO.pos){
-    const me = [GEO.pos.lat, GEO.pos.lon], d = haversine(me, target), fromCampus = haversine(me, c.center);
-    const near = d <= Math.max(30, Math.min(GEO.pos.acc, 60));
-    let line;
-    if(near) line = '<b>' + esc(t('live_here', {b: buildingLabel(r)})) + '</b>';
-    else if(fromCampus > 3000) line = esc(t('live_off', {d: fmtDist(fromCampus)}));
-    else line = '<b>' + esc(t('live_dist', {d: fmtDist(d), dir: dirName(bearing(me, target))})) + '</b>';
-    status = '<p class="live-now" role="status">' + icon('nav') + '<span>' + line + '<small>' + esc(t('live_acc', {a: Math.round(GEO.pos.acc)})) + '</small></span></p>';
-    steps = '<ol class="steps">' + (near ? '' : '<li>' + esc(t('step_walk_live', {m: fmtDist(Math.round(d * 1.2)), min: walkMinutes(d * 1.2), b: buildingLabel(r)})) + '</li>') + '<li>' + esc(roomInside(r)) + '</li></ol>';
-  } else {
-    steps = '<ol class="steps"><li>' + esc(buildingLabel(r) + ' · ' + buildingAddr(r)) + '</li><li>' + esc(roomInside(r)) + '</li></ol>';
-  }
-  const gm = 'https://www.google.com/maps/dir/?api=1&destination=' + target[0].toFixed(5) + ',' + target[1].toFixed(5) + '&travelmode=walking';
-  return '<div id="live-block">' + status + geoMapHTML({target, label: r.b, live: true}) + steps +
-    (buildingOf(r).est ? '<p class="note-line">' + icon('info') + '<span>' + esc(t('pos_approx')) + '</span></p>' : '') +
-    '<div class="btn-row"><a class="btn btn-soft" href="' + esc(gm) + '" target="_blank" rel="noopener" data-act="ext" data-ext="karten-app">' + icon('ext') + esc(t('live_ext')) + '</a>' +
-    (GEO.watch !== null ? '<button class="btn btn-soft" type="button" data-act="geo-stop">' + esc(t('live_stop')) + '</button>' : '') + '</div></div>';
-}
 function liveRefresh(){
-  const lb = $('live-block'); if(!lb || state.tab !== 'rooms' || state.view !== 'live') return;
+  const lb = $('live-block'); if(!lb || state.tab !== 'rooms') return;
   const now = Date.now();
   if(now - GEO.renderAt < 900){ clearTimeout(GEO.renderTimer); GEO.renderTimer = setTimeout(liveRefresh, 950 - (now - GEO.renderAt)); return; }
   GEO.renderAt = now;
@@ -3534,10 +3700,6 @@ function geoOk(p){
   if(first) track('standort_erhalten', {nach_ms: Math.round(performance.now() - GEO.startedAt), genauigkeit_m: Math.round(GEO.pos.acc)});
   geoTrack();
   geoArrival();
-  /* opted-in testers near a campus get the live view automatically, once */
-  if(first && !GEO.autoLive && state.tab === 'rooms' && state.view === 'plan' && haversine([GEO.pos.lat, GEO.pos.lon], C().center) < 1500){
-    GEO.autoLive = true; state.view = 'live'; track('live_automatisch', {}); renderScreen(true); return;
-  }
   if(GEO.follow && GEO.opts && GEO.opts.live) fitToMe();
   liveRefresh();
 }
@@ -3557,7 +3719,7 @@ function geoTrack(){
   GEO.lastTrack = {t: now, ll: me};
   const tg = geoTarget(), cp = C();
   track('standort', {lat: +GEO.pos.lat.toFixed(4), lon: +GEO.pos.lon.toFixed(4), genauigkeit_m: Math.round(GEO.pos.acc),
-    ziel: state.room, entfernung_m: tg ? Math.round(haversine(me, tg)) : null, campus_m: Math.round(haversine(me, cp.center)), live_ansicht: state.tab === 'rooms' && state.view === 'live',
+    ziel: state.room, entfernung_m: tg ? Math.round(haversine(me, tg)) : null, campus_m: Math.round(haversine(me, cp.center)), live_ansicht: state.tab === 'rooms',
     messzeit: new Date(GEO.pos.fix || GEO.pos.t).toISOString()});
   if(ST.rec && !ST.rec.standort_campus && haversine(me, cp.center) < 600) ST.rec.standort_campus = cp.id;
 }
@@ -3566,15 +3728,15 @@ function geoArrival(){
   const d = haversine([GEO.pos.lat, GEO.pos.lon], tg);
   if(d <= Math.max(30, Math.min(GEO.pos.acc, 60))){
     GEO.arrived[state.room] = true;
-    track('ziel_erreicht', {raum: state.room, entfernung_m: Math.round(d), genauigkeit_m: Math.round(GEO.pos.acc), live_ansicht: state.tab === 'rooms' && state.view === 'live'});
+    track('ziel_erreicht', {raum: state.room, entfernung_m: Math.round(d), genauigkeit_m: Math.round(GEO.pos.acc), live_ansicht: state.tab === 'rooms'});
   }
 }
 function geoAfterRender(){
-  if(state.tab === 'rooms' && state.view === 'live' && GEO.watch === null && (ST.geoOk || GEO.granted) && GEO.status !== 'denied' && GEO.status !== 'na') geoStart(ST.geoOk ? 'einwilligung' : 'wieder');
+  if(state.tab === 'rooms' && GEO.watch === null && (ST.geoOk || GEO.granted) && GEO.status !== 'denied' && GEO.status !== 'na') geoStart(ST.geoOk ? 'einwilligung' : 'wieder');
 }
 document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'hidden'){ if(GEO.watch !== null){ try { navigator.geolocation.clearWatch(GEO.watch); } catch(e){} GEO.watch = null; GEO.resume = true; } }
-  else if(GEO.resume){ GEO.resume = false; if(GEO.keep || (state.tab === 'rooms' && state.view === 'live')){ GEO.status = 'off'; geoStart('zurueck'); } }
+  else if(GEO.resume){ GEO.resume = false; if(GEO.keep || state.tab === 'rooms'){ GEO.status = 'off'; geoStart('zurueck'); } }
 });
 
 /* watchdog: some phones (above all iPhones) silently stop delivering positions; restart the watch when it went quiet */
@@ -3628,11 +3790,180 @@ function geoAction(a, el){
       if(GEO.pos){ GEO.follow = true; fitToMe(); gmapRender(); track('karte', {aktion: 'mich_zeigen'}); }
       else geoStart('mich_zeigen');
       return true;
-    case 'view': {
-      const v = el.dataset.view === 'live' ? 'live' : 'plan';
-      if(v !== state.view){ state.view = v; renderScreen(true); }
-      return true;
+    case 'view': return true;
+  }
+  return false;
+}
+
+
+/* ================= Version 15: eine Karte mit echten Routen =================
+   Statt „Plan“ und „Live-Karte“ gibt es nur noch eine Karte (OpenStreetMap).
+   Routen folgen Wegen und Straßen (Routing-Server der FOSSGIS, OpenStreetMap-Daten), keine Luftlinie:
+   - Zu Fuß: vom eigenen Standort oder einem Startpunkt bis zum Eingang
+   - Bus & Bahn: Fußweg von der Haltestelle, die Verbindung selbst sucht die Karten-App
+   - Auto: vom eigenen Standort bis zum Parkhaus bzw. Gebäude, dann zu Fuß
+   Auf dem Campus und im Gebäude gibt es eine schriftliche Wegbeschreibung.
+   Berechnete Routen werden auf dem Gerät zwischengespeichert (höchstens 25). */
+const ROUTER = {walk: 'https://routing.openstreetmap.de/routed-foot/route/v1/driving/', car: 'https://routing.openstreetmap.de/routed-car/route/v1/driving/'};
+const RT_CACHE_KEY = 'campi-routen-v1', WALK_MAX_M = 8000;
+const TRANSIT_STOPS = {SM: ['BF'], FL: ['B105', 'B111N', 'B111S'], GP: []};
+const PARKING = {FL: 'PH'};
+const RT = {mem: {}, pending: {}, failed: {}};
+(() => { try { const o = JSON.parse(lsGet(RT_CACHE_KEY) || 'null'); if(o && typeof o === 'object') RT.mem = o; } catch(e){} })();
+
+const rnd5 = v => Math.round(v * 2000) / 2000;            /* own position rounded to about 50 m: fewer requests while walking */
+function rtKey(kind, a, b){ return kind + ':' + a[0].toFixed(5) + ',' + a[1].toFixed(5) + '>' + b[0].toFixed(5) + ',' + b[1].toFixed(5); }
+function rtSave(){ const ks = Object.keys(RT.mem); ks.slice(0, Math.max(0, ks.length - 25)).forEach(k => delete RT.mem[k]); lsSet(RT_CACHE_KEY, JSON.stringify(RT.mem)); }
+/* returns a route {pts, m, s}, {loading:true} or {fail:true}; a finished request redraws the route block */
+function rtGet(kind, a, b){
+  const k = rtKey(kind, a, b);
+  if(RT.mem[k]) return RT.mem[k];
+  if(RT.failed[k] && Date.now() - RT.failed[k] < 60000) return {fail: true};
+  if(!RT.pending[k]){
+    const t0 = performance.now();
+    RT.pending[k] = rtFetch(kind, a, b)
+      .then(r => { RT.mem[k] = r; rtSave(); track('route', {art: kind, ergebnis: 'ok', meter: r.m, ms: Math.round(performance.now() - t0)}); },
+            e => { RT.failed[k] = Date.now(); track('route', {art: kind, ergebnis: 'fehler', grund: String(e && e.message || e).slice(0, 60)}); })
+      .then(() => { delete RT.pending[k]; GEO.renderAt = 0; liveRefresh(); });
+  }
+  return {loading: true};
+}
+async function rtFetch(kind, a, b){
+  const url = ROUTER[kind] + a[1].toFixed(6) + ',' + a[0].toFixed(6) + ';' + b[1].toFixed(6) + ',' + b[0].toFixed(6) + '?overview=full&geometries=geojson&steps=false';
+  const c = typeof AbortController === 'function' ? new AbortController() : null, tm = c ? setTimeout(() => c.abort(), 9000) : 0;
+  try {
+    const r = await fetch(url, {signal: c ? c.signal : undefined});
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json(), rt = j && j.routes && j.routes[0];
+    if(!rt || !rt.geometry || !Array.isArray(rt.geometry.coordinates) || rt.geometry.coordinates.length < 2) throw new Error('keine Route');
+    let pts = rt.geometry.coordinates.map(p => [+(+p[1]).toFixed(6), +(+p[0]).toFixed(6)]);
+    if(pts.length > 400){ const st = Math.ceil(pts.length / 400); pts = pts.filter((p, i) => i % st === 0 || i === pts.length - 1); }
+    return {pts, m: Math.round(rt.distance), s: Math.round(rt.duration)};
+  } finally { if(tm) clearTimeout(tm); }
+}
+
+/* places */
+function startLL(c, id){ const st = c.starts[id]; if(!st) return null; return st.ll || (c.plan && st.node ? flPlanLL(c.plan.nodes[st.node]) : null); }
+function entranceFor(r, from){
+  const c = CAMPUS[r.c]; if(!c.plan) return null;
+  if(from){                                                  /* own position: nearest suitable entrance */
+    const P = c.plan; let cands = c.buildings[r.b].ent.slice();
+    if(state.bf){ const own = cands.filter(e => P.entrances[e].bf); if(own.length) cands = own; }
+    return cands.reduce((best, e) => haversine(from, flPlanLL(P.nodes[e])) < haversine(from, flPlanLL(P.nodes[best])) ? e : best, cands[0]);
+  }
+  const sid = c.starts[state.start] ? state.start : c.defStart;
+  return routeTo(r.id, sid, state.bf).entrance;
+}
+function goalLL(r, ent){ const c = CAMPUS[r.c]; return ent ? flPlanLL(c.plan.nodes[ent]) : buildingOf(r).ll; }
+function meLL(){ return GEO.pos ? [GEO.pos.lat, GEO.pos.lon] : null; }
+/* start of the walking route: own position (once known, unless a start point was picked) or a start point */
+function walkStart(){ return state.start === 'ME' || (!state.startPicked && GEO.pos) ? 'ME' : state.start; }
+
+/* ---------- route block on the rooms screen ---------- */
+function travelSeg(){
+  const modes = [['walk', 'walk', 'tr_walk'], ['transit', 'bus', 'tr_transit'], ['car', 'car', 'tr_car']];
+  return '<div class="seg seg-sm tr-modes" role="tablist" aria-label="' + esc(t('tr_how')) + '">' + modes.map(m => '<button type="button" role="tab" data-act="travel" data-mode="' + m[0] + '" aria-selected="' + (state.travel === m[0]) + '">' + icon(m[1]) + esc(t(m[2])) + '</button>').join('') + '</div>';
+}
+function chipRow(label, items){
+  return '<div class="route-opts"><span class="ro-label">' + esc(label) + '</span><div class="chips">' + items.map(i => '<button class="chip chip-sm" type="button" data-act="' + i.act + '" data-start="' + i.id + '" aria-pressed="' + i.on + '">' + (i.ic ? icon(i.ic) : '') + esc(i.l) + '</button>').join('') + '</div></div>';
+}
+function geoStatusHTML(){
+  if(GEO.status === 'wait') return '<p class="live-hint live-wait" role="status">' + icon('locate') + '<span>' + esc(t('live_wait')) + '</span></p>';
+  if(GEO.status === 'denied') return '<p class="live-hint live-bad" role="status">' + icon('info') + '<span>' + esc(t('live_denied')) + '</span></p>';
+  if(GEO.status === 'na' || GEO.status === 'error') return '<p class="live-hint live-bad" role="status">' + icon('info') + '<span>' + esc(t('live_na')) + '</span></p>';
+  return '';
+}
+function sumLine(res, key, extra){
+  if(res.loading) return '<p class="tr-sum tr-wait" role="status">' + icon('nav') + '<span>' + esc(t('tr_loading')) + '</span></p>';
+  if(res.fail) return '<p class="tr-sum tr-bad" role="status">' + icon('info') + '<span>' + esc(t('tr_fail')) + '</span></p>';
+  const min = key === 'tr_sum_car' ? Math.max(1, Math.round(res.s / 60)) : walkMinutes(res.m);
+  return '<p class="tr-sum">' + icon(key === 'tr_sum_car' ? 'car' : 'walk') + '<span><b>' + esc(t(key, {d: fmtDist(res.m), min})) + '</b>' + (extra ? '<small>' + esc(extra) + '</small>' : '') + '</span></p>';
+}
+function mapsLink(mode, goal){
+  const me = meLL();
+  return 'https://www.google.com/maps/dir/?api=1' + (me ? '&origin=' + me[0].toFixed(5) + ',' + me[1].toFixed(5) : '') + '&destination=' + goal[0].toFixed(5) + ',' + goal[1].toFixed(5) +
+    '&travelmode=' + ({walk: 'walking', transit: 'transit', car: 'driving'})[mode];
+}
+function liveBlockHTML(r){
+  const c = CAMPUS[r.c], mode = state.travel || 'walk', me = meLL(), segs = [];
+  let rows = '', sum = '', card = '', from = null, extraMk = null, goal, ent, near = false;
+  if(mode === 'walk'){
+    const sid = walkStart();
+    rows = chipRow(t('start'), [{act: 'start', id: 'ME', on: sid === 'ME', ic: 'locate', l: t('tr_me')}].concat(Object.keys(c.starts).map(k => ({act: 'start', id: k, on: sid === k, l: L(c.starts[k].chip)}))));
+    if(sid === 'ME'){
+      rows += geoStatusHTML();
+      if(me){
+        ent = entranceFor(r, me); goal = goalLL(r, ent);
+        const d = haversine(me, goal);
+        near = d <= Math.max(30, Math.min(GEO.pos.acc, 60));
+        if(near) sum = '<p class="tr-sum tr-ok" role="status">' + icon('check') + '<span><b>' + esc(t('live_here', {b: buildingLabel(r)})) + '</b></span></p>';
+        else if(d > WALK_MAX_M) sum = '<p class="tr-sum tr-bad">' + icon('info') + '<span>' + esc(t('tr_far', {d: fmtDist(d)})) + '</span></p>';
+        else { const res = rtGet('walk', [rnd5(me[0]), rnd5(me[1])], goal); if(res.pts) segs.push({pts: res.pts, kind: 'walk'}); sum = sumLine(res, 'tr_sum_walk', t('live_acc', {a: Math.round(GEO.pos.acc)})); }
+      } else { ent = entranceFor(r, null); goal = goalLL(r, ent); if(GEO.status === 'off') rows += '<button class="btn btn-primary btn-block" type="button" data-act="geo-start">' + icon('locate') + esc(t('live_use')) + '</button>'; }
+    } else {
+      from = startLL(c, sid); ent = entranceFor(r, null); goal = goalLL(r, ent);
+      if(from){ const res = rtGet('walk', from, goal); if(res.pts) segs.push({pts: res.pts, kind: 'walk'}); sum = sumLine(res, 'tr_sum_walk', t('step_start', {s: L(c.starts[sid].name)})); }
     }
+  } else if(mode === 'transit'){
+    const stops = TRANSIT_STOPS[r.c] || [];
+    ent = entranceFor(r, null); goal = goalLL(r, ent);
+    if(stops.length){
+      const sid = stops.includes(state.stop) ? state.stop : stops[0];
+      rows = chipRow(t('tr_stop'), stops.map(k => ({act: 'stop', id: k, on: sid === k, l: L(c.starts[k].chip)})));
+      if(c.plan){ ent = routeTo(r.id, sid, state.bf).entrance; goal = goalLL(r, ent); }
+      from = startLL(c, sid); extraMk = {ll: from, cls: 'gm-stop', txt: 'H'};
+      const res = rtGet('walk', from, goal); if(res.pts) segs.push({pts: res.pts, kind: 'walk'});
+      sum = sumLine(res, 'tr_stop_walk', L(c.starts[sid].name));
+    } else rows = '<p class="tr-note">' + esc(t('tr_no_stop')) + '</p>';
+    card = '<div class="tr-card">' + icon('bus') + '<div><p>' + esc(L(c.transit)) + '</p><a class="btn btn-soft btn-sm" href="' + esc(mapsLink('transit', goal)) + '" target="_blank" rel="noopener" data-act="ext" data-ext="route-oepnv">' + icon('ext') + esc(t('tr_transit_go')) + '</a></div></div>';
+  } else {
+    const pk = PARKING[r.c], pkLL = pk ? startLL(c, pk) : null;
+    ent = entranceFor(r, null); goal = goalLL(r, ent);
+    if(pk){ if(c.plan){ ent = routeTo(r.id, pk, state.bf).entrance; goal = goalLL(r, ent); } extraMk = {ll: pkLL, cls: 'gm-park', txt: 'P'}; }
+    const carGoal = pkLL || goal;
+    if(me){
+      rows = geoStatusHTML();
+      const res = rtGet('car', [rnd5(me[0]), rnd5(me[1])], carGoal); if(res.pts) segs.push({pts: res.pts, kind: 'car'});
+      sum = sumLine(res, 'tr_sum_car');
+    } else {
+      rows = geoStatusHTML() + '<p class="tr-note">' + esc(t('tr_car_nopos')) + '</p>' + (GEO.status === 'off' ? '<button class="btn btn-primary btn-block" type="button" data-act="geo-start">' + icon('locate') + esc(t('live_use')) + '</button>' : '');
+    }
+    if(pkLL){ const w = rtGet('walk', pkLL, goal); if(w.pts) segs.push({pts: w.pts, kind: 'walk'}); if(!w.loading && !w.fail) sum += sumLine(w, 'tr_park_walk', L(c.starts[pk].name)); }
+  }
+  const segKey = segs.map(s => s.pts.length).join('-');
+  const gm = geoMapHTML({target: goal, label: r.b, from: mode === 'walk' ? from : null, live: true, segs, extraMk, key: mode + ':' + walkStart() + ':' + (state.stop || '') + ':' + segKey});
+  const btnKey = {walk: 'live_ext', transit: 'tr_transit_go', car: 'tr_car_go'}[mode];
+  return '<div id="live-block">' + travelSeg() + rows + sum + gm + card +
+    '<h3 class="tr-inside-h">' + esc(t('tr_inside')) + '</h3>' + insideStepsHTML(r, ent) +
+    (buildingOf(r).est ? '<p class="note-line">' + icon('info') + '<span>' + esc(t('pos_approx')) + '</span></p>' : '') +
+    '<div class="btn-row">' + (mode !== 'transit' ? '<a class="btn btn-soft" href="' + esc(mapsLink(mode, mode === 'car' && PARKING[r.c] ? startLL(c, PARKING[r.c]) : goal)) + '" target="_blank" rel="noopener" data-act="ext" data-ext="karten-app-' + mode + '">' + icon('ext') + esc(t(btnKey)) + '</a>' : '') +
+    (GEO.watch !== null && !GEO.keep ? '<button class="btn btn-soft" type="button" data-act="geo-stop">' + esc(t('live_stop')) + '</button>' : '') + '</div>' +
+    '<p class="src">' + icon('doc') + esc(t('tr_src')) + '</p></div>';
+}
+
+/* ---------- written directions: entrance, floor, where the room is ---------- */
+function insideSteps(r, ent, lang){
+  const c = CAMPUS[r.c], out = [];
+  if(ent && c.plan) out.push(t('in_enter', {e: entranceName(c.plan.entrances[ent], lang)}, lang));
+  else out.push(t('in_main', {b: buildingLabel(r, lang), a: buildingAddr(r)}, lang));
+  if(r.f === 0) out.push(t('in_eg', null, lang));
+  else out.push(t(r.f > 0 ? 'in_up' : 'in_down', {f: floorLabel(r.f, lang)}, lang) + ', ' + t(state.bf ? 'by_lift' : 'by_stairs', null, lang) + '.');
+  if(r.hint) out.push(t('in_find', {n: roomName(r, lang), h: L(HINT[r.hint], lang)}, lang));
+  else out.push(t('in_signs', {n: roomName(r, lang)}, lang));
+  return out;
+}
+function insideStepsHTML(r, ent){
+  return '<ol class="steps tr-inside">' + insideSteps(r, ent).map(s => '<li>' + esc(s) + '</li>').join('') + '</ol>' +
+    '<div class="route-opts"><span class="ro-label">' + esc(t('way')) + '</span><div class="chips"><button class="chip chip-sm" type="button" data-act="bf" aria-pressed="' + !!state.bf + '">' + icon('access') + esc(t('accessible')) + '</button></div></div>';
+}
+function routeAction(a, el){
+  switch(a){
+    case 'travel': { const m = ['walk', 'transit', 'car'].includes(el.dataset.mode) ? el.dataset.mode : 'walk'; if(m !== state.travel){ state.travel = m; renderScreen(true); } if(m === 'car' && !GEO.pos && (GEO.granted || ST.geoOk)) geoStart('auto'); return true; }
+    case 'stop': state.stop = el.dataset.start; renderScreen(true); return true;
+    case 'start':
+      state.start = el.dataset.start; state.startPicked = true;
+      if(state.start === 'ME' && !GEO.pos && GEO.status !== 'denied' && GEO.status !== 'na'){ GEO.status = 'off'; geoStart('route'); }
+      renderScreen(true); return true;
   }
   return false;
 }
@@ -3831,7 +4162,7 @@ function sessionMeta(){
 }
 function screenKey(){
   if(state.mode !== 'app') return 'einstellungen';
-  const base = state.tab === 'discover' ? 'entdecken-' + state.discover : state.tab === 'rooms' ? 'raeume-' + state.view : ({start:'start', chat:'chat', mensa:'mensa', help:'hilfe'})[state.tab] || state.tab;
+  const base = state.tab === 'discover' ? 'entdecken-' + state.discover : state.tab === 'rooms' ? 'raeume-' + (state.travel || 'walk') : ({start:'start', chat:'chat', mensa:'mensa', help:'hilfe'})[state.tab] || state.tab;
   return base + ($('map-overlay') ? '+karte' : '') + (state.sheet ? '+' + ({lang:'sprache', campus:'standort', name:'name', install:'app-anleitung', frist:'frist-hinweis'}[state.sheet] || state.sheet) : '');
 }
 function studySampleScroll(){
@@ -3944,7 +4275,8 @@ function studyOnAction(a, el){
   if(a === 'room') noteWay(el.closest('.result') ? 'Suche' : 'Schnellauswahl');
   if(a === 'route') noteWay(el.closest('.msg') ? 'Frag Campi' : 'Weg-Knopf');
   if(a === 'map-zoom') noteVisit('Lageplan groß');
-  if(a === 'view' && el.dataset.view === 'live'){ noteWay('Live-Karte'); noteVisit('Live-Karte'); }
+  if(a === 'travel') noteVisit({walk: 'Route zu Fuß', transit: 'Route Bus & Bahn', car: 'Route Auto'}[el.dataset.mode] || 'Route');
+  if(a === 'stop') noteVisit('Routen-Optionen');
   if(a === 'geo-start') noteVisit('Eigener Standort');
   if(a === 'filter' || a === 'day') noteVisit('Mensa-Filter');
   if(a === 'cat') noteVisit('Stadt-Kategorien');
@@ -4812,6 +5144,7 @@ document.addEventListener('click', e => {
   const a = el.dataset.act;
   studyOnAction(a, el);
   if(geoAction(a, el)) return;
+  if(routeAction(a, el)) return;
   switch(a){
     case 'tab': go(el.dataset.tab); break;
     case 'route': state.roomQuery = ''; go('rooms', {room:el.dataset.room}); break;
