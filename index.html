@@ -2334,7 +2334,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261031-222240';
+const CAMPI_BUILD = '20261101-101132';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -4000,7 +4000,13 @@ function routeAction(a, el){
 const STUDY_VERSION = '2026-10-g';
 const QCACHE_KEY = 'campi-fragen-cache-v1';
 const OUTBOX_KEY = 'campi-outbox-v2', STUDY_DONE_KEY = 'campi-studie-fertig-v1', PILOT_KEY = 'campi-pilot-v1', INSTALL_LATER_KEY = 'campi-install-spaeter', GUIDE_KEY = 'campi-app-anleitung-v1';
-const NEW_OPEN_AFTER_MS = 30 * 60 * 1000;
+const NEW_OPEN_AFTER_MS = 30 * 60 * 1000, SESSION_MAX_MS = 12 * 3600 * 1000;
+/* a new pilot session after 30 minutes away, after 12 hours or on a new day (a session never runs into the 7-day limit of the database) */
+function pilotNeedsNewSession(away){
+  if(!(ST.mode === 'pilot' && !ST.active && pilotInfo())) return false;
+  const now = Date.now(), start = ST.tWall || now;
+  return away >= NEW_OPEN_AFTER_MS || now - start >= SESSION_MAX_MS || new Date(start).toDateString() !== new Date(now).toDateString();
+}
 const DEFAULT_QUESTIONS = [
   {id:null, schluessel:'installieren', typ:'einfach', frage:'Würdest du Campi installieren, wenn deine Hochschule die App anbietet?', optionen:['Ja, sicher','Eher ja','Eher nein','Nein'], pflicht:true,
     uebersetzungen:{
@@ -4206,7 +4212,7 @@ function clipData(d){
 }
 function track(typ, daten){
   if(!ST.tracking || ST.preview) return;
-  OB.ereignisse.push({id: uuid(), sitzung_id: ST.sid, zeit_ms: Math.max(0, Math.round(performance.now() - ST.tStart)), zeitpunkt: new Date().toISOString(),
+  OB.ereignisse.push({id: uuid(), sitzung_id: ST.sid, zeit_ms: Math.min(604800000, Math.max(0, Date.now() - (ST.tWall || Date.now()))), zeitpunkt: new Date().toISOString(),
     typ, schritt: ST.step || (ST.mode === 'pilot' ? 'pilot' : 'danach'), ansicht: screenKey(), daten: clipData(daten)});
   persistOutbox(); scheduleFlush();
 }
@@ -4415,7 +4421,7 @@ function startPilotSession(why){
   if(ST.tracking){ endScreen('neu'); persistOutbox(true); flush(true); }
   Object.assign(ST, {active:false, preview:false, tracking:true, mode:'pilot', step:'', sid: uuid(), screenKey:'', geoOk: !!info.geo, pilot: info});
   ST.rec = {gruppe:'pilot'};
-  ST.tStart = performance.now(); ST.stepSince = ST.tStart;
+  ST.tStart = performance.now(); ST.stepSince = ST.tStart; ST.tWall = Date.now();
   GEO.keep = !!info.geo;
   enqueue('sitzungen', Object.assign({id: ST.sid}, sessionMeta(), {modus:'pilot', pilot_id: info.id, standort: state.campus, standort_freigabe: !!info.geo}));
   trackTech();
@@ -4798,7 +4804,7 @@ function requireFields(f, names){
   return d;
 }
 function onConsent(d){
-  ST.tStart = performance.now(); ST.stepSince = ST.tStart;
+  ST.tStart = performance.now(); ST.stepSince = ST.tStart; ST.tWall = Date.now();
   const campus = CAMPUS[d.standort] ? d.standort : 'FL';
   if(CAMPUS[d.standort]) { state.campus = d.standort; lsSet(CAMPUS_KEY, d.standort); } else state.campus = 'FL';
   state.room = CAMPUS[state.campus].next.room; state.start = CAMPUS[state.campus].defStart;
@@ -4898,16 +4904,21 @@ document.addEventListener('scroll', e => {
 document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'hidden'){
     if(!ST.tracking) return;
-    ST.hiddenAt = performance.now();
+    ST.hiddenAt = Date.now();
     endScreen('hintergrund'); track('verlassen', {}); persistOutbox(true); flush(true);
   } else if(ST.hiddenAt){
-    const away = Math.round(performance.now() - ST.hiddenAt); ST.hiddenAt = 0;
-    if(ST.mode === 'pilot' && !ST.active && away >= NEW_OPEN_AFTER_MS && pilotInfo()){ startPilotSession('zurueck'); return; }
+    /* wall clock: on iPhones performance.now() stands still while the app sleeps in the background,
+       so "away for 30 minutes" was never detected and one pilot session went on for days */
+    const away = Math.max(0, Date.now() - ST.hiddenAt); ST.hiddenAt = 0;
+    if(pilotNeedsNewSession(away)){ startPilotSession('zurueck'); return; }
     if(!ST.tracking) return;
     track('zurueck', {weg_ms: away});
     beginScreen('zurueck');
   }
 });
+/* the page comes back from the browser cache or after the phone slept, sometimes without visibilitychange */
+window.addEventListener('pageshow', e => { if(e.persisted && pilotNeedsNewSession(ST.hiddenAt ? Date.now() - ST.hiddenAt : 0)){ ST.hiddenAt = 0; startPilotSession('zurueck'); } });
+setInterval(() => { if(document.visibilityState === 'visible' && pilotNeedsNewSession(0)) startPilotSession('neuer_tag'); }, 60000);
 window.addEventListener('pagehide', () => {
   if(!ST.tracking) return;
   endScreen('geschlossen');

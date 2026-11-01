@@ -423,7 +423,7 @@ function view(){
   const f = S.filter, now = new Date();
   const since = f.zeit === 'heute' ? new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() : f.zeit === '7' ? Date.now() - 7 * 864e5 : f.zeit === '30' ? Date.now() - 30 * 864e5 : 0;
   const resBy = {}; d.ergebnisse.forEach(r => resBy[r.sitzung_id] = r);
-  const sess = d.sitzungen.filter(s => (s._start || Date.parse(s.erstellt)) >= since && (f.geraet === 'alle' || s.geraet === f.geraet) && (f.gruppe === 'alle' || s.gruppe === f.gruppe) &&
+  const sess = d.sitzungen.filter(s => (s._last || s._start || Date.parse(s.erstellt)) >= since && (f.geraet === 'alle' || s.geraet === f.geraet) && (f.gruppe === 'alle' || s.gruppe === f.gruppe) &&
     (f.modus === 'alle' || (f.modus === 'pilot' ? s.modus === 'pilot' : s.modus !== 'pilot')) && (!f.fertig || resBy[s.id]));
   const ids = new Set(sess.map(s => s.id));
   const res = d.ergebnisse.filter(r => ids.has(r.sitzung_id));
@@ -769,7 +769,9 @@ function secTxt(ms){ const s = Math.round((ms || 0) / 1000); return s < 60 ? s +
 function sessionStarts(d){
   const first = {};
   d.ereignisse.forEach(e => { if(e.zeitpunkt && !(e.sitzung_id in first)) first[e.sitzung_id] = Date.parse(e.zeitpunkt) - (Number(e.zeit_ms) || 0); });
-  d.sitzungen.forEach(s => { s._start = first[s.id] || Date.parse(s.erstellt); });
+  const last = {};
+  d.ereignisse.forEach(e => { const t = e.zeitpunkt ? Date.parse(e.zeitpunkt) : Date.parse(e.erstellt); if(t && !(last[e.sitzung_id] >= t)) last[e.sitzung_id] = t; });
+  d.sitzungen.forEach(s => { s._start = first[s.id] || Date.parse(s.erstellt); s._last = Math.max(s._start, last[s.id] || 0); });
 }
 function evTime(e, s){ return e.zeitpunkt ? Date.parse(e.zeitpunkt) : (s ? s._start + (Number(e.zeit_ms) || 0) : Date.parse(e.erstellt)); }
 
