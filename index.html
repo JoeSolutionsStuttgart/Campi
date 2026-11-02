@@ -2334,7 +2334,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261101-101132';
+const CAMPI_BUILD = '20261102-080326';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -4242,8 +4242,33 @@ function resetAppState(){
   renderSheet();
   ST.resetting = true; renderScreen(false); ST.resetting = false;
 }
+/* Version 17: settings from the admin page (order of the three entry questions, headings of the pages with questions).
+   Cached on the device, so the test starts at once even on a bad connection. */
+const SETTINGS_KEY = 'campi-einstellungen-v1', INTRO_KEYS = ['semester', 'standort', 'letzte_raumsuche'];
+let STSET = (() => { try { const o = JSON.parse(lsGet(SETTINGS_KEY) || 'null'); return o && typeof o === 'object' ? o : {}; } catch(e){ return {}; } })();
+async function loadSettings(){
+  if(!REMOTE) return;
+  try {
+    const rows = await SB.get('einstellungen?select=schluessel,wert', 6000), o = {};
+    (Array.isArray(rows) ? rows : []).forEach(r => { if(r && typeof r.schluessel === 'string') o[r.schluessel] = r.wert; });
+    if(JSON.stringify(o) === JSON.stringify(STSET)) return;
+    STSET = o; lsSet(SETTINGS_KEY, JSON.stringify(o));
+    /* redraw only if nothing is filled in yet */
+    if(ST.active && ['intro', 'fragen', 't1-q', 't2-q', 'pilot-intro'].includes(ST.step) && !document.querySelector('#st-layer input:checked, #st-layer textarea')) renderStudy();
+  } catch(e){}
+}
+/* custom heading for a page, in the app language; empty = the standard text of that language */
+function hd(page, part, def){
+  const u = STSET.ueberschriften && STSET.ueberschriften[page], v = u && u[LANG] && u[LANG][part];
+  return typeof v === 'string' && v.trim() ? v.trim().slice(0, 120) : def;
+}
+function introOrder(){
+  const o = Array.isArray(STSET.einstieg_reihenfolge) ? STSET.einstieg_reihenfolge.filter((k, i, a) => INTRO_KEYS.includes(k) && a.indexOf(k) === i) : [];
+  return o.concat(INTRO_KEYS.filter(k => !o.includes(k)));
+}
 function startStudy(preview){
   clearInterval(ST.timer); ST.timer = null;
+  loadSettings();
   if(ST.tracking){ endScreen('neu'); flush(); }
   if(!preview) setUserName('');   /* new test person on a shared device: no name from the last one */
   Object.assign(ST, {active:true, preview:!!preview, tracking:false, mode:'test', sent:'', sid: uuid(), qs:null, qsSource:'', qPage:0, answers:{}, screenKey:'', step:'', geoOk:false});
@@ -4458,6 +4483,7 @@ async function endPilot(){
   const info = pilotInfo(); if(!info) return;
   if(REMOTE && ST.mode === 'pilot' && !ST.active && !ST.pilotAsked){
     ST.pilotAsked = true; ST.active = true; ST.answers = {}; ST.saved = {}; ST.qs = null;
+    loadSettings();
     renderStudy();
     await askPhase('pilot_ende', () => { ST.active = false; ST.step = ''; renderStudy(); endPilot0(); });
     return;
@@ -4649,14 +4675,16 @@ function studyOverlayHTML(){
   switch(ST.step){
     case 'intro': {
       const where = t(REMOTE ? 'st_where_remote' : 'st_where_local');
-      return stScreen(stLangRow() + '<p class="st-kicker">' + esc(CFG.projekt) + '</p><h1 id="st-h">' + esc(t('st_title')) + '</h1>' +
+      const iq = {
+        semester: stQ(esc(t('q_semester')), stRadio('semester', [{v:'1. Semester', l:t('o_sem1')}, {v:'2. bis 3. Semester', l:t('o_sem2')}, {v:'4. Semester oder höher', l:t('o_sem4')}, {v:'Ich studiere nicht', l:t('o_semx')}])),
+        standort: stQ(esc(t('q_campus')), stRadio('standort', CAMPUS_IDS.map(k => ({v:k, l:L(CAMPUS[k].name)})).concat([{v:'andere', l:t('o_campus_x')}]))),
+        letzte_raumsuche: stQ(esc(t('q_lastroom')), stRadio('letzte_raumsuche', [{v:'Diese Woche', l:t('o_lr1')}, {v:'In diesem Monat', l:t('o_lr2')}, {v:'Länger her', l:t('o_lr3')}, {v:'Noch nie', l:t('o_lr4')}]))};
+      return stScreen(stLangRow() + '<p class="st-kicker">' + esc(hd('einstieg', 'zeile', CFG.projekt)) + '</p><h1 id="st-h">' + esc(hd('einstieg', 'titel', t('st_title'))) + '</h1>' +
         '<p>' + esc(t('st_text')) + '</p>' +
         '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('st_box2')) + ' ' + esc(where) + ' ' + esc(t('st_map_note')) + '</p>' +
         (CFG.kontakt ? '<p>' + esc(t('st_contact', {c: CFG.kontakt})) + '</p>' : '') + '</div>' +
         stForm('intro',
-          stQ(esc(t('q_semester')), stRadio('semester', [{v:'1. Semester', l:t('o_sem1')}, {v:'2. bis 3. Semester', l:t('o_sem2')}, {v:'4. Semester oder höher', l:t('o_sem4')}, {v:'Ich studiere nicht', l:t('o_semx')}])) +
-          stQ(esc(t('q_campus')), stRadio('standort', CAMPUS_IDS.map(k => ({v:k, l:L(CAMPUS[k].name)})).concat([{v:'andere', l:t('o_campus_x')}]))) +
-          stQ(esc(t('q_lastroom')), stRadio('letzte_raumsuche', [{v:'Diese Woche', l:t('o_lr1')}, {v:'In diesem Monat', l:t('o_lr2')}, {v:'Länger her', l:t('o_lr3')}, {v:'Noch nie', l:t('o_lr4')}])) +
+          introOrder().map(k => iq[k]).join('') +
           (geoAvailable() ? '<label class="st-check st-check-soft"><input type="checkbox" name="standort_freigabe" value="ja"><span>' + esc(t('st_geo')) + '</span></label>' : '') +
           '<label class="st-check"><input type="checkbox" name="einwilligung" value="ja"><span>' + esc(t('st_consent')) + '</span></label>',
           t('st_go')) +
@@ -4677,10 +4705,10 @@ function studyOverlayHTML(){
     case 'pilot-install': return stScreen('<p class="st-kicker">' + esc(t('g_kicker')) + '</p><h1 id="st-h">' + esc(t('g_title')) + '</h1>' + installGuideHTML(true) +
       '<button class="st-btn" type="button" data-st="guide-ok">' + esc(t('g_ok')) + '</button>');
     case 't1-brief': return stBrief(1, t('t1_title'), t('t1_text', {room: t1Code()}), t('giveup_note'));
-    case 't1-q': return stScreen(stProgress(1) + '<p class="st-kicker">' + esc(t('task_of', {n:1})) + '</p><h1 id="st-h">' + esc(t('q1_title')) + '</h1>' +
+    case 't1-q': return stScreen(stProgress(1) + '<p class="st-kicker">' + esc(hd('aufgabe1', 'zeile', t('task_of', {n:1}))) + '</p><h1 id="st-h">' + esc(hd('aufgabe1', 'titel', t('q1_title'))) + '</h1>' +
       stForm('t1', stQ(esc(t('q1')), stScale('a1_verstaendlich', esc(t('q1_lo')), esc(t('q1_hi')))), t('next')));
     case 't2-brief': return stBrief(2, t('t2_title'), t('t2_text'), t('giveup_note'));
-    case 't2-q': return stScreen(stProgress(2) + '<p class="st-kicker">' + esc(t('task_of', {n:2})) + '</p><h1 id="st-h">' + esc(t('q2_title')) + '</h1>' +
+    case 't2-q': return stScreen(stProgress(2) + '<p class="st-kicker">' + esc(hd('aufgabe2', 'zeile', t('task_of', {n:2}))) + '</p><h1 id="st-h">' + esc(hd('aufgabe2', 'titel', t('q2_title'))) + '</h1>' +
       stForm('t2',
         stQ(esc(t('q2a')), stScale('a2_vertrauen', esc(t('q2a_lo')), esc(t('q2a_hi')))) +
         stQ(esc(t('q2b')), stRadio('a2_lieber', [{v:'Campi fragen', l:t('o_campi')}, {v:'Website der Hochschule durchsuchen', l:t('o_web')}, {v:'Jemanden fragen', l:t('o_person')}])),
@@ -4689,7 +4717,9 @@ function studyOverlayHTML(){
     case 'fragen': {
       const pages = qPages(), page = pages[ST.qPage] || [], last = ST.qPage >= pages.length - 1;
       const ph = ST.qPhase || 'ende', prog = {vorher: 1, nach_a1: 2, nach_a2: 3, ende: 4}[ph];
-      return stScreen((ST.mode === 'pilot' ? '' : stProgress(prog || 4)) + '<p class="st-kicker">' + esc(t(ph === 'ende' ? 'almost' : ph === 'pilot_ende' ? 'q_pilot_end' : 'q_between')) + (pages.length > 1 ? ' · ' + esc(t('page_of', {n: ST.qPage + 1, m: pages.length})) : '') + '</p><h1 id="st-h">' + esc(t(ph === 'pilot_ende' ? 'q_pilot_title' : 'opinion')) + '</h1>' +
+      const pk = ph === 'ende' && page[0] && qTime(page[0].q) === 'schluss' ? 'schluss' : ph;
+      const kick = hd(pk, 'zeile', t(ph === 'ende' ? 'almost' : ph === 'pilot_ende' ? 'q_pilot_end' : 'q_between')), title = hd(pk, 'titel', t(ph === 'pilot_ende' ? 'q_pilot_title' : 'opinion'));
+      return stScreen((ST.mode === 'pilot' ? '' : stProgress(prog || 4)) + '<p class="st-kicker">' + esc(kick) + (pages.length > 1 ? ' · ' + esc(t('page_of', {n: ST.qPage + 1, m: pages.length})) : '') + '</p><h1 id="st-h">' + esc(title) + '</h1>' +
         stForm('fragen', page.map(questionHTML).join(''), last ? t('submit') : t('next')) +
         (ph === 'pilot_ende' ? '<button class="st-link" type="button" data-st="q-skip">' + esc(t('q_skip')) + '</button>' : ''));
     }
