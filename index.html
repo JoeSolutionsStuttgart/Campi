@@ -2334,7 +2334,7 @@ function setRoom(id){
 
 /* ================= App rendering ================= */
 /* build number: set by the build script, used to notice a newer version on the server */
-const CAMPI_BUILD = '20261102-080326';
+const CAMPI_BUILD = '20261102-082821';
 function deviceHTML(){
   return '<div class="device"><div class="app" id="app">' +
     '<div class="statusbar" aria-hidden="true"><span id="sb-time">9:41</span><span class="sb-icons"><i style="width:17px;height:10px"></i><i style="width:15px;height:10px;opacity:.7"></i><i style="width:24px;height:11px;border-radius:3px"></i></span></div>' +
@@ -4262,6 +4262,20 @@ function hd(page, part, def){
   const u = STSET.ueberschriften && STSET.ueberschriften[page], v = u && u[LANG] && u[LANG][part];
   return typeof v === 'string' && v.trim() ? v.trim().slice(0, 120) : def;
 }
+/* where each entry question is asked: 'einstieg' (first page, default) or a point in time like the other questions */
+function introTime(k){ const z = STSET.einstieg_zeitpunkte && STSET.einstieg_zeitpunkte[k]; return ['vorher', 'nach_a1', 'nach_a2', 'ende', 'schluss'].includes(z) ? z : 'einstieg'; }
+function introOnFirstPage(){ return introOrder().filter(k => introTime(k) === 'einstieg'); }
+const INTRO_DEF = {
+  semester: {key: 'q_semester', opts: [['1. Semester', 'o_sem1'], ['2. bis 3. Semester', 'o_sem2'], ['4. Semester oder höher', 'o_sem4'], ['Ich studiere nicht', 'o_semx']]},
+  standort: {key: 'q_campus', opts: CAMPUS_IDS.map(k => [k, null]).concat([['andere', 'o_campus_x']])},
+  letzte_raumsuche: {key: 'q_lastroom', opts: [['Diese Woche', 'o_lr1'], ['In diesem Monat', 'o_lr2'], ['Länger her', 'o_lr3'], ['Noch nie', 'o_lr4']]}};
+/* an entry question moved to a later point becomes a question in the questionnaire; its answer goes into the session like before */
+function introAsQuestion(k){
+  const d = INTRO_DEF[k], tr = {};
+  LANGS.forEach(l => { tr[l] = {frage: t(d.key, null, l), optionen: d.opts.map(o => o[1] ? t(o[1], null, l) : L(CAMPUS[o[0]].name, l))}; });
+  return {id: null, intro: k, typ: 'einfach', frage: t(d.key, null, 'de'), optionen: d.opts.map(o => o[0]), pflicht: true, zeitpunkt: introTime(k), uebersetzungen: tr};
+}
+function withIntroQuestions(list){ return introOrder().filter(k => introTime(k) !== 'einstieg').map(introAsQuestion).concat(list || []); }
 function introOrder(){
   const o = Array.isArray(STSET.einstieg_reihenfolge) ? STSET.einstieg_reihenfolge.filter((k, i, a) => INTRO_KEYS.includes(k) && a.indexOf(k) === i) : [];
   return o.concat(INTRO_KEYS.filter(k => !o.includes(k)));
@@ -4356,17 +4370,18 @@ function validQuestion(q){
 let qsLoading = null;
 function loadQuestions(){ if(!qsLoading) qsLoading = loadQuestions0().finally(() => { qsLoading = null; }); return qsLoading; }
 async function loadQuestions0(){
-  if(!REMOTE){ ST.qs = DEFAULT_QUESTIONS; ST.qsSource = 'standard'; return; }
+  if(!REMOTE){ ST.qs = withIntroQuestions(DEFAULT_QUESTIONS); ST.qsSource = 'standard'; return; }
   const ms = netSlow() ? 6000 : 10000, sel = 'id,position,typ,frage,hinweis,optionen,skala_min,skala_max,pflicht,schluessel';
-  const got = rows => { ST.qs = (Array.isArray(rows) ? rows : []).filter(validQuestion); ST.qsSource = 'datenbank'; lsSet(QCACHE_KEY, JSON.stringify({zeit: new Date().toISOString(), fragen: ST.qs})); };
+  const got = rows => { ST.qs = withIntroQuestions((Array.isArray(rows) ? rows : []).filter(validQuestion)); ST.qsSource = 'datenbank'; lsSet(QCACHE_KEY, JSON.stringify({zeit: new Date().toISOString(), fragen: ST.qs.filter(q => !q.intro)})); };
   for(const extra of [',uebersetzungen,zeitpunkt', ',uebersetzungen', '']){
     try { got(await SB.get('fragen?select=' + sel + extra + '&aktiv=is.true&order=position.asc,erstellt.asc', ms)); return; }
     catch(e){ if(!(e && e.status)) break; }          /* 400: column not there yet (older supabase-setup.sql), try with fewer columns */
   }
-  try { const c = JSON.parse(lsGet(QCACHE_KEY) || 'null'); if(c && Array.isArray(c.fragen) && c.fragen.length){ ST.qs = c.fragen.filter(validQuestion); ST.qsSource = 'zwischenspeicher'; return; } } catch(e){}
-  ST.qs = DEFAULT_QUESTIONS; ST.qsSource = 'standard';
+  try { const c = JSON.parse(lsGet(QCACHE_KEY) || 'null'); if(c && Array.isArray(c.fragen) && c.fragen.length){ ST.qs = withIntroQuestions(c.fragen.filter(validQuestion)); ST.qsSource = 'zwischenspeicher'; return; } } catch(e){}
+  ST.qs = withIntroQuestions(DEFAULT_QUESTIONS); ST.qsSource = 'standard';
 }
 function qText(q){
+  if(q.intro){ const tr = q.uebersetzungen[LANG] || q.uebersetzungen.de; return {frage: tr.frage, hinweis: '', opts: q.optionen.map((v, i) => ({v, l: tr.optionen[i]})), lo: '', hi: '', uebersetzt: false}; }
   const tr = (q.uebersetzungen && typeof q.uebersetzungen === 'object' && q.uebersetzungen[LANG]) || {};
   const opts = (q.optionen || []).map((v, i) => ({v, l: (Array.isArray(tr.optionen) && typeof tr.optionen[i] === 'string' && tr.optionen[i].trim()) ? tr.optionen[i] : v}));
   return {frage: (LANG !== 'de' && tr.frage) || q.frage, hinweis: (LANG !== 'de' && tr.hinweis) || q.hinweis || '', opts,
@@ -4404,6 +4419,7 @@ function saveAnswers(){
     const v = ST.answers[i];
     if(ST.saved[i] || v === undefined || v === '' || (Array.isArray(v) && !v.length)) return;
     ST.saved[i] = true;
+    if(q.intro){ ST.rec[q.intro] = v; enqueue('sitzungen', {id: ST.sid, modus: ST.mode === 'pilot' ? 'pilot' : 'test', [q.intro]: v}); return; }
     enqueue('antworten', {id: uuid(), sitzung_id: ST.sid, frage_id: q.id || null, frage: q.frage.slice(0, 300), typ: q.typ, wert: v});
   });
 }
@@ -4684,7 +4700,7 @@ function studyOverlayHTML(){
         '<div class="st-box"><b>' + icon('info') + esc(t('st_box')) + '</b><p>' + esc(t('st_box2')) + ' ' + esc(where) + ' ' + esc(t('st_map_note')) + '</p>' +
         (CFG.kontakt ? '<p>' + esc(t('st_contact', {c: CFG.kontakt})) + '</p>' : '') + '</div>' +
         stForm('intro',
-          introOrder().map(k => iq[k]).join('') +
+          introOnFirstPage().map(k => iq[k]).join('') +
           (geoAvailable() ? '<label class="st-check st-check-soft"><input type="checkbox" name="standort_freigabe" value="ja"><span>' + esc(t('st_geo')) + '</span></label>' : '') +
           '<label class="st-check"><input type="checkbox" name="einwilligung" value="ja"><span>' + esc(t('st_consent')) + '</span></label>',
           t('st_go')) +
@@ -4835,8 +4851,10 @@ function requireFields(f, names){
 }
 function onConsent(d){
   ST.tStart = performance.now(); ST.stepSince = ST.tStart; ST.tWall = Date.now();
-  const campus = CAMPUS[d.standort] ? d.standort : 'FL';
-  if(CAMPUS[d.standort]) { state.campus = d.standort; lsSet(CAMPUS_KEY, d.standort); } else state.campus = 'FL';
+  /* campus for the tasks: the answer, otherwise (question asked later) the campus last chosen on this device, otherwise Flandernstraße */
+  const campus = CAMPUS[d.standort] ? d.standort : (introTime('standort') !== 'einstieg' && CAMPUS[state.campus] ? state.campus : 'FL');
+  if(CAMPUS[d.standort]) lsSet(CAMPUS_KEY, d.standort);
+  state.campus = campus;
   state.room = CAMPUS[state.campus].next.room; state.start = CAMPUS[state.campus].defStart;
   ST.t1room = CAMPUS[campus].t1;
   ST.geoOk = d.standort_freigabe === 'ja';
@@ -4859,7 +4877,7 @@ document.addEventListener('submit', e => {
   if(!ST.active) return;
   const k = f.dataset.stForm;
   if(k === 'intro'){
-    const d = requireFields(f, ['semester','standort','letzte_raumsuche','einwilligung']); if(!d) return;
+    const d = requireFields(f, introOnFirstPage().concat(['einwilligung'])); if(!d) return;
     onConsent(d);
   } else if(k === 'pilot'){
     const d = requireFields(f, ['einwilligung']); if(!d) return;
