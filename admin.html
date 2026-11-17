@@ -376,7 +376,8 @@ const S = {
   auth: (() => { try { const a = JSON.parse(lsGet(AUTH_KEY) || 'null'); return a && a.access_token ? a : null; } catch(e){ return null; } })(),
   admin: null, data: null, loading: false, error: '', notice: '', loginError: '', loginBusy: false, loadedAt: null,
   tab: 'uebersicht', filter: {zeit:'alle', geraet:'alle', gruppe:'alle', modus:'alle', fertig:false}, auto: false,
-  edit: null, editError: '', armed: '', detail: null, busy: false, ivEdit: null, ivError: '', person: null, tlAll: false, geo: null
+  edit: null, editError: '', armed: '', detail: null, busy: false, ivEdit: null, ivError: '', person: null, tlAll: false, geo: null,
+  radar: {q: '', quelle: 'alle', thema: 'alle', sprache: 'alle', campus: 'alle', raster: 'tag', offen: false, ohneHallo: true, open: '', alle: false}
 };
 try { const u = JSON.parse(lsGet(UI_KEY) || 'null'); if(u){ if(u.tab) S.tab = u.tab; if(u.filter) Object.assign(S.filter, u.filter); } } catch(e){}
 function saveUI(){ lsSet(UI_KEY, JSON.stringify({tab: S.tab, filter: S.filter})); }
@@ -2737,6 +2738,370 @@ async function exportXlsx(ext){
 }
 
 /* ================= Darstellung ================= */
+/* RADAR_START */
+
+/* ================= Fragen-Radar (Version 19) =================
+   Sammelt alles, was Studierende eingetippt haben (Fragen an Campi, Raumsuche), fasst gleiche Anliegen zusammen
+   und zeigt, was sie am meisten beschäftigt und wann.
+   Zusammenfassen:
+   - Raumnummern: F02.227, f02227, f.2227, F 02 227 und 02.227 sind derselbe Raum (Ziffern normalisiert, Buchstabe optional)
+   - Wörter: klein, ohne Umlaute und Satzzeichen, Füllwörter weg, Synonyme und Tippfehler auf ein Stichwort
+     (Essen, Speiseplan, Mensx, lunch -> mensa); gleiche Stichwörter = gleiches Anliegen, egal in welcher Reihenfolge
+   - Thema: eigene Stichwortliste, sonst das Thema, das die App selbst erkannt hat
+   - Raumsuche: Zwischenstände beim Tippen (b, bi, bib …) zählen nicht, nur die letzte Eingabe; halbe Raumnummern auch nicht */
+const RD_THEMES = ['Mensa & Essen', 'Raumsuche', 'Bibliothek & Lernen', 'Öffnungszeiten', 'Prüfungen', 'Fristen & Anmeldung', 'Studienorganisation', 'IT & WLAN', 'Drucken',
+  'Anfahrt & Parken', 'Veranstaltungen', 'Stadtleben', 'Hochschulsport', 'Wohnen & Geld', 'App-Hilfe', 'Begrüßung & Smalltalk', 'Sonstiges'];
+const RD_APP_TOPIC = {'Mensa':'Mensa & Essen', 'Raumsuche':'Raumsuche', 'Prüfungen':'Prüfungen', 'Fristen und Rückmeldung':'Fristen & Anmeldung', 'Studienorganisation':'Studienorganisation',
+  'IT':'IT & WLAN', 'Anfahrt':'Anfahrt & Parken', 'Veranstaltungen':'Veranstaltungen', 'Stadtleben':'Stadtleben', 'Hochschulsport':'Hochschulsport', 'Wohnen und Stadt':'Wohnen & Geld',
+  'App-Hilfe':'App-Hilfe', 'Begrüßung':'Begrüßung & Smalltalk', 'Bibliothek':'Bibliothek & Lernen', 'Drucken':'Drucken', 'Öffnungszeiten':'Öffnungszeiten'};
+/* stem -> words (already folded: ä=ae, ö=oe, ü=ue, ß=ss); the stem is also the theme hint */
+const RD_SYN = {
+  mensa: ['mensa', 'mensen', 'essen', 'speiseplan', 'speisekarte', 'mittagessen', 'mittag', 'kantine', 'cafeteria', 'cafe', 'kaffee', 'food', 'lunch', 'menu', 'meal', 'meals', 'canteen', 'comida', 'comedor', 'pranzo', 'mensa', 'repas', 'yemek', 'vegan', 'vegetarisch', 'vegetarian', 'gericht', 'gerichte', 'hunger', 'essensplan', 'tagesgericht', 'preis', 'preise'],
+  bibliothek: ['bibliothek', 'bib', 'bibo', 'bibi', 'bibliotheken', 'library', 'buecherei', 'biblioteca', 'bibliotheque', 'kuetuephane', 'kutuphane', 'lernraum', 'lernraeume', 'lernplatz', 'lernplaetze', 'gruppenraum', 'ausleihe', 'ausleihen', 'buch', 'buecher'],
+  oeffnung: ['offen', 'geoeffnet', 'oeffnungszeiten', 'oeffnungszeit', 'oeffnet', 'oeffnen', 'open', 'opening', 'hours', 'zu', 'geschlossen', 'closed', 'abierto', 'aperto', 'ouvert', 'acik', 'uhrzeit', 'zeiten'],
+  pruefung: ['pruefung', 'pruefungen', 'klausur', 'klausuren', 'exam', 'exams', 'examen', 'esame', 'sinav', 'pruefungsamt', 'nachpruefung', 'wiederholung'],
+  anmeldung: ['anmeldung', 'anmelden', 'abmeldung', 'abmelden', 'rueckmeldung', 'rueckmelden', 'einschreibung', 'einschreiben', 'frist', 'fristen', 'deadline', 'deadlines', 'registration', 'register', 'semesterbeitrag', 'bewerbung', 'bewerben'],
+  drucken: ['drucken', 'drucker', 'druck', 'ausdrucken', 'print', 'printer', 'printing', 'kopieren', 'kopierer', 'scannen', 'scanner', 'imprimir', 'stampare', 'imprimer', 'yazdirmak'],
+  wlan: ['wlan', 'wifi', 'wi', 'fi', 'eduroam', 'internet', 'vpn', 'passwort', 'password', 'login', 'einloggen', 'account', 'konto', 'email', 'mail', 'moodle', 'it', 'rechenzentrum', 'software', 'lizenz'],
+  anfahrt: ['anfahrt', 'bus', 'busse', 'bahn', 'sbahn', 's1', 'zug', 'parken', 'parkplatz', 'parkplaetze', 'parkhaus', 'auto', 'fahrrad', 'haltestelle', 'oepnv', 'vvs', 'ticket', 'deutschlandticket', 'parking', 'train', 'station', 'bahnhof'],
+  raum: ['raum', 'raeume', 'room', 'rooms', 'hoersaal', 'hoersaele', 'saal', 'gebaeude', 'building', 'labor', 'lab', 'aula', 'zimmer', 'aula', 'stockwerk', 'etage', 'sala', 'aula', 'salle', 'oda', 'derslik', 'wo', 'where', 'finden', 'find', 'weg'],
+  veranstaltung: ['veranstaltung', 'veranstaltungen', 'event', 'events', 'party', 'partys', 'feier', 'fest', 'konzert', 'konzerte', 'vortrag', 'workshop', 'messe', 'karrieremesse', 'evento', 'evenement', 'etkinlik', 'los', 'programm'],
+  stadt: ['stadt', 'esslingen', 'goeppingen', 'stuttgart', 'kneipe', 'bar', 'bars', 'club', 'kino', 'ausgehen', 'freizeit', 'altstadt', 'weihnachtsmarkt', 'restaurant', 'restaurants'],
+  sport: ['sport', 'hochschulsport', 'fitness', 'gym', 'fussball', 'volleyball', 'basketball', 'yoga', 'laufen', 'schwimmen', 'kurs', 'kurse', 'deporte', 'spor'],
+  wohnen: ['wohnen', 'wohnung', 'wohnheim', 'wg', 'zimmer', 'miete', 'bafoeg', 'geld', 'stipendium', 'job', 'jobs', 'nebenjob', 'werkstudent', 'housing', 'dorm', 'rent'],
+  studium: ['stundenplan', 'vorlesung', 'vorlesungen', 'modul', 'module', 'semester', 'studiengang', 'ects', 'noten', 'note', 'praktikum', 'praxissemester', 'auslandssemester', 'erasmus', 'professor', 'sekretariat', 'studienberatung', 'beratung', 'lsf', 'stundenplaene', 'timetable', 'lecture', 'course'],
+  app: ['campi', 'app', 'installieren', 'installation', 'homebildschirm', 'startbildschirm', 'sprache', 'language', 'einstellungen', 'hilfe', 'help', 'funktioniert', 'bug', 'fehler'],
+  hallo: ['hallo', 'hi', 'hey', 'moin', 'servus', 'danke', 'thanks', 'hello', 'hola', 'ciao', 'bonjour', 'merhaba', 'tschuess', 'bye', 'wer', 'bist', 'du']
+};
+RD_SYN.vegan = ['vegan', 'vegane', 'veganes', 'veganer', 'vegetarisch', 'vegetarische', 'vegetarian', 'veggie', 'fleischlos'];
+RD_SYN.mensa = RD_SYN.mensa.filter(w => !RD_SYN.vegan.includes(w));
+const RD_STEM_THEME = {vegan:'Mensa & Essen', mensa:'Mensa & Essen', bibliothek:'Bibliothek & Lernen', oeffnung:'Öffnungszeiten', pruefung:'Prüfungen', anmeldung:'Fristen & Anmeldung', drucken:'Drucken', wlan:'IT & WLAN',
+  anfahrt:'Anfahrt & Parken', raum:'Raumsuche', veranstaltung:'Veranstaltungen', stadt:'Stadtleben', sport:'Hochschulsport', wohnen:'Wohnen & Geld', studium:'Studienorganisation', app:'App-Hilfe', hallo:'Begrüßung & Smalltalk'};
+/* order decides the theme when several stems occur ("Wann hat die Bib offen" -> Bibliothek, not Öffnungszeiten) */
+const RD_STEM_PRIO = ['drucken', 'bibliothek', 'mensa', 'vegan', 'pruefung', 'anmeldung', 'wlan', 'anfahrt', 'sport', 'wohnen', 'veranstaltung', 'stadt', 'studium', 'app', 'raum', 'oeffnung', 'hallo'];
+const RD_STEM_LABEL = {mensa:'Mensa', bibliothek:'Bibliothek', oeffnung:'Öffnungszeiten', pruefung:'Prüfung', anmeldung:'Anmeldung/Frist', drucken:'Drucken', wlan:'WLAN/IT', anfahrt:'Anfahrt',
+  raum:'Raum', veranstaltung:'Veranstaltungen', stadt:'Stadt', sport:'Sport', wohnen:'Wohnen', studium:'Studium', app:'Campi-App', hallo:'Hallo'};
+/* words that never make a difference */
+const RD_STOP = new Set(('der die das den dem des ein eine einen einem einer und oder aber ist sind bin bist war hat haben habe gibt gibts es ich du man mir mich mein meine wir ihr sie er im in am an auf aus bei mit nach von vor zu zum zur ' +
+  'fuer ueber unter wie was wann wer welche welcher welches wieviel viele viel kann koennen kannst muss muessen soll sollte bitte mal noch schon auch denn doch ja nein nicht kein keine heute morgen jetzt gerade ' +
+  'hier dort da dann so sehr gut gute neue alle alles etwas eigentlich bzw ca the a an is are was were do does did i you we my me to of for in on at it this that what when how which can could please today tomorrow now there here ' +
+  'el la los las de del en que es un una por para el y o le les des du et est une pour il lo gli di che e per una con bir ve ne nerede zaman mi mu').split(' '));
+const RD_VOCAB = (() => { const m = new Map(); Object.entries(RD_SYN).forEach(([stem, ws]) => ws.forEach(w => { if(!m.has(w)) m.set(w, stem); })); return m; })();
+const RD_VOCAB_LONG = [...RD_VOCAB.keys()].filter(w => w.length >= 5);
+function rdFold(s){ return String(s || '').toLowerCase().replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss').normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+function rdLev(a, b, max){
+  if(Math.abs(a.length - b.length) > max) return max + 1;
+  let prev = Array.from({length: b.length + 1}, (_, i) => i);
+  for(let i = 1; i <= a.length; i++){
+    const cur = [i]; let best = i;
+    for(let j = 1; j <= b.length; j++){ cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); if(cur[j] < best) best = cur[j]; }
+    if(best > max) return max + 1; prev = cur;
+  }
+  return prev[b.length];
+}
+const RD_TYPO = new Map();
+function rdWord(w){
+  if(RD_VOCAB.has(w)) return {stem: RD_VOCAB.get(w), w: w};
+  if(w.length < 4) return {stem: null, w};
+  if(!RD_TYPO.has(w)){
+    const max = w.length >= 8 ? 2 : 1; let hit = null;
+    for(const v of RD_VOCAB_LONG){ if(rdLev(w, v, max) <= max){ hit = v; break; } }
+    RD_TYPO.set(w, hit);
+  }
+  const h = RD_TYPO.get(w);
+  if(h) return {stem: RD_VOCAB.get(h), w: h};
+  /* compound words: Prüfungsanmeldung -> Prüfung + Anmeldung, Mensaplan -> Mensa */
+  if(w.length >= 7){
+    const parts = RD_VOCAB_LONG.filter(v => w.includes(v)).map(v => RD_VOCAB.get(v));
+    if(parts.length) return {stem: parts[0], stems: [...new Set(parts)], w};
+  }
+  return {stem: null, w};
+}
+/* room numbers: optional letter, 1-2 digit building, 3 digit room, any separators in between */
+const RD_ROOM_RE = /(?:^|[^a-z0-9])([a-z])?\s*[.\-\/]?\s*(\d{1,2})\s*[.\-\/,]?\s*(\d{3})(?![0-9])/i;
+function rdRoom(text){
+  const m = RD_ROOM_RE.exec(rdFold(text));
+  if(!m) return null;
+  const sep = /\d{1,2}\s*[.\-\/,]\s*\d{3}/.test(m[0]);
+  const digits = m[2] + m[3];
+  if(!m[1] && !sep && digits.length < 4) return null;          /* "105" alone could be a bus line */
+  if(/^(19|20)\d{2}$/.test(digits) && !m[1] && !sep) return null; /* a year like 2026 */
+  if(!sep && digits.length === 4 && digits[0] === '0') return null;  /* "s0110": half typed (s01105) */
+  return {letter: m[1] ? m[1].toUpperCase() : '', code: m[2].padStart(2, '0') + '.' + m[3]};
+}
+function rdAnalyse(text, appTopic){
+  const room = rdRoom(text);
+  const words = rdFold(text).replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+  const stems = new Set(), rest = new Set();
+  words.forEach(w0 => {
+    if(RD_STOP.has(w0)) return;
+    if(/^\d+$/.test(w0)) return;
+    const r = rdWord(w0);
+    if(r.stems) r.stems.forEach(x => stems.add(x)); else if(r.stem) stems.add(r.stem); else if(w0.length >= 3) rest.add(w0);
+  });
+  if(room){ stems.add('raum'); }
+  const stemList = RD_STEM_PRIO.filter(s => stems.has(s));
+  let theme = stemList.length ? RD_STEM_THEME[stemList[0]] : (RD_APP_TOPIC[appTopic] || 'Sonstiges');
+  if(room) theme = 'Raumsuche';
+  /* the concern: a room, or the stems (+ unknown words when there are no stems) */
+  let key, label;
+  if(room){ key = 'raum:' + room.code; label = null; }
+  else if(stemList.length){
+    /* "wo" / "finden" only matter when nothing else is there */
+    const main = stemList.length > 1 ? stemList.filter(s => s !== 'raum' && s !== 'hallo') : stemList;
+    key = 's:' + main.slice().sort().join('+') + (main.includes('raum') && rest.size ? '|' + [...rest].sort().join('+') : '');
+    label = null;
+  } else if(rest.size){ key = 'w:' + [...rest].sort().join('+'); label = null; }
+  else { key = 't:' + rdFold(text).replace(/[^a-z0-9]/g, ''); label = null; }
+  return {key, room, theme, stems: stemList};
+}
+function rdClean(text){ const t = String(text || '').replace(/\s+/g, ' ').trim(); return t.length > 140 ? t.slice(0, 139) + '…' : t; }
+
+/* all inputs in the current filter, with time, source, person, answered flag */
+function rdItems(v){
+  const sBy = new Map(v.sess.map(s => [s.id, s])), out = [];
+  Object.keys(v.evBy).forEach(sid => {
+    const s = sBy.get(sid); if(!s) return;
+    const evs = v.evBy[sid].filter(e => e.daten && (e.typ === 'chat_frage' || e.typ === 'chat_antwort' || e.typ === 'suche'));
+    for(let i = 0; i < evs.length; i++){
+      const e = evs[i], d = e.daten, t = evTime(e, s);
+      if(e.typ === 'chat_frage' && typeof d.text === 'string' && d.text.trim()){
+        const ans = evs.slice(i + 1, i + 4).find(x => x.typ === 'chat_antwort' && Math.abs((Number(x.zeit_ms) || 0) - (Number(e.zeit_ms) || 0)) < 20000);
+        const src = d.quelle === 'vorschlag' || d.quelle === 'hilfe' ? 'vorschlag' : 'getippt';
+        out.push({text: rdClean(d.text), t, sid, person: s.pilot_id || s.id, src, srcRaw: d.quelle || 'eingabe', answered: ans ? !!ans.daten.beantwortet : null, appTopic: ans && ans.daten.thema, lang: s.sprache_app || '', campus: s.standort || '', modus: s.modus});
+      } else if(e.typ === 'suche' && typeof d.text === 'string' && d.text.trim()){
+        /* only the last state of a typing burst: skip if the next search follows within 60 s and continues/corrects this text */
+        const nx = evs.slice(i + 1).find(x => x.typ === 'suche');
+        if(nx && nx.daten && typeof nx.daten.text === 'string'){
+          const a = rdFold(d.text).trim(), b2 = rdFold(nx.daten.text).trim(), dt = evTime(nx, s) - t;
+          if(dt >= 0 && dt < 60000 && (b2.startsWith(a) || a.startsWith(b2) || rdLev(a, b2, 2) <= 2)) continue;
+        }
+        if(rdFold(d.text).trim().length < 2) continue;
+        { const ft = rdFold(d.text).trim(); if(/^[a-z]?[\s.\-]*[\d\s.\-]+$/.test(ft) && /\d/.test(ft) && ft.replace(/\D/g, '').length <= 3) continue; }   /* half a room number (F02.2, f.22) */
+        out.push({text: rdClean(d.text), t, sid, person: s.pilot_id || s.id, src: 'suche', srcRaw: 'raumsuche', answered: Number(d.treffer) > 0, appTopic: 'Raumsuche', lang: s.sprache_app || '', campus: s.standort || '', modus: s.modus});
+      }
+    }
+  });
+  /* the same question sent twice within a minute counts once */
+  out.sort((a, b) => a.t - b.t);
+  const seen = new Map();
+  return out.filter(it => { const k = it.sid + '|' + rdFold(it.text).replace(/[^a-z0-9]/g, ''); const last = seen.get(k); seen.set(k, it.t); return !(last && it.t - last < 60000); });
+}
+let RD_CACHE = {data: null, key: '', res: null};
+function rdCompute(v){
+  const ck = v.sess.length + '|' + v.ev.length + '|' + JSON.stringify(S.filter);
+  if(RD_CACHE.data === S.data && RD_CACHE.key === ck) return RD_CACHE.res;
+  const items = rdItems(v);
+  items.forEach(it => Object.assign(it, rdAnalyse(it.text, it.appTopic)));
+  /* a room number without letter joins the lettered version if there is exactly one letter for it */
+  const letters = {};
+  items.forEach(it => { if(it.room && it.room.letter) (letters[it.room.code] = letters[it.room.code] || new Set()).add(it.room.letter); });
+  /* rooms the app knows (S = Stadtmitte, F = Flandernstraße, G = Göppingen) */
+  const known = {};
+  Object.values((typeof ESS !== 'undefined' && ESS.rooms) || {}).forEach(lbl => { const m = /^([A-Z]) (\d\d\.\d{3})$/.exec(lbl); if(m) (known[m[2]] = known[m[2]] || new Set()).add(m[1]); });
+  Object.keys(known).forEach(code => { if(!letters[code] && known[code].size === 1 && items.some(it => it.room && it.room.code === code)) letters[code] = new Set(known[code]); });
+  items.forEach(it => { if(it.room){ const L = letters[it.room.code]; const letter = it.room.letter || (L && L.size === 1 ? [...L][0] : ''); it.key = 'raum:' + (L && L.size > 1 ? letter : '') + it.room.code; it.roomLabel = (letter ? letter + ' ' : '') + it.room.code; } });
+  RD_CACHE = {data: S.data, key: ck, res: items};
+  return items;
+}
+function rdLabel(c){
+  if(c.items[0].room) return 'Raum ' + c.items[0].roomLabel;
+  /* the most frequent wording, otherwise the shortest */
+  const cnt = countBy(c.items, it => it.text.toLowerCase().replace(/[?!.]+$/, ''));
+  const best = [...cnt.entries()].sort((a, b) => b[1] - a[1] || a[0].length - b[0].length)[0][0];
+  const orig = c.items.find(it => it.text.toLowerCase().replace(/[?!.]+$/, '') === best).text.replace(/[?!.]+$/, '');
+  return orig.charAt(0).toUpperCase() + orig.slice(1);
+}
+function rdFiltered(v){
+  const R = S.radar, all = rdCompute(v), q = rdFold(R.q || '').trim();
+  return all.filter(it => (R.quelle === 'alle' ? it.src !== 'vorschlag' : R.quelle === 'mitvorschlag' ? true : it.src === R.quelle) &&
+    (R.thema === 'alle' || it.theme === R.thema) && (R.sprache === 'alle' || it.lang === R.sprache) && (R.campus === 'alle' || it.campus === R.campus) &&
+    (!R.offen || it.answered === false) && (!R.ohneHallo || it.theme !== 'Begrüßung & Smalltalk') &&
+    (!q || rdFold(it.text).includes(q) || (it.roomLabel && rdFold(it.roomLabel).replace(/\s/g, '').includes(q.replace(/[\s.]/g, '').replace(/^([a-z]?)(\d)/, '$1$2'))) || rdFold(it.theme).includes(q)));
+}
+function rdClusters(items){
+  const by = new Map();
+  items.forEach(it => { const c = by.get(it.key) || {key: it.key, items: []}; c.items.push(it); by.set(it.key, c); });
+  const now = Date.now(), wk = 7 * 864e5;
+  return [...by.values()].map(c => {
+    const themes = countBy(c.items, it => it.theme), theme = [...themes.entries()].sort((a, b) => b[1] - a[1])[0][0];
+    const variants = [...countBy(c.items, it => it.text.trim()).entries()].sort((a, b) => b[1] - a[1]);
+    const ans = c.items.filter(it => it.answered !== null);
+    return Object.assign(c, {label: rdLabel(c), theme, n: c.items.length, people: new Set(c.items.map(it => it.person)).size, variants,
+      open: ans.filter(it => !it.answered).length, answeredKnown: ans.length, last: Math.max(...c.items.map(it => it.t)),
+      recent: c.items.filter(it => it.t >= now - wk).length, before: c.items.filter(it => it.t < now - wk && it.t >= now - 2 * wk).length});
+  }).sort((a, b) => b.n - a.n || b.people - a.people || b.last - a.last);
+}
+/* time buckets */
+function rdBucket(t, g){
+  const d = new Date(t);
+  if(g === 'stunde'){ d.setMinutes(0, 0, 0); return d.getTime(); }
+  if(g === 'woche'){ d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return d.getTime(); }
+  d.setHours(0, 0, 0, 0); return d.getTime();
+}
+function rdSeries(items, g){
+  if(!items.length) return [];
+  const step = g === 'stunde' ? 3600e3 : g === 'woche' ? 7 * 864e5 : 864e5;
+  const first = rdBucket(Math.min(...items.map(i => i.t)), g), last = rdBucket(Math.max(Date.now(), ...items.map(i => i.t)), g);
+  const n = Math.min(400, Math.round((last - first) / step) + 1), counts = new Map(), tops = new Map();
+  items.forEach(it => { const b = rdBucket(it.t, g); counts.set(b, (counts.get(b) || 0) + 1); const m = tops.get(b) || new Map(); m.set(it.theme, (m.get(it.theme) || 0) + 1); tops.set(b, m); });
+  const pts = [];
+  for(let i = 0; i < n; i++){
+    /* step by calendar (summer/winter time safe) */
+    const d = new Date(first); if(g === 'stunde') d.setHours(d.getHours() + i); else d.setDate(d.getDate() + i * (g === 'woche' ? 7 : 1));
+    const b = rdBucket(d.getTime(), g), m = tops.get(b), top = m ? [...m.entries()].sort((x, y) => y[1] - x[1])[0] : null;
+    pts.push({t: b, value: counts.get(b) || 0, top});
+  }
+  return pts.slice(-(g === 'stunde' ? 168 : g === 'woche' ? 52 : 120));
+}
+function rdTimeLabel(t, g, long){
+  const d = new Date(t), wd = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][d.getDay()], dm = d.getDate() + '.' + (d.getMonth() + 1) + '.';
+  if(g === 'stunde') return long ? wd + ' ' + dm + ', ' + d.getHours() + '–' + (d.getHours() + 1) + ' Uhr' : (d.getHours() === 0 ? wd + ' ' + dm : d.getHours() + ' h');
+  if(g === 'woche') return (long ? 'Woche ab ' : '') + dm;
+  return long ? wd + ' ' + dm + d.getFullYear() : dm;
+}
+function rdColumns(pts, g){
+  if(!pts.length || !pts.some(p => p.value)) return empty('Keine Eingaben im gewählten Zeitraum.');
+  const max = Math.max(...pts.map(p => p.value)) || 1, every = Math.ceil(pts.length / 12), maxIdx = pts.findIndex(p => p.value === max);
+  return '<div class="cols rd-cols">' + pts.map((p, i) => '<div class="col" data-tip="' + esc(rdTimeLabel(p.t, g, true) + ': ' + p.value + (p.value === 1 ? ' Eingabe' : ' Eingaben') + (p.top ? ' · meist ' + p.top[0] + ' (' + p.top[1] + ')' : '')) + '">' +
+      (i === maxIdx && p.value ? '<b style="bottom:' + (p.value / max * 100) + '%">' + p.value + '</b>' : '') +
+      '<i style="height:' + (p.value / max * 100).toFixed(1) + '%"></i></div>').join('') + '</div>' +
+    '<div class="col-l" aria-hidden="true">' + pts.map((p, i) => '<span>' + (i % every === 0 ? esc(rdTimeLabel(p.t, g, false)) : '') + '</span>').join('') + '</div>';
+}
+/* weekday x time of day: when are questions asked? */
+function rdHeat(items){
+  const slots = [[0, 8, 'bis 8'], [8, 10, '8–10'], [10, 12, '10–12'], [12, 14, '12–14'], [14, 16, '14–16'], [16, 18, '16–18'], [18, 20, '18–20'], [20, 24, 'ab 20']];
+  const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'], grid = days.map(() => slots.map(() => ({n: 0, th: new Map()})));
+  items.forEach(it => { const d = new Date(it.t), di = (d.getDay() + 6) % 7, h = d.getHours(), si = slots.findIndex(s => h >= s[0] && h < s[1]); const c = grid[di][si]; c.n++; c.th.set(it.theme, (c.th.get(it.theme) || 0) + 1); });
+  const max = Math.max(1, ...grid.flat().map(c => c.n));
+  return '<div class="rd-heat" role="table" aria-label="Eingaben nach Wochentag und Uhrzeit"><div role="row" class="rd-hr"><span></span>' + slots.map(s => '<span role="columnheader">' + s[2] + '</span>').join('') + '</div>' +
+    grid.map((row, di) => '<div role="row" class="rd-hr"><span role="rowheader">' + days[di] + '</span>' + row.map((c, si) => {
+      const top = [...c.th.entries()].sort((a, b) => b[1] - a[1])[0], lvl = c.n ? Math.max(12, Math.round(c.n / max * 100)) : 0;
+      return '<span role="cell" class="rd-cell' + (c.n / max > .55 ? ' hi' : '') + '" style="--l:' + lvl + '%" data-tip="' + esc(days[di] + ', ' + slots[si][2] + ' Uhr: ' + c.n + (c.n === 1 ? ' Eingabe' : ' Eingaben') + (top ? ' · meist ' + top[0] + ' (' + top[1] + ')' : '')) + '">' + (c.n || '') + '</span>';
+    }).join('') + '</div>').join('') + '</div>';
+}
+/* peaks: hours with clearly more questions than usual */
+function rdPeaks(items){
+  const by = new Map();
+  items.forEach(it => { const b = rdBucket(it.t, 'stunde'), o = by.get(b) || {t: b, n: 0, th: new Map(), cl: new Map()}; o.n++; o.th.set(it.theme, (o.th.get(it.theme) || 0) + 1); o.cl.set(it.key, (o.cl.get(it.key) || 0) + 1); by.set(b, o); });
+  const vals = [...by.values()], sorted = vals.map(o => o.n).sort((a, b) => a - b), med = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 0;
+  return vals.filter(o => o.n >= 3 && o.n >= 2 * Math.max(1, med)).sort((a, b) => b.n - a.n).slice(0, 5).map(o => Object.assign(o, {top: [...o.th.entries()].sort((a, b) => b[1] - a[1])[0], topKey: [...o.cl.entries()].sort((a, b) => b[1] - a[1])[0]}));
+}
+function viewRadar(v){
+  const R = S.radar, all = rdCompute(v), items = rdFiltered(v), cl = rdClusters(items);
+  const typed = all.filter(it => it.src !== 'vorschlag').length;
+  if(!all.length) return '<div class="alert"><b>Noch keine Eingaben</b>Hier erscheinen die Fragen an Campi und die Raumsuchen der Testpersonen, sobald welche gespeichert sind. Filter oben prüfen (Zeitraum, Test/Pilot).</div>';
+  const themeCnt = countBy(items, it => it.theme), themeList = RD_THEMES.filter(t => themeCnt.get(t)).map(t => ({t, n: themeCnt.get(t)})).sort((a, b) => b.n - a.n);
+  const people = new Set(items.map(it => it.person)).size, ans = items.filter(it => it.answered !== null), open = ans.filter(it => !it.answered).length;
+  const langs = [...new Set(all.map(it => it.lang).filter(Boolean))].sort(), camps = [...new Set(all.map(it => it.campus).filter(Boolean))].sort();
+  const sel = (name, label, opts) => '<label class="rd-f"><span>' + label + '</span><select data-rd="' + name + '">' + opts.map(o => '<option value="' + esc(o[0]) + '"' + (String(R[name]) === o[0] ? ' selected' : '') + '>' + esc(o[1]) + '</option>').join('') + '</select></label>';
+  let h = '<div class="rd-filters">' +
+    '<label class="rd-f rd-q"><span>Suchen</span><input type="search" data-rd="q" value="' + esc(R.q || '') + '" placeholder="z. B. mensa, f02227, drucken"></label>' +
+    sel('quelle', 'Eingaben', [['alle', 'Getippt + Raumsuche'], ['getippt', 'Nur getippte Fragen'], ['suche', 'Nur Raumsuche'], ['vorschlag', 'Nur angetippte Vorschläge'], ['mitvorschlag', 'Alles inkl. Vorschläge']]) +
+    sel('thema', 'Thema', [['alle', 'Alle Themen']].concat(RD_THEMES.map(t => [t, t]))) +
+    sel('sprache', 'Sprache', [['alle', 'Alle']].concat(langs.map(l => [l, (LANG_NAME && LANG_NAME[l]) || l.toUpperCase()]))) +
+    sel('campus', 'Standort', [['alle', 'Alle']].concat(camps.map(c => [c, (CAMPUS_NAME && CAMPUS_NAME[c]) || c]))) +
+    sel('raster', 'Zeitraster', [['tag', 'Tage'], ['stunde', 'Stunden'], ['woche', 'Wochen']]) +
+    '<label class="check"><input type="checkbox" data-rd="offen"' + (R.offen ? ' checked' : '') + '>Nur unbeantwortete</label>' +
+    '<label class="check"><input type="checkbox" data-rd="ohneHallo"' + (R.ohneHallo ? ' checked' : '') + '>Ohne Begrüßung/Smalltalk</label>' +
+    (R.q || R.thema !== 'alle' || R.sprache !== 'alle' || R.campus !== 'alle' || R.offen || R.quelle !== 'alle' ? '<button class="btn-link" type="button" data-a="rd-reset">Filter zurücksetzen</button>' : '') +
+    '<span class="spacer"></span><button class="btn btn-2 btn-sm" type="button" data-a="rd-csv"' + (cl.length ? '' : ' disabled') + '>' + icon('down2') + 'CSV</button></div>';
+  h += '<div class="grid g4" style="margin-bottom:16px">' + tile('Eingaben', nf(items.length), typed !== items.length && R.quelle === 'alle' ? 'ohne angetippte Vorschläge' : 'im Filter') +
+    tile('Verschiedene Anliegen', nf(cl.length), items.length ? 'zusammengefasst aus ' + nf(new Set(items.map(it => it.text.toLowerCase())).size) + ' Schreibweisen' : '') +
+    tile('Personen', nf(people), items.length ? (items.length / Math.max(1, people)).toFixed(1).replace('.', ',') + ' Eingaben pro Person' : '') +
+    tile('Ohne Antwort', ans.length ? pct(open, ans.length) + ' %' : '–', ans.length ? open + ' von ' + ans.length + ' blieben offen' : 'keine Angabe') + '</div>';
+  if(!items.length) return h + '<div class="alert">Keine Eingaben für diese Filter.</div>';
+  /* themes (clickable) and time */
+  const maxT = themeList.length ? themeList[0].n : 1;
+  const themesHTML = '<div class="bars rd-themes">' + themeList.map(x => '<button type="button" class="bar-row rd-th' + (R.thema === x.t ? ' on' : '') + '" data-a="rd-thema" data-id="' + esc(x.t) + '" aria-pressed="' + (R.thema === x.t) + '" data-tip="' + esc(x.t + ': ' + x.n + ' Eingaben · ' + pct(x.n, items.length) + ' % · anklicken zum Filtern') + '">' +
+    '<span class="bl">' + esc(x.t) + '</span><span class="bt"><i style="width:' + (x.n / maxT * 100).toFixed(1) + '%"></i></span><span class="bv">' + nf(x.n) + '<small>' + pct(x.n, items.length) + ' %</small></span></button>').join('') + '</div>';
+  h += '<div class="grid g2" style="margin-bottom:16px">' + card('Was beschäftigt die Studierenden?', 'Themen nach Anzahl der Eingaben. Ein Klick filtert die ganze Seite auf ein Thema.', themesHTML) +
+    card('Wann wird gefragt?', 'Alle Eingaben im Filter nach Wochentag und Uhrzeit. Je dunkler, desto mehr.', rdHeat(items)) + '</div>';
+  const pts = rdSeries(items, R.raster);
+  const peaks = rdPeaks(items), byKey = new Map(cl.map(c => [c.key, c]));
+  h += card('Zeitverlauf', 'Eingaben pro ' + ({tag: 'Tag', stunde: 'Stunde (letzte 7 Tage)', woche: 'Woche'})[R.raster] + (R.thema !== 'alle' ? ' · Thema ' + R.thema : '') + '. Über einen Balken fahren zeigt das häufigste Thema.', rdColumns(pts, R.raster)) +
+    (peaks.length ? '<div style="height:16px"></div>' + card('Höhepunkte', 'Stunden mit mindestens doppelt so vielen Eingaben wie sonst üblich', '<ol class="rd-peaks">' + peaks.map(p => '<li><b>' + esc(rdTimeLabel(p.t, 'stunde', true)) + '</b><span>' + p.n + ' Eingaben · meist ' + esc(p.top[0]) + ' (' + p.top[1] + ')' + (byKey.get(p.topKey[0]) && p.topKey[1] > 1 ? ' · häufigstes Anliegen: „' + esc(byKey.get(p.topKey[0]).label) + '“ (' + p.topKey[1] + ')' : '') + '</span></li>').join('') + '</ol>') : '');
+  /* concerns */
+  const limit = R.alle ? cl.length : 25;
+  const rows = cl.slice(0, limit).map((c, i) => {
+    const tr = c.recent - c.before, trend = !c.recent && !c.before ? '' : tr > 0 ? '<span class="rd-up" title="Letzte 7 Tage: ' + c.recent + ', 7 Tage davor: ' + c.before + '">▲ ' + tr + '</span>' : tr < 0 ? '<span class="rd-down" title="Letzte 7 Tage: ' + c.recent + ', 7 Tage davor: ' + c.before + '">▼ ' + (-tr) + '</span>' : '<span class="muted" title="gleich viele wie in den 7 Tagen davor">=</span>';
+    const isOpen = R.open === c.key;
+    return '<tr class="rd-row' + (isOpen ? ' on' : '') + '"><td class="num">' + (i + 1) + '</td><td><button type="button" class="rd-name" data-a="rd-open" data-id="' + esc(c.key) + '" aria-expanded="' + isOpen + '">' + esc(c.label) + '</button>' +
+      (c.variants.length > 1 ? '<small class="rd-var">auch: ' + c.variants.slice(c.variants[0][0] === c.label ? 1 : 0, 4).filter(x => x[0] !== c.label).slice(0, 3).map(x => '„' + esc(x[0]) + '“').join(', ') + (c.variants.length > 4 ? ' und ' + (c.variants.length - 4) + ' weitere' : '') + '</small>' : '') + '</td>' +
+      '<td><span class="pill">' + esc(c.theme) + '</span></td><td class="num"><b>' + c.n + '</b></td><td class="num">' + c.people + '</td>' +
+      '<td class="num">' + (c.answeredKnown ? (c.open ? '<span class="rd-open-n">' + pct(c.open, c.answeredKnown) + ' %</span>' : '0 %') : '–') + '</td><td class="num">' + trend + '</td><td>' + esc(dShort(c.last)) + '</td></tr>' +
+      (isOpen ? '<tr class="rd-detail"><td></td><td colspan="7"><ul>' + c.items.slice().sort((a, b) => b.t - a.t).slice(0, 60).map(it => '<li><span class="muted">' + esc(dt(new Date(it.t).toISOString())) + '</span> „' + esc(it.text) + '“ <small class="muted">' + ({getippt: it.srcRaw === 'start' ? 'Startseite' : 'Chat', suche: 'Raumsuche', vorschlag: 'Vorschlag'})[it.src] +
+        (it.lang ? ' · ' + it.lang.toUpperCase() : '') + (it.answered === false ? ' · <b class="rd-open-n">' + (it.src === 'suche' ? 'kein Treffer' : 'nicht beantwortet') + '</b>' : '') + '</small></li>').join('') + (c.items.length > 60 ? '<li class="muted">… und ' + (c.items.length - 60) + ' ältere</li>' : '') + '</ul></td></tr>' : '');
+  }).join('');
+  h += '<div style="height:16px"></div>' + card('Häufigste Anliegen', 'Gleiche Anliegen sind zusammengefasst (Schreibweise, Tippfehler, Reihenfolge, Raumnummern wie F02.227 = f02227 = f.2227). Klick auf ein Anliegen zeigt alle Eingaben dazu.',
+    '<div class="table-wrap"><table class="rd-table"><thead><tr><th class="num">#</th><th>Anliegen</th><th>Thema</th><th class="num">Anzahl</th><th class="num">Personen</th><th class="num" title="Anteil der Eingaben, auf die Campi keine Antwort hatte (Raumsuche: kein Treffer)">Ohne Antwort</th><th class="num" title="Letzte 7 Tage im Vergleich zu den 7 Tagen davor">Trend</th><th>Zuletzt</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+    (cl.length > 25 ? '<p style="margin-top:10px"><button class="btn-link" type="button" data-a="rd-all">' + (R.alle ? 'Nur die 25 häufigsten zeigen' : 'Alle ' + cl.length + ' Anliegen zeigen') + '</button></p>' : ''));
+  return h;
+}
+function radarClick(a, b){
+  const R = S.radar;
+  switch(a){
+    case 'rd-thema': R.thema = R.thema === b.dataset.id ? 'alle' : b.dataset.id; R.open = ''; render(); return true;
+    case 'rd-open': R.open = R.open === b.dataset.id ? '' : b.dataset.id; render(); return true;
+    case 'rd-all': R.alle = !R.alle; render(); return true;
+    case 'rd-reset': Object.assign(R, {q: '', quelle: 'alle', thema: 'alle', sprache: 'alle', campus: 'alle', offen: false, open: ''}); render(); return true;
+    case 'rd-csv': {
+      const v = view(), cl = rdClusters(rdFiltered(v));
+      const rows = cl.map((c, i) => ({rang: i + 1, anliegen: c.label, thema: c.theme, anzahl: c.n, personen: c.people, ohne_antwort: c.answeredKnown ? c.open : '', letzte_7_tage: c.recent, die_7_tage_davor: c.before,
+        zuletzt: new Date(c.last).toISOString(), schreibweisen: c.variants.map(x => x[0] + ' (' + x[1] + ')').join(' | ')}));
+      download('campi-fragen-radar-' + new Date().toISOString().slice(0, 10) + '.csv', csv(rows, ['rang', 'anliegen', 'thema', 'anzahl', 'personen', 'ohne_antwort', 'letzte_7_tage', 'die_7_tage_davor', 'zuletzt', 'schreibweisen']));
+      return true;
+    }
+  }
+  return false;
+}
+let RD_TYPING = null;
+function radarInput(el){
+  const k = el.dataset.rd; if(!k) return;
+  if(el.type === 'checkbox') S.radar[k] = el.checked;
+  else S.radar[k] = el.value;
+  S.radar.open = '';
+  if(k === 'q'){
+    clearTimeout(RD_TYPING);
+    RD_TYPING = setTimeout(() => { const pos = el.selectionStart; render(); const n = document.querySelector('[data-rd="q"]'); if(n){ n.focus(); try { n.setSelectionRange(pos, pos); } catch(x){} } }, 250);
+  } else render();
+}
+document.addEventListener('input', e => { if(e.target.dataset && e.target.dataset.rd === 'q') radarInput(e.target); });
+document.addEventListener('change', e => { if(e.target.dataset && e.target.dataset.rd && e.target.dataset.rd !== 'q') radarInput(e.target); });
+
+/* styles */
+(() => { const st = document.createElement('style'); st.textContent = `
+.muted{color:var(--muted)} th.num,td.num{text-align:right}
+.rd-filters{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin-bottom:16px;font-size:14px}
+.rd-f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink2);font-weight:600}
+.rd-f select,.rd-f input{font:inherit;font-size:14px;font-weight:400;color:var(--ink);background:var(--field);border:1px solid var(--border);border-radius:10px;padding:7px 10px;min-height:36px}
+.rd-q input{width:240px;max-width:70vw}
+.rd-filters .check{align-self:center;margin-top:16px}
+.rd-filters .spacer{flex:1}
+.rd-themes .rd-th{width:100%;background:none;border:0;padding:3px 4px;border-radius:8px;cursor:pointer;color:inherit;font:inherit;text-align:left}
+.rd-themes .rd-th:hover{background:var(--field)} .rd-themes .rd-th.on{background:var(--s1-soft)}
+.rd-themes .rd-th:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.rd-heat{display:grid;gap:3px;font-size:12px}
+.rd-hr{display:grid;grid-template-columns:28px repeat(8,minmax(0,1fr));gap:3px;align-items:center}
+.rd-hr > span:first-child{color:var(--ink2);font-weight:600}
+.rd-hr:first-child span{color:var(--muted);text-align:center;font-size:11px}
+.rd-cell{height:30px;border-radius:6px;display:grid;place-items:center;font-variant-numeric:tabular-nums;color:var(--ink2);
+  background:color-mix(in srgb, var(--s1) var(--l), var(--field))}
+.rd-cell.hi{color:#fff;font-weight:700}
+.rd-peaks{margin:0;padding-left:20px;display:grid;gap:8px;font-size:14px}
+.rd-peaks li span{display:block;color:var(--ink2);font-size:13px}
+.rd-table td{white-space:normal;vertical-align:top}
+.rd-name{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--ink);cursor:pointer;text-align:left}
+.rd-name:hover{text-decoration:underline} .rd-name:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
+.rd-var{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.rd-row.on td{background:var(--s1-soft)}
+.rd-detail ul{margin:0;padding-left:16px;display:grid;gap:4px;font-size:13px}
+.rd-up,.rd-down{color:var(--ink2);font-weight:700}
+.rd-open-n{color:var(--crit-ink)}
+@media (max-width:700px){.rd-q input{width:100%}.rd-filters .rd-q{flex:1 1 100%}}
+`; document.head.appendChild(st); })();
+
+/* RADAR_END */
 function render(){
   const app = $('app');
   const scrollY = window.scrollY;
@@ -2769,7 +3134,7 @@ function render(){
     return;
   }
   const v = view();
-  const tabs = [['uebersicht','Übersicht'],['pilot','Pilot'],['personen','Personen'],['aufgaben','Aufgaben'],['verhalten','Verhalten'],['fragebogen','Fragebogen'],['fragen','Fragen bearbeiten'],['orte','Orte'],['daten','Daten']];
+  const tabs = [['uebersicht','Übersicht'],['pilot','Pilot'],['personen','Personen'],['aufgaben','Aufgaben'],['verhalten','Verhalten'],['radar','Fragen-Radar'],['fragebogen','Fragebogen'],['fragen','Fragen bearbeiten'],['orte','Orte'],['daten','Daten']];
   const f = S.filter;
   const sel = (name, opts) => '<select name="' + name + '" aria-label="' + ({zeit:'Zeitraum', geraet:'Gerät', gruppe:'Gruppe', modus:'Art'})[name] + '">' + opts.map(o => '<option value="' + o[0] + '"' + (String(f[name]) === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select>';
   body += '<div class="tabs" role="tablist">' + tabs.map(t => '<button class="tab" role="tab" type="button" data-a="tab" data-t="' + t[0] + '" aria-selected="' + (S.tab === t[0]) + '">' + t[1] + '</button>').join('') + '</div>';
@@ -2787,6 +3152,7 @@ function render(){
   else if(S.tab === 'aufgaben') body += viewTasks(v);
   else if(S.tab === 'verhalten') body += viewBehavior(v);
   else if(S.tab === 'fragebogen') body += viewSurvey(v);
+  else if(S.tab === 'radar') body += viewRadar(v);
   else if(S.tab === 'fragen') body += viewQuestions();
   else if(S.tab === 'daten') body += viewData(v);
   else if(S.tab === 'pilot') body += viewPilot();
@@ -2920,6 +3286,7 @@ document.addEventListener('click', e => {
   const a = b.dataset.a, id = b.dataset.id;
   if(a !== 'q-del' && a !== 's-del' && a !== 'iv-del' && S.armed){ S.armed = ''; }
   if(extClick(a, b)) return;
+  if(radarClick(a, b)) return;
   switch(a){
     case 'tab': S.tab = b.dataset.t; S.notice = ''; S.error = ''; saveUI(); render(); window.scrollTo(0, 0); break;
     case 'reload': S.notice = ''; loadData(); break;
